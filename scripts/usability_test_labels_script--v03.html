@@ -1,0 +1,363 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Usability test script: Labels admin (v03)</title>
+
+<!-- Primitive tier: the Monitoring Design System's own tokens, read from the repository's _ds/ folder. -->
+<link rel="stylesheet" href="../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/fonts.css">
+<link rel="stylesheet" href="../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/colors.css">
+<link rel="stylesheet" href="../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/typography.css">
+<link rel="stylesheet" href="../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/spacing.css">
+
+<style>
+/* ------------------------------------------------------------------------------------------------
+   Semantic tier: what each DS token means in a script read aloud, in a call, under time pressure.
+   ------------------------------------------------------------------------------------------------ */
+:root {
+  --doc-ground: var(--background-default);
+  --doc-paper: var(--background-paper);
+  --doc-ink: var(--text-primary);
+  --doc-ink-soft: var(--text-secondary);
+  --doc-rule: var(--bluegrey-100);
+  --doc-rule-soft: var(--divider);
+  --doc-accent: var(--color-primary-main);
+  --doc-accent-soft: var(--color-primary-light);
+  --doc-fill: var(--im-green-50);            /* a field to fill in, same ground as a search match in the prototype */
+  --doc-fill-edge: var(--im-green-600);
+  --doc-fill-ink: var(--im-green-900);
+
+  --doc-measure: 62ch;                        /* the line a facilitator can read aloud without losing the place */
+  --doc-rail: calc(var(--space-12) * 2);
+  --doc-side: calc(var(--space-12) * 4);
+}
+
+/* ------------------------------------------------------------------------------------------------
+   Base
+   ------------------------------------------------------------------------------------------------ */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+body {
+  margin: 0; background: var(--doc-ground); color: var(--doc-ink);
+  font: var(--fw-regular) var(--fs-body1) / var(--lh-body) var(--font-body);
+}
+h1, h2, h3, p, ul, ol, dl, dd { margin: 0; padding: 0; }
+ul, ol { list-style: none; }
+a { color: inherit; }
+:focus-visible { outline: 2px solid var(--doc-accent); outline-offset: 2px; }
+
+/* ------------------------------------------------------------------------------------------------
+   Component tier, BEM
+   ------------------------------------------------------------------------------------------------ */
+
+/* the page: a head across the top, the run of show on the left, the script beside it */
+.doc { display: grid; gap: 0 var(--space-4); padding: var(--space-6) var(--space-3) var(--space-12); max-width: calc(var(--doc-rail) + var(--doc-measure) + var(--doc-side) + var(--space-8) + var(--space-12)); margin: 0 auto; }
+.doc__head { grid-column: 1 / -1; padding-bottom: var(--space-4); border-bottom: 1px solid var(--doc-ink); margin-bottom: var(--space-4); }
+.doc__kicker { font-size: var(--fs-caption); font-weight: var(--fw-medium); letter-spacing: .08em; text-transform: uppercase; color: var(--doc-accent); }
+.doc__title { font: var(--fw-regular) var(--fs-h4) / var(--lh-heading) var(--font-title); margin-top: var(--space-1); }
+.doc__meta { display: flex; flex-wrap: wrap; gap: var(--space-0-5) var(--space-3); margin-top: var(--space-1-5); font-size: var(--fs-body2); color: var(--doc-ink-soft); }
+
+/* what the marks in the script mean */
+.legend { display: flex; flex-wrap: wrap; gap: var(--space-1) var(--space-3); margin-top: var(--space-3); font-size: var(--fs-caption); color: var(--doc-ink-soft); }
+.legend__item { display: flex; align-items: center; gap: var(--space-1); }
+
+/* the run of show */
+.run { position: sticky; top: var(--space-3); align-self: start; padding-right: var(--space-3); border-right: 1px solid var(--doc-rule); }
+.run__title { font-size: var(--fs-caption); font-weight: var(--fw-medium); letter-spacing: .08em; text-transform: uppercase; color: var(--doc-ink-soft); }
+.run__sub { font-size: var(--fs-caption); color: var(--doc-ink-soft); margin-bottom: var(--space-2); }
+.run__list { display: flex; flex-direction: column; }
+.run__item + .run__item { border-top: 1px solid var(--doc-rule-soft); }
+.run__link { display: grid; grid-template-columns: var(--space-6) 1fr; column-gap: var(--space-1); padding: var(--space-1-5) 0; text-decoration: none; }
+.run__link:hover .run__what { text-decoration: underline; }
+.run__time { font: var(--fw-medium) var(--fs-h6) / var(--lh-heading) var(--font-title); font-variant-numeric: tabular-nums; color: var(--doc-accent); }
+.run__what { font-size: var(--fs-body2); }
+.run__len { grid-column: 2; font-size: var(--fs-caption); color: var(--doc-ink-soft); }
+.run__item--end .run__what { color: var(--doc-ink-soft); }
+
+/* a part of the session */
+.part { padding-bottom: var(--space-6); }
+.part + .part { border-top: 1px solid var(--doc-rule); padding-top: var(--space-4); }
+.part__head { display: flex; flex-wrap: wrap; align-items: baseline; gap: var(--space-0-5) var(--space-2); margin-bottom: var(--space-3); }
+.part__title { font: var(--fw-regular) var(--fs-h5) / var(--lh-heading) var(--font-title); }
+.part__time { font-size: var(--fs-caption); font-weight: var(--fw-medium); letter-spacing: .04em; text-transform: uppercase; color: var(--doc-accent); font-variant-numeric: tabular-nums; }
+.part__sub { font: var(--fw-medium) var(--fs-body1) / var(--lh-heading) var(--font-title); margin: var(--space-4) 0 var(--space-1-5); padding-bottom: var(--space-0-5); border-bottom: 1px solid var(--doc-rule-soft); }
+.part__sub:first-of-type { margin-top: 0; }
+
+/* a step: a line said aloud, asked, or done */
+.steps { display: flex; flex-direction: column; gap: var(--space-1-5); }
+.step { display: grid; grid-template-columns: var(--space-6) 1fr; column-gap: var(--space-1-5); align-items: baseline; max-width: var(--doc-measure); }
+.step__tag { font-size: var(--fs-caption); font-weight: var(--fw-medium); letter-spacing: .08em; text-transform: uppercase; color: var(--doc-ink-soft); }
+.step--say, .step--ask { padding-left: var(--space-1-5); border-left: 3px solid var(--doc-accent); margin-left: calc(var(--space-1-5) * -1); }
+.step--say .step__text, .step--ask .step__text { font-size: var(--fs-h6); line-height: var(--lh-body); }
+.step--say .step__tag, .step--ask .step__tag, .step__tag--accent { color: var(--doc-accent); }
+.step--ask { border-left-style: double; border-left-width: 6px; }
+.step--do .step__text { font-size: var(--fs-body1); color: var(--doc-ink); }
+.step--do .step__tag::before { content: ""; display: inline-block; width: var(--space-1); height: var(--space-1); border: 1px solid var(--doc-ink-soft); margin-right: var(--space-1); vertical-align: baseline; }
+.step--nested { margin-left: var(--space-6); }
+
+/* inline: the words to say inside an instruction, a field to fill in, a cue to act on */
+.aloud { font-weight: var(--fw-medium); quotes: "\201C" "\201D"; }
+.aloud::before { content: open-quote; }
+.aloud::after { content: close-quote; }
+.fill { background: var(--doc-fill); color: var(--doc-fill-ink); border-bottom: 2px solid var(--doc-fill-edge); border-radius: var(--radius) var(--radius) 0 0; padding: 0 var(--space-0-5); font-weight: var(--fw-medium); }
+.fill[contenteditable] { cursor: text; }
+.cue { display: inline-block; font-size: var(--fs-caption); font-weight: var(--fw-medium); letter-spacing: .04em; text-transform: uppercase; color: var(--doc-accent); border: 1px solid var(--doc-accent); padding: 0 var(--space-1); white-space: nowrap; vertical-align: middle; }
+
+/* the rules column: sticky, so it is in view however far down the script is; taller than the window, it scrolls by itself */
+.rules { position: sticky; top: var(--space-3); align-self: start; max-height: calc(100vh - var(--space-6)); overflow-y: auto; padding-left: var(--space-3); border-left: 1px solid var(--doc-rule); overscroll-behavior: contain; }
+.rules__title { font-size: var(--fs-caption); font-weight: var(--fw-medium); letter-spacing: .08em; text-transform: uppercase; color: var(--doc-ink-soft); }
+.rules .rules__title + .part__sub { margin-top: var(--space-1-5); }
+.rules .steps { gap: var(--space-1); }
+.rules .part__sub { font-size: var(--fs-body2); margin: var(--space-2) 0 var(--space-1); }
+.rules .step { grid-template-columns: var(--space-3) 1fr; column-gap: var(--space-1); }
+.rules .step__text { font-size: var(--fs-body2); line-height: 1.3; }
+.rules .step__tag { font-size: 0; }
+.rules .step__tag::before { margin-right: 0; }
+.rules .step--nested { margin-left: var(--space-2); }
+.rules .phrases { padding: var(--space-1) var(--space-1-5); margin: var(--space-1) 0; }
+.rules .phrases__list { gap: 0; margin-top: var(--space-0-5); }
+.rules .phrases__item { font-size: var(--fs-body2); line-height: 1.3; }
+
+/* the four tasks */
+.tasks { display: flex; flex-direction: column; margin: var(--space-2) 0 var(--space-3); border: 1px solid var(--doc-ink); background: var(--doc-paper); max-width: var(--doc-measure); }
+.task { padding: var(--space-2); }
+.task + .task { border-top: 1px solid var(--doc-rule); }
+.task__n { display: block; font: var(--fw-medium) var(--fs-caption) / 1 var(--font-title); letter-spacing: .08em; text-transform: uppercase; color: var(--doc-accent); margin-bottom: var(--space-1); }
+.task__say { font-size: var(--fs-h6); line-height: var(--lh-body); }
+.task__follow { margin-top: var(--space-1-5); padding-top: var(--space-1-5); border-top: 1px dashed var(--doc-rule); font-size: var(--fs-body2); color: var(--doc-ink); }
+.task__follow .step__tag { margin-right: var(--space-1); }
+
+/* the phrases that are safe to use during a task */
+.phrases { max-width: var(--doc-measure); margin: var(--space-1) 0 var(--space-2); border-left: 3px solid var(--doc-fill-edge); background: var(--doc-paper); padding: var(--space-1-5) var(--space-2); }
+.phrases__title { font-size: var(--fs-body2); font-weight: var(--fw-medium); }
+.phrases__list { display: flex; flex-direction: column; gap: var(--space-0-5); margin-top: var(--space-1); }
+.phrases__item { font-size: var(--fs-body1); }
+.phrases__item::before { content: "\2014"; color: var(--doc-ink-soft); margin-right: var(--space-1); }
+
+/* a numbered run of questions */
+.questions { display: flex; flex-direction: column; gap: var(--space-1); counter-reset: q; max-width: var(--doc-measure); margin: var(--space-1) 0 var(--space-2) var(--space-6); }
+.questions__item { counter-increment: q; display: grid; grid-template-columns: var(--space-3) 1fr; font-size: var(--fs-h6); }
+.questions__item::before { content: counter(q) "."; font-family: var(--font-title); font-weight: var(--fw-medium); color: var(--doc-accent); }
+
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
+
+/* ------------------------------------------------------------------------------------------------
+   Layout: the run of show sits beside the script only where there is room (the breakpoint is in rem
+   because a media query cannot read a custom property)
+   ------------------------------------------------------------------------------------------------ */
+@media (min-width: 60rem) {
+  .doc { grid-template-columns: var(--doc-rail) minmax(0, 1fr); }
+  .run { grid-column: 1; grid-row: 2 / span 2; }
+  .script { grid-column: 2; grid-row: 2; }
+  .rules { grid-column: 2; grid-row: 3; position: static; max-height: none; border-left: 0; padding-left: 0; border-top: 1px solid var(--doc-rule); padding-top: var(--space-3); margin-top: var(--space-3); }
+}
+@media (min-width: 80rem) {
+  .doc { grid-template-columns: var(--doc-rail) minmax(0, 1fr) var(--doc-side); }
+  .run { grid-row: 2; }
+  .rules { grid-column: 3; grid-row: 2; position: sticky; max-height: calc(100vh - var(--space-6)); border-top: 0; padding-top: 0; margin-top: 0; padding-left: var(--space-3); border-left: 1px solid var(--doc-rule); }
+}
+@media (max-width: 59.99rem) {
+  .run { position: static; border-right: 0; border-bottom: 1px solid var(--doc-rule); padding: 0 0 var(--space-3); margin-bottom: var(--space-4); }
+  .rules { position: static; max-height: none; border-left: 0; padding: var(--space-3) 0 0; margin-top: var(--space-3); border-top: 1px solid var(--doc-rule); }
+  .step--say, .step--ask { margin-left: 0; }
+}
+
+@media print {
+  body { background: var(--doc-paper); }
+  .doc { padding: 0; max-width: none; display: block; }
+  .run { position: static; border: 0; margin-bottom: var(--space-3); }
+  .rules { position: static; max-height: none; border: 0; padding: 0; margin-top: var(--space-4); }
+  .part, .task, .step { break-inside: avoid; }
+  .run__link { text-decoration: none; }
+}
+</style>
+</head>
+
+<body>
+<div class="doc">
+
+  <header class="doc__head">
+    <p class="doc__kicker">Facilitator script</p>
+    <h1 class="doc__title">Usability test: Labels admin</h1>
+    <p class="doc__meta"><span>Version 03</span><span>20 minutes</span><span>4 tasks</span><span>Facilitator only</span></p>
+
+    <dl class="legend" aria-label="How to read this script">
+      <div class="legend__item"><dt class="step__tag step__tag--accent">Say</dt><dd>read aloud, as written</dd></div>
+      <div class="legend__item"><dt class="step__tag step__tag--accent">Ask</dt><dd>a question to put to the participant</dd></div>
+      <div class="legend__item"><dt class="step__tag">Do</dt><dd>an action, not spoken</dd></div>
+      <div class="legend__item"><dt><mark class="fill">Fill</mark></dt><dd>to fill in or choose (click to edit)</dd></div>
+    </dl>
+  </header>
+
+  <!-- the run of show -->
+  <nav class="run" aria-label="Agenda">
+    <h2 class="run__title">Agenda</h2>
+    <p class="run__sub">facilitator only, 20 min</p>
+    <ol class="run__list">
+      <li class="run__item"><a class="run__link" href="#intro"><time class="run__time" datetime="PT0S">0:00</time> <span class="run__what">Intro and recording consent</span> <span class="run__len">(2:30)</span></a></li>
+      <li class="run__item"><a class="run__link" href="#open"><time class="run__time" datetime="PT2M30S">2:30</time> <span class="run__what">Share screen, open the link</span> <span class="run__len">(1:00)</span></a></li>
+      <li class="run__item"><a class="run__link" href="#impression"><time class="run__time" datetime="PT3M30S">3:30</time> <span class="run__what">First impression</span> <span class="run__len">(2:00 max)</span></a></li>
+      <li class="run__item"><a class="run__link" href="#tasks"><time class="run__time" datetime="PT5M30S">5:30</time> <span class="run__what">Tasks 1-4</span> <span class="run__len">(3:00 max each, including reading it out)</span></a></li>
+      <li class="run__item"><a class="run__link" href="#wrap"><time class="run__time" datetime="PT17M30S">17:30</time> <span class="run__what">Debrief questions, thanks, stop recording</span> <span class="run__len">(2:30)</span></a></li>
+      <li class="run__item run__item--end"><span class="run__link"><time class="run__time" datetime="PT20M">20:00</time> <span class="run__what">End</span></span></li>
+    </ol>
+  </nav>
+
+  <main class="script">
+
+    <!-- ===================================== 0:00 ===================================== -->
+    <section class="part" id="intro" aria-labelledby="intro-title">
+      <header class="part__head">
+        <h2 class="part__title" id="intro-title">The instructions</h2>
+        <span class="part__time">0:00 · 2:30</span>
+      </header>
+
+      <h3 class="part__sub">Set up</h3>
+      <ul class="steps">
+        <li class="step step--do"><span class="step__tag">Do</span><span class="step__text">Start in Teams</span></li>
+        <li class="step step--do"><span class="step__tag">Do</span><span class="step__text">Ask them to share their screen</span></li>
+      </ul>
+
+      <h3 class="part__sub">Welcome</h3>
+      <div class="steps">
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">Hi, <mark class="fill" contenteditable="true" spellcheck="false" role="textbox" aria-label="Participant name">[PARTICIPANT NAME]</mark>! My name is Vince and I’m going to be walking you through this session today.</span></p>
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">Before we begin, I have some information for you, and I’m going to read it to make sure that I cover everything.</span></p>
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">You probably have an idea of why we asked you here, but let me go over it again briefly. We’re asking people to try using a new feature of Influencer Monitor that we’re working on so we can see whether it works as intended. The session should take about 20 minutes.</span></p>
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">The first thing I want to make clear right away is that we’re testing a new feature, not you. You can’t do anything wrong here. In fact, this is probably the one place today where you don’t have to worry about making mistakes.</span></p>
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">As you use the feature, I’m going to ask you as much as possible to try to think out loud: to say what you’re looking at, what you’re trying to do, and what you’re thinking. This will be a big help to us.</span></p>
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">And don’t worry that you’re going to hurt our feelings. We’re doing this to improve our app, so we need to hear your honest reactions to things.</span></p>
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">If you have any questions as we go along, just ask them. I may not be able to answer them right away, since we’re interested in how people do when they don’t have someone sitting next to them to help. But if you still have any questions when we’re done I’ll try to answer them then. And if you need to take a break at any point, just let me know.</span></p>
+      </div>
+
+      <h3 class="part__sub">Recording consent</h3>
+      <div class="steps">
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">Before we go on, I need your OK on one thing. I’d like to record this call and your screen. That lets me give you my full attention instead of writing things down, and helps us catch every detail. We only use the recording to improve the product. We’ll also use an automatic tool to transcribe the call. The recording and the transcript are stored in a Google Drive folder for 6 months, and only the Influencer Monitor team can see them.</span></p>
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text"><mark class="fill" contenteditable="true" spellcheck="false" role="textbox" aria-label="Who else is on the call: choose one">[No one else is on this call. / A few colleagues are listening with their cameras off.]</mark></span></p>
+        <p class="step step--ask"><span class="step__tag">Ask</span><span class="step__text">You can stop at any time. Is it OK to record? <span class="cue">[if yes, start recording]</span></span></p>
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">Please say <q class="aloud">yes</q> so it’s on the recording.</span></p>
+      </div>
+
+      <h3 class="part__sub">Your role</h3>
+      <div class="steps">
+        <p class="step step--ask"><span class="step__tag">Ask</span><span class="step__text">Before we look at anything, one quick question: what’s your role?</span></p>
+      </div>
+
+      <h3 class="part__sub" id="open">Open the prototype <span class="part__time">2:30 · 1:00</span></h3>
+      <div class="steps">
+        <p class="step step--do"><span class="step__tag">Do</span><span class="step__text">Share the link in the chat and ask them to open it. They will see a welcome screen (a waiting room). Ask them to not click on it yet.</span></p>
+        <p class="step step--ask"><span class="step__tag">Ask</span><span class="step__text">Do you have any questions so far?</span></p>
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">On this welcome screen, whenever you’re ready, reveal the prototype by clicking on the <q class="aloud">Show prototype</q> button. Please, don’t navigate or access the interface yet!</span></p>
+      </div>
+    </section>
+
+    <!-- ===================================== 3:30 ===================================== -->
+    <section class="part" id="impression" aria-labelledby="impression-title">
+      <header class="part__head">
+        <h2 class="part__title" id="impression-title">Initial impression</h2>
+        <span class="part__time">3:30 · 2:00 max</span>
+      </header>
+      <div class="steps">
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">First, I’m going to ask you to look at this page and tell me what you make of it: what strikes you about it and what you think you can do here. Just look around and do a little narrative. You can scroll if you want to, but don’t click on anything yet.</span></p>
+        <p class="step step--do"><span class="step__tag">Do</span><span class="step__text">Allow this to continue for two minutes, at most.</span></p>
+      </div>
+    </section>
+
+    <!-- ===================================== 5:30 ===================================== -->
+    <section class="part" id="tasks" aria-labelledby="tasks-title">
+      <header class="part__head">
+        <h2 class="part__title" id="tasks-title">Tasks</h2>
+        <span class="part__time">5:30 · 3:00 max each</span>
+      </header>
+
+      <div class="steps">
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">Thanks. Now I’m going to ask you to try doing some specific tasks. I’ll read each task out loud and paste it in the chat so you can read it again.</span></p>
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">And again, as much as possible, it will help us if you can try to think out loud as you go along.</span></p>
+        <p class="step step--do"><span class="step__tag">Do</span><span class="step__text">Read each task out loud, then paste it in the Teams chat. Give the next one only when the current one is done.</span></p>
+      </div>
+
+      <ol class="tasks" aria-label="The four tasks">
+        <li class="task">
+          <span class="task__n">Task 1<span class="sr-only">:</span></span>
+          <p class="task__say">A colleague says the label <q class="aloud">Emirates</q> is on about a dozen posts. Check whether that’s right.</p>
+        </li>
+        <li class="task">
+          <span class="task__n">Task 2<span class="sr-only">:</span></span>
+          <p class="task__say">Your team wants to clean out labels nobody uses. Remove every label that isn’t on any post.</p>
+          <p class="task__follow"><span class="step__tag">Ask</span>If the participant left any label in (for example Gambling), ask once, after the task: <q class="aloud">You left <mark class="fill" contenteditable="true" spellcheck="false" role="textbox" aria-label="The label left in">[LABEL]</mark> in. Can you tell me about that?</q></p>
+        </li>
+        <li class="task">
+          <span class="task__n">Task 3<span class="sr-only">:</span></span>
+          <p class="task__say">Your team has two categories, <q class="aloud">Campaign</q> and <q class="aloud">Campaigns</q>, that mean the same thing. You want one category left, holding all their labels.</p>
+        </li>
+        <li class="task">
+          <span class="task__n">Task 4<span class="sr-only">:</span></span>
+          <p class="task__say">Your team has started tracking a new competitor, <q class="aloud">Reebok</q>. Add it alongside Puma and New Balance.</p>
+        </li>
+      </ol>
+
+      <h3 class="part__sub">After each task</h3>
+      <ul class="steps">
+        <li class="step step--ask"><span class="step__tag">Ask</span><span class="step__text">After each task, ask: <q class="aloud">Overall, how easy or difficult was that task, from 1 to 10? 1 = very difficult, 10 = very easy.</q> Write the number down.</span></li>
+      </ul>
+    </section>
+
+    <!-- ===================================== 17:30 ===================================== -->
+    <section class="part" id="wrap" aria-labelledby="wrap-title">
+      <header class="part__head">
+        <h2 class="part__title" id="wrap-title">Wrapping up</h2>
+        <span class="part__time">17:30 · 2:30</span>
+      </header>
+      <div class="steps">
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">Before we finish, three quick questions.</span></p>
+      </div>
+      <ol class="questions" aria-label="The three closing questions">
+        <li class="questions__item"><span>What was the most confusing part?</span></li>
+        <li class="questions__item"><span>Was there anything you expected to find that wasn’t there?</span></li>
+        <li class="questions__item"><span>If you could change one thing, what would it be?</span></li>
+      </ol>
+      <div class="steps">
+        <p class="step step--ask"><span class="step__tag">Ask</span><span class="step__text">If you had to explain this screen to a colleague, what would you say?</span></p>
+        <p class="step step--say"><span class="step__tag">Say</span><span class="step__text">Thank you, that helped us a lot! Do you have any questions for me, now that we’re done?</span></p>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- the rules for running the tasks: a column of its own, in view all through the session -->
+  <aside class="rules" aria-labelledby="rules-title">
+    <h2 class="rules__title" id="rules-title">Facilitation rules</h2>
+        <h3 class="part__sub">Time box and help</h3>
+        <ul class="steps">
+          <li class="step step--do"><span class="step__tag">Do</span><span class="step__text">Each task has 3 minutes. Do not help before then.</span></li>
+          <li class="step step--do"><span class="step__tag">Do</span><span class="step__text">If the participant asks for help, say: <q class="aloud">What would you do if I weren’t here?</q></span></li>
+          <li class="step step--do"><span class="step__tag">Do</span><span class="step__text">At 3:00, or if they say they’d give up, say: <q class="aloud">Thanks, that’s very helpful. Let’s go on to the next one.</q> Mark the task as <q class="aloud">not completed</q>.</span></li>
+        </ul>
+
+        <h3 class="part__sub">How to facilitate</h3>
+        <ul class="steps">
+          <li class="step step--do"><span class="step__tag">Do</span><span class="step__text">Your primary tools are open-ended questions and silence. Your role is to keep them talking about what they see and think in detail.</span></li>
+          <li class="step step--do step--nested"><span class="step__tag">Do</span><span class="step__text">Do not interrupt or fill a pause quickly; they are often formulating a key thought.</span></li>
+          <li class="step step--do step--nested"><span class="step__tag">Do</span><span class="step__text">Don’t say too much, but if there’s a long silence, you can ask ‘who’, ‘what’, ‘when’, ‘which’, ‘how.’</span></li>
+          <li class="step step--do step--nested"><span class="step__tag">Do</span><span class="step__text">Usually you don’t even have to finish your sentence to get them talking again.</span></li>
+        </ul>
+
+        <div class="phrases" role="group" aria-labelledby="phrases-title">
+          <p class="phrases__title" id="phrases-title">During a task, use these neutral phrases:</p>
+          <ul class="phrases__list">
+            <li class="phrases__item">What are you looking at?</li>
+            <li class="phrases__item">What are you thinking?</li>
+            <li class="phrases__item">You paused. What’s on your mind?</li>
+            <li class="phrases__item">What else did you notice?</li>
+            <li class="phrases__item">Can you say a bit more about that?</li>
+          </ul>
+        </div>
+
+        <ul class="steps">
+          <li class="step step--do"><span class="step__tag">Do</span><span class="step__text">Don’t confirm what they say by nodding or encouraging: ‘yes’, ‘indeed’. (This is hard for people that are good at active listening ;)</span></li>
+        </ul>
+  </aside>
+</div>
+</body>
+</html>
