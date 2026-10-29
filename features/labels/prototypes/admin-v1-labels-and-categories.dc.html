@@ -261,7 +261,7 @@ button{font:inherit}
     <button class="gnav__btn" onClick="{{chrome.onReset}}">Reset</button>
     <button class="gnav__btn" onClick="{{chrome.onHide}}">Hide</button>
     <span class="gnav__rule"></span>
-    <a class="gnav__link" href="v4-save-and-create-in-place.dc.html">[v4] Labels in a post &rsaquo;</a>
+    <a class="gnav__link" href="post-v4-save-and-create-in-place.dc.html">[v4] Labels in a post &rsaquo;</a>
   </div>
 </sc-if>
 <sc-if value="{{chrome.hidden}}" hint-placeholder-val="{{false}}">
@@ -2069,7 +2069,7 @@ class Component extends DCLogic {
         columns: this.columns([{ key: 'name', text: 'Post' }, { key: 'platform', text: 'Platform' }, { key: 'published', text: 'Published', firstDir: 'desc' }, { key: 'by', text: 'Label added by' }, { key: 'at', text: 'Added', firstDir: 'desc' }], sort),
         rows: pg.visible.map((p) => {
           const col = this.platformColors(p.platform);
-          const open = () => { if (p.inV4) location.href = 'v4-save-and-create-in-place.dc.html'; };
+          const open = () => { if (p.inV4) location.href = 'post-v4-save-and-create-in-place.dc.html'; };
           return {
             key: 'p' + p.id, selectable: false, checked: false, renaming: false, hasMenu: false, menuOpen: false, menuItems: [],
             onRowClick: (e) => { if (!e.target.closest('button, a')) open(); }, onOpen: open, openable: p.inV4,

@@ -26,13 +26,13 @@ Open `index.html` for the cover, or go straight to one:
 | --- | --- | --- |
 | **admin v2** | [`prototypes/admin-v2-labels-and-categories.dc.html`](prototypes/admin-v2-labels-and-categories.dc.html) | **New.** The admin after the first round of feedback; see [Admin v2 — what changed](#admin-v2--what-changed). |
 | **admin v1** | [`prototypes/admin-v1-labels-and-categories.dc.html`](prototypes/admin-v1-labels-and-categories.dc.html) | Managing the catalogue — categories and their labels — laid out like the product's Keyword Groups screen. Not part of the in-place vs modal question; see [The admin](#the-admin). |
-| **v4** | [`prototypes/v4-save-and-create-in-place.dc.html`](prototypes/v4-save-and-create-in-place.dc.html) | **Current — used in interviews.** v3's winning candidate — everything resolved in place on the page — on its own, with the ability to create new labels (and, via "Category / New label", new categories) restored to the same combobox that already adds existing ones. |
-| **v3** | [`prototypes/v3-save-flow-in-place-vs-modal.dc.html`](prototypes/v3-save-flow-in-place-vs-modal.dc.html) | The two candidates side by side. **A** resolves every action in place on the page, so the card itself is the editor; **B** resolves everything inside an "Edit labels" modal. Both share the same rules underneath — an explicit save step, visible authorship and timestamp on each label, and a switch to simulate someone else editing the same post — so a preference comes from the interaction model, not from a feature one has and the other lacks. |
-| **v2** | [`prototypes/v2-input-variants-a-h.dc.html`](prototypes/v2-input-variants-a-h.dc.html) | The exploration that narrowed the field: eight ways (a–h) of adding and managing labels, from fully inline to fully modal. v3 takes the two ends of that range and makes them comparable. |
-| **v1** | [`prototypes/v1-section-mockups.dc.html`](prototypes/v1-section-mockups.dc.html) | Where it started: static mockups of the labels section on its own, before any interaction was decided. |
+| **v4** | [`prototypes/post-v4-save-and-create-in-place.dc.html`](prototypes/post-v4-save-and-create-in-place.dc.html) | **Current — used in interviews.** v3's winning candidate — everything resolved in place on the page — on its own, with the ability to create new labels (and, via "Category / New label", new categories) restored to the same combobox that already adds existing ones. |
+| **v3** | [`prototypes/post-v3-save-flow-in-place-vs-modal.dc.html`](prototypes/post-v3-save-flow-in-place-vs-modal.dc.html) | The two candidates side by side. **A** resolves every action in place on the page, so the card itself is the editor; **B** resolves everything inside an "Edit labels" modal. Both share the same rules underneath — an explicit save step, visible authorship and timestamp on each label, and a switch to simulate someone else editing the same post — so a preference comes from the interaction model, not from a feature one has and the other lacks. |
+| **v2** | [`prototypes/post-v2-input-variants-a-h.dc.html`](prototypes/post-v2-input-variants-a-h.dc.html) | The exploration that narrowed the field: eight ways (a–h) of adding and managing labels, from fully inline to fully modal. v3 takes the two ends of that range and makes them comparable. |
+| **v1** | [`prototypes/post-v1-section-mockups.dc.html`](prototypes/post-v1-section-mockups.dc.html) | Where it started: static mockups of the labels section on its own, before any interaction was decided. |
 
 Two numbering schemes run side by side and mean different things. **v1/v2/v3/v4**
-number the prototypes in this repository, oldest to newest. **A/B** name the two
+number the prototypes in this repository (`post-v1` to `post-v4` on disk), oldest to newest. **A/B** name the two
 candidates *inside* v3. They were once called V1 and V2, which collided with the
 file numbering; v3's state keys in the source are still `'v1'` and `'v2'`, and
 the section comments name the letter each one maps to. v4 forks only v3's
@@ -162,7 +162,7 @@ round of feedback applied. The first admin is kept as it was, for comparison.
 
 ### A clean copy for sessions
 
-`testing/2026-10-01-labels-admin-testing.dc.html` is admin v2 with everything a
+`testing/2026-10-01-admin-v2/prototype.dc.html` is admin v2 with everything a
 participant should not see taken out: the dark facilitator bar and the `H` key
 that toggled it, the link to v4 and the post row that opened it, and the version
 in the page title. The data and the behaviour are the same. It is not linked
@@ -199,11 +199,15 @@ Szabo Viktor, Marissa Lewis (backstage); mr lee, Avtar Singh (kit).
 
 ```
 index.html      The cover for this feature
-prototypes/     v1–v4 and both admins
-testing/        The clean copy for sessions, and the usability test scripts
+prototypes/     The post section (post-v1 to post-v4) and the admin (admin-v1,
+                admin-v2)
+testing/        One folder per test round, named by date and what was tested
+  2026-10-01-admin-v2/
+                The clean copy of admin v2 and the facilitator script
 assets/         The Real Madrid post and admin v2's stock thumbnails
-reference/      Screenshots and a saved copy of the real staging page, and an
-                earlier build; not linked from the cover
+reference/      The real product: a staging screenshot and a saved copy of
+                the page
+archive/        Earlier builds, kept for reference; not linked from the cover
 ```
 
 The design system, the `.dc.html` runtime and the Influencer Monitor mark are

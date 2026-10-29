@@ -22,10 +22,12 @@ index.html                  The hub: one row per feature
 features/<feature>/         One folder per feature
   index.html                  Its cover
   README.md                   What it explores, what changed between versions
-  prototypes/                 The working pages, vN-short-name.dc.html
-  testing/                    Clean copies for sessions, test scripts
+  prototypes/                 The working pages, <surface>-vN-short-name.dc.html
+  testing/<date>-<what>/      One folder per test round: the session copy,
+                              the script and the round's findings
   assets/                     Images used by this feature only
   reference/                  Screenshots and captures of the real product
+  archive/                    Earlier builds no longer linked from the cover
 features/_template/         Starting point for a new feature
 _ds/monitoring-design-…/    The Monitoring Design System, shared by every feature
 shared/support.js           Runtime for the .dc.html pages
@@ -39,12 +41,17 @@ shared/assets/              Assets used by more than one feature (the IM mark)
 2. Fill in its `README.md` and the cover in its `index.html`.
 3. Put prototypes in `prototypes/`. A page there is three levels below the
    root, so it loads shared files as `../../../_ds/…` and
-   `../../../shared/support.js`.
+   `../../../shared/support.js`. A session copy in a test round is one level
+   deeper and uses `../../../../`.
 4. Add a row for the feature to the root `index.html` and to the table above.
 
 File names are kebab-case: no spaces, brackets or commas, so links need no
-URL encoding. Prototypes carry their version first (`v1-…`, `admin-v2-…`), and
-session copies carry the session date (`2026-10-01-…`).
+URL encoding. Prototypes name the surface they prototype, then the version
+(`post-v4-…`, `admin-v2-…`), so two surfaces of one feature never share a
+numbering. A test round's folder carries the session date and the prototype it
+tested (`2026-10-01-admin-v2/`); inside it the session copy is always
+`prototype.dc.html`, scripts are `script-vNN`, and `README.md` records the
+findings.
 
 ## Design system
 
