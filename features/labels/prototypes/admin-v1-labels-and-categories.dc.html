@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>[admin] Labels and categories</title>
-<script src="./support.js"></script>
+<script src="../../../shared/support.js"></script>
 </head>
 <body>
 <x-dc>
@@ -20,12 +20,12 @@
     <rect x="26" y="52" width="60" height="2" fill="#1C00B7" opacity="0.35"/>
   </svg>
 </template>
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/fonts.css">
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/colors.css">
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/typography.css">
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/spacing.css">
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/styles.css">
-<script src="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/_ds_bundle.js"></script>
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/fonts.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/colors.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/typography.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/spacing.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/styles.css">
+<script src="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/_ds_bundle.js"></script>
 <style>
 /* Tokens in three tiers. Primitive (--im-blue-700, --space-2 …) and semantic (--color-primary-main,
    --text-secondary, --divider …) come from the design system in _ds/. This page only adds the
@@ -261,7 +261,7 @@ button{font:inherit}
     <button class="gnav__btn" onClick="{{chrome.onReset}}">Reset</button>
     <button class="gnav__btn" onClick="{{chrome.onHide}}">Hide</button>
     <span class="gnav__rule"></span>
-    <a class="gnav__link" href="%5Bv4%5D%20Save%20and%20create%2C%20in%20place.dc.html">[v4] Labels in a post &rsaquo;</a>
+    <a class="gnav__link" href="v4-save-and-create-in-place.dc.html">[v4] Labels in a post &rsaquo;</a>
   </div>
 </sc-if>
 <sc-if value="{{chrome.hidden}}" hint-placeholder-val="{{false}}">
@@ -725,7 +725,7 @@ class Component extends DCLogic {
       'ad | partnership with the brand', 'weekend vibes', 'behind the scenes', 'the kit of the season'];
     const platforms = ['Instagram', 'TikTok', 'YouTube'];
     const posts = [{ id: 1975517, handle: 'realmadrid', platform: 'Instagram', publishedAt: new Date('2026-02-01T13:20:00'),
-      caption: 'hala madrid #realmadridrayo', img: 'assets/real-madrid-post.jpg', inV4: true }];
+      caption: 'hala madrid #realmadridrayo', img: '../assets/real-madrid-post.jpg', inV4: true }];
     const start = d('2025-03-10').getTime(), span = d('2026-09-15').getTime() - start;
     for (let i = 0; i < 47; i++) {
       posts.push({
@@ -2069,7 +2069,7 @@ class Component extends DCLogic {
         columns: this.columns([{ key: 'name', text: 'Post' }, { key: 'platform', text: 'Platform' }, { key: 'published', text: 'Published', firstDir: 'desc' }, { key: 'by', text: 'Label added by' }, { key: 'at', text: 'Added', firstDir: 'desc' }], sort),
         rows: pg.visible.map((p) => {
           const col = this.platformColors(p.platform);
-          const open = () => { if (p.inV4) location.href = '%5Bv4%5D%20Save%20and%20create%2C%20in%20place.dc.html'; };
+          const open = () => { if (p.inV4) location.href = 'v4-save-and-create-in-place.dc.html'; };
           return {
             key: 'p' + p.id, selectable: false, checked: false, renaming: false, hasMenu: false, menuOpen: false, menuItems: [],
             onRowClick: (e) => { if (!e.target.closest('button, a')) open(); }, onOpen: open, openable: p.inV4,

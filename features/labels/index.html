@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Labels in a post (exploring interactions)</title>
+<link rel="stylesheet" href="../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/fonts.css">
+<link rel="stylesheet" href="../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/colors.css">
+<link rel="stylesheet" href="../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/typography.css">
+<link rel="stylesheet" href="../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/spacing.css">
+<style>
+  /* E — MASTHEAD AND REGISTERS
+     Structure: a masthead closed by a heavy rule, then three edge-to-edge
+     horizontal registers that divide the remaining height between them.
+     The register, not a list row, is the unit. Forbidden: centring,
+     border-radius, box-shadow. */
+  *,*::before,*::after{box-sizing:border-box;border-radius:0}
+  html,body{margin:0}
+  body{background:var(--background-paper);color:var(--text-primary);
+    font:var(--fw-regular) var(--fs-body2)/1.5 var(--font-body);
+    min-height:100vh;display:grid;grid-template-rows:auto 1fr;text-align:left;overflow-x:hidden}
+
+  .masthead{padding:var(--space-5) var(--space-8) var(--space-3);
+    border-bottom:3px solid var(--text-primary);
+    display:grid;grid-template-columns:minmax(0,1fr) 34ch;gap:var(--space-8);align-items:end}
+  .up{display:inline-block;margin-bottom:var(--space-3);color:var(--text-secondary);text-decoration:none;
+    font-size:var(--fs-caption);font-weight:var(--fw-medium);letter-spacing:1px;text-transform:uppercase}
+  .up:hover{color:var(--color-primary-main)}
+  h1{font:var(--fw-light) clamp(44px,7.6vw,116px)/0.86 var(--font-title);
+    letter-spacing:-0.035em;margin:0}
+  h1 .paren{display:block;color:var(--text-secondary)}
+  .stand{margin:0 0 var(--space-1);color:var(--text-secondary);font-size:var(--fs-subtitle1);line-height:1.45}
+  .stand b{font-weight:var(--fw-medium);color:var(--text-primary)}
+
+  .registers{display:grid;grid-template-rows:repeat(5,minmax(0,1fr))}
+  .reg{display:grid;grid-template-columns:200px minmax(0,1fr) 64px;align-items:center;
+    padding:var(--space-3) var(--space-8);border-bottom:1px solid var(--divider);
+    text-decoration:none;color:inherit;transition:background 120ms linear}
+  .reg:last-child{border-bottom:0}
+  .num{font:var(--fw-light) clamp(44px,6.2vw,96px)/0.8 var(--font-title);
+    letter-spacing:-0.03em;color:var(--bluegrey-100)}
+  .name{font:var(--fw-regular) var(--fs-h4)/1.1 var(--font-title);letter-spacing:0.25px;
+    margin:0 0 var(--space-1);display:block}
+  .what{color:var(--text-secondary);max-width:62ch;display:block}
+  .flag{display:block;margin-top:var(--space-1);font-weight:var(--fw-medium);
+    letter-spacing:1px;text-transform:uppercase;font-size:var(--fs-caption);color:var(--color-primary-main)}
+  .arrow{font-size:var(--fs-h4);color:var(--bluegrey-200);justify-self:end;transition:transform 120ms linear}
+
+  .reg:hover{background:var(--color-primary-main);color:#fff}
+  .reg:hover .num{color:rgba(255,255,255,.32)}
+  .reg:hover .what{color:rgba(255,255,255,.78)}
+  .reg:hover .flag{color:var(--im-green-300)}
+  .reg:hover .arrow{color:#fff;transform:translateX(10px)}
+
+  @media (max-width:900px){
+    .masthead{grid-template-columns:minmax(0,1fr);gap:var(--space-3);
+      padding:var(--space-4) var(--space-4) var(--space-3)}
+    .stand{margin:0;max-width:60ch}
+    .registers{grid-template-rows:none}
+    .reg{grid-template-columns:2.6em minmax(0,1fr) 32px;gap:var(--space-3);
+      padding:var(--space-3) var(--space-4);align-items:start}
+    .name{font-size:var(--fs-h5)}
+    .arrow{font-size:var(--fs-h5)}
+  }
+  @media (max-width:560px){
+    .reg{grid-template-columns:minmax(0,1fr) 24px;gap:var(--space-2)}
+    .num{grid-column:1 / -1;line-height:1}
+    .name{font-size:var(--fs-h6)}
+    .what{font-size:var(--fs-caption)}
+  }
+</style>
+</head>
+<body>
+  <header class="masthead">
+    <div>
+      <a class="up" href="../../index.html">&larr; Influencer Monitor design lab</a>
+      <h1>Labels in a post <span class="paren">(exploring interactions)</span></h1>
+    </div>
+    <p class="stand">Four prototypes of the labels section on an evaluation post, made to answer one question: is it better to resolve label changes in place on the page, or inside a modal? Plus the admin where the label catalogue itself is managed. <b>Each is a working page, not a mockup.</b></p>
+  </header>
+
+  <nav class="registers">
+    <a class="reg" href="prototypes/admin-v2-labels-and-categories.dc.html">
+      <span class="num">adm v2</span>
+      <span><span class="name">Labels and categories, the admin &mdash; v2</span>
+        <span class="what">The admin after the first round of feedback: posts are listed like the Violations page, known by their picture rather than a caption, and categories are deleted one at a time.</span>
+        <span class="flag">New</span></span>
+      <span class="arrow">&rarr;</span>
+    </a>
+    <a class="reg" href="prototypes/admin-v1-labels-and-categories.dc.html">
+      <span class="num">adm v1</span>
+      <span><span class="name">Labels and categories, the admin &mdash; v1</span>
+        <span class="what">Where the catalogue is managed, laid out like Keyword Groups: search, create in bulk, rename, move, duplicate, merge, delete and export &mdash; with every change showing which posts it touches before it happens.</span></span>
+      <span class="arrow">&rarr;</span>
+    </a>
+    <a class="reg" href="prototypes/v4-save-and-create-in-place.dc.html">
+      <span class="num">v4</span>
+      <span><span class="name">Save and create, in place</span>
+        <span class="what">v3&rsquo;s winning candidate on its own, with the ability to create new labels &mdash; and, via &ldquo;Category / New label&rdquo;, new categories &mdash; restored to the same in-place combobox.</span>
+        <span class="flag">Current &mdash; used in interviews</span></span>
+      <span class="arrow">&rarr;</span>
+    </a>
+    <a class="reg" href="prototypes/v3-save-flow-in-place-vs-modal.dc.html">
+      <span class="num">v3</span>
+      <span><span class="name">Save flow &mdash; in place vs modal</span>
+        <span class="what">The two candidates side by side. A resolves every action on the page; B resolves everything inside an &ldquo;Edit labels&rdquo; modal. Same rules underneath, so a preference comes from the model, not the feature set.</span></span>
+      <span class="arrow">&rarr;</span>
+    </a>
+    <a class="reg" href="prototypes/v2-input-variants-a-h.dc.html">
+      <span class="num">v2</span>
+      <span><span class="name">Input variants a&ndash;h</span>
+        <span class="what">The exploration that narrowed the field: eight ways of adding and managing labels, from fully inline to fully modal.</span></span>
+      <span class="arrow">&rarr;</span>
+    </a>
+    <a class="reg" href="prototypes/v1-section-mockups.dc.html">
+      <span class="num">v1</span>
+      <span><span class="name">Section mockups</span>
+        <span class="what">Where it started: static mockups of the labels section on its own, before any interaction was decided.</span></span>
+      <span class="arrow">&rarr;</span>
+    </a>
+  </nav>
+</body>
+</html>

@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Labels</title>
-<script src="./support.js"></script>
+<script src="../../../shared/support.js"></script>
 </head>
 <body>
 <x-dc>
@@ -20,12 +20,12 @@
     <rect x="26" y="52" width="60" height="2" fill="#1C00B7" opacity="0.35"/>
   </svg>
 </template>
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/fonts.css">
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/colors.css">
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/typography.css">
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/spacing.css">
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/styles.css">
-<script src="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/_ds_bundle.js"></script>
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/fonts.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/colors.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/typography.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/spacing.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/styles.css">
+<script src="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/_ds_bundle.js"></script>
 <style>
 /* Tokens in three tiers. Primitive (--im-blue-700, --space-2 …) and semantic (--color-primary-main,
    --text-secondary, --divider …) come from the design system in _ds/. This page only adds the
@@ -308,7 +308,7 @@ button.grid__preview{cursor:pointer}
 
 <sc-if value="{{!welcome.started}}" hint-placeholder-val="{{true}}">
   <main class="welcome">
-    <img class="welcome__logo" src="assets/im-logo.svg" alt="Influencer Monitor">
+    <img class="welcome__logo" src="../../../shared/assets/im-logo.svg" alt="Influencer Monitor">
     <h1 class="welcome__title">Hello! Welcome to an Influencer Monitor session!</h1>
     <p class="welcome__text">Thank you for joining us.<br>There is nothing to do yet: please listen to the instructions first. When we ask you to, click “Show prototype”.</p>
     <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Button" variant="contained" color="primary" onClick="{{welcome.onStart}}" hint-size="auto,42px">Show prototype</x-import>
@@ -318,7 +318,7 @@ button.grid__preview{cursor:pointer}
 <div class="app {{welcome.appMod}}">
   <!-- static stand-in for the product's navigation rail; only "Labels" is live -->
   <nav class="rail" aria-label="Product">
-    <img class="rail__mark" src="assets/im-logo.svg" alt="Influencer Monitor">
+    <img class="rail__mark" src="../../../shared/assets/im-logo.svg" alt="Influencer Monitor">
     <span class="rail__item" aria-label="Workspace dashboard">
       <svg class="rail__icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M11 2v20c-5.07-.5-9-4.79-9-10s3.93-9.5 9-10zm2.03 0v8.99H22c-.47-4.74-4.24-8.52-8.97-8.99zm0 11.01V22c4.74-.47 8.5-4.25 8.97-8.99h-8.97z"/></svg>
       <span class="rail__tip" role="tooltip">
@@ -862,7 +862,7 @@ class Component extends DCLogic {
     // generic stock photos, two per caption, so a thumbnail matches the text the post would carry
     const shots = this.postShots();
     const posts = [{ id: 1975517, handle: 'realmadrid', platform: 'Instagram', format: 'Post', publishedAt: new Date('2026-02-01T13:20:00'),
-      caption: 'hala madrid #realmadridrayo', img: 'assets/real-madrid-post.jpg' }];
+      caption: 'hala madrid #realmadridrayo', img: '../assets/real-madrid-post.jpg' }];
     const start = d('2025-03-10').getTime(), span = d('2026-09-15').getTime() - start;
     for (let i = 0; i < 47; i++) {
       const platform = platforms[i % 3];
@@ -874,7 +874,7 @@ class Component extends DCLogic {
         handle: handles[i % handles.length],
         platform, format: formats[platform][Math.floor(i / 3) % formats[platform].length],
         publishedAt, caption,
-        img: pics.length ? 'assets/posts/' + pics[i % pics.length] + '.jpg' : null,
+        img: pics.length ? '../assets/posts/' + pics[i % pics.length] + '.jpg' : null,
       });
     }
 

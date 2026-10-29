@@ -3,16 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Labels in a post (exploring interactions)</title>
+<title>Influencer Monitor design lab</title>
 <link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/fonts.css">
 <link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/colors.css">
 <link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/typography.css">
 <link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/spacing.css">
 <style>
-  /* E — MASTHEAD AND REGISTERS
-     Structure: a masthead closed by a heavy rule, then three edge-to-edge
-     horizontal registers that divide the remaining height between them.
-     The register, not a list row, is the unit. Forbidden: centring,
+  /* The hub follows the feature covers: a masthead closed by a heavy rule,
+     then one edge-to-edge register per feature. Forbidden: centring,
      border-radius, box-shadow. */
   *,*::before,*::after{box-sizing:border-box;border-radius:0}
   html,body{margin:0}
@@ -23,17 +21,17 @@
   .masthead{padding:var(--space-5) var(--space-8) var(--space-3);
     border-bottom:3px solid var(--text-primary);
     display:grid;grid-template-columns:minmax(0,1fr) 34ch;gap:var(--space-8);align-items:end}
+  .mark{display:block;width:auto;height:var(--space-6);margin-bottom:var(--space-3)}
   h1{font:var(--fw-light) clamp(44px,7.6vw,116px)/0.86 var(--font-title);
     letter-spacing:-0.035em;margin:0}
   h1 .paren{display:block;color:var(--text-secondary)}
   .stand{margin:0 0 var(--space-1);color:var(--text-secondary);font-size:var(--fs-subtitle1);line-height:1.45}
   .stand b{font-weight:var(--fw-medium);color:var(--text-primary)}
 
-  .registers{display:grid;grid-template-rows:repeat(5,minmax(0,1fr))}
+  .registers{display:grid;align-content:start}
   .reg{display:grid;grid-template-columns:200px minmax(0,1fr) 64px;align-items:center;
-    padding:var(--space-3) var(--space-8);border-bottom:1px solid var(--divider);
+    padding:var(--space-4) var(--space-8);border-bottom:1px solid var(--divider);
     text-decoration:none;color:inherit;transition:background 120ms linear}
-  .reg:last-child{border-bottom:0}
   .num{font:var(--fw-light) clamp(44px,6.2vw,96px)/0.8 var(--font-title);
     letter-spacing:-0.03em;color:var(--bluegrey-100)}
   .name{font:var(--fw-regular) var(--fs-h4)/1.1 var(--font-title);letter-spacing:0.25px;
@@ -53,7 +51,6 @@
     .masthead{grid-template-columns:minmax(0,1fr);gap:var(--space-3);
       padding:var(--space-4) var(--space-4) var(--space-3)}
     .stand{margin:0;max-width:60ch}
-    .registers{grid-template-rows:none}
     .reg{grid-template-columns:2.6em minmax(0,1fr) 32px;gap:var(--space-3);
       padding:var(--space-3) var(--space-4);align-items:start}
     .name{font-size:var(--fs-h5)}
@@ -69,47 +66,19 @@
 </head>
 <body>
   <header class="masthead">
-    <h1>Labels in a post <span class="paren">(exploring interactions)</span></h1>
-    <p class="stand">Four prototypes of the labels section on an evaluation post, made to answer one question: is it better to resolve label changes in place on the page, or inside a modal? Plus the admin where the label catalogue itself is managed. <b>Each is a working page, not a mockup.</b></p>
+    <div>
+      <img class="mark" src="shared/assets/im-logo.svg" alt="">
+      <h1>Influencer Monitor <span class="paren">(design lab)</span></h1>
+    </div>
+    <p class="stand">Prototypes and usability test material, one feature at a time, all built on the Monitoring Design System. <b>Each prototype is a working page, not a mockup.</b></p>
   </header>
 
   <nav class="registers">
-    <a class="reg" href="%5Badmin%20v2%5D%20Labels%20and%20categories.dc.html">
-      <span class="num">adm v2</span>
-      <span><span class="name">Labels and categories, the admin &mdash; v2</span>
-        <span class="what">The admin after the first round of feedback: posts are listed like the Violations page, known by their picture rather than a caption, and categories are deleted one at a time.</span>
-        <span class="flag">New</span></span>
-      <span class="arrow">&rarr;</span>
-    </a>
-    <a class="reg" href="%5Badmin%5D%20Labels%20and%20categories.dc.html">
-      <span class="num">adm v1</span>
-      <span><span class="name">Labels and categories, the admin &mdash; v1</span>
-        <span class="what">Where the catalogue is managed, laid out like Keyword Groups: search, create in bulk, rename, move, duplicate, merge, delete and export &mdash; with every change showing which posts it touches before it happens.</span></span>
-      <span class="arrow">&rarr;</span>
-    </a>
-    <a class="reg" href="%5Bv4%5D%20Save%20and%20create%2C%20in%20place.dc.html">
-      <span class="num">v4</span>
-      <span><span class="name">Save and create, in place</span>
-        <span class="what">v3&rsquo;s winning candidate on its own, with the ability to create new labels &mdash; and, via &ldquo;Category / New label&rdquo;, new categories &mdash; restored to the same in-place combobox.</span>
-        <span class="flag">Current &mdash; used in interviews</span></span>
-      <span class="arrow">&rarr;</span>
-    </a>
-    <a class="reg" href="%5Bv3%5D%20Save%20flow%20-%20in%20place%20vs%20modal.dc.html">
-      <span class="num">v3</span>
-      <span><span class="name">Save flow &mdash; in place vs modal</span>
-        <span class="what">The two candidates side by side. A resolves every action on the page; B resolves everything inside an &ldquo;Edit labels&rdquo; modal. Same rules underneath, so a preference comes from the model, not the feature set.</span></span>
-      <span class="arrow">&rarr;</span>
-    </a>
-    <a class="reg" href="%5Bv2%5D%20Input%20variants%20a-h.dc.html">
-      <span class="num">v2</span>
-      <span><span class="name">Input variants a&ndash;h</span>
-        <span class="what">The exploration that narrowed the field: eight ways of adding and managing labels, from fully inline to fully modal.</span></span>
-      <span class="arrow">&rarr;</span>
-    </a>
-    <a class="reg" href="%5Bv1%5D%20Section%20mockups.dc.html">
-      <span class="num">v1</span>
-      <span><span class="name">Section mockups</span>
-        <span class="what">Where it started: static mockups of the labels section on its own, before any interaction was decided.</span></span>
+    <a class="reg" href="features/labels/index.html">
+      <span class="num">01</span>
+      <span><span class="name">Labels</span>
+        <span class="what">Labels on an evaluation post: whether changes resolve in place or inside a modal, and the admin where the label catalogue is managed. Four prototypes, two admins and a clean copy for sessions.</span>
+        <span class="flag">Tested 1 Oct 2026</span></span>
       <span class="arrow">&rarr;</span>
     </a>
   </nav>
