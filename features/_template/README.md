@@ -21,11 +21,13 @@ One section per version: what it changes and why.
 ## Testing
 
 Each test round gets its own folder in `testing/`, named by the session date and
-the prototype tested (`YYYY-MM-DD-surface-vN/`). Inside it:
+the prototype tested (`YYYY-MM-DD-surface-vN/`). Start one by copying
+`testing/yyyy-mm-dd-surface-vn/` from the template and renaming it. Inside it:
 
 - `prototype.dc.html`, a copy of the prototype with facilitator scaffolding and
   links out removed
-- `script-vNN.html`, the facilitator script, with no participant names
+- `script-v01.html`, the generic facilitator script; write this round's tasks
+  into it, and keep participant names out
 - `README.md`, what was tested and the findings
 
 Tag the commit each round ran on.

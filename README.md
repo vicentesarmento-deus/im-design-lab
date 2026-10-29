@@ -53,6 +53,20 @@ tested (`2026-10-01-admin-v2/`); inside it the session copy is always
 `prototype.dc.html`, scripts are `script-vNN`, and `README.md` records the
 findings.
 
+## Usability test scripts
+
+There is one generic facilitator script, without tasks:
+[`features/_template/testing/yyyy-mm-dd-surface-vn/script-v01.html`](features/_template/testing/yyyy-mm-dd-surface-vn/script-v01.html).
+It holds what every session shares: the introduction, recording consent, first
+impression, wrap-up questions and facilitation rules. Each test round keeps its
+own copy of it with that test's tasks written in, so a round's script always
+shows exactly what was read to its participants. To start a round, copy the
+template's round folder into the feature's `testing/` and fill in the tasks.
+
+Change the generic script when something should apply to every future test;
+change a round's copy only for that round. Participant names never go into
+either: the name field stays `[PARTICIPANT NAME]` and is filled in on screen.
+
 ## Design system
 
 Everything is built on the **Monitoring Design System** in `_ds/` — see its own

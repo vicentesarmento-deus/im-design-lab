@@ -20,6 +20,9 @@ The repository holds prototypes for several Influencer Monitor features. Read
   `features/<feature>/prototypes/` reaches them with `../../../`; a session
   copy in `features/<feature>/testing/<round>/` with `../../../../`.
 - Usability test material is grouped by round in `testing/<date>-<what>/`.
+  The generic script, without tasks, is in
+  `features/_template/testing/yyyy-mm-dd-surface-vn/`; each round has its own
+  copy with its tasks.
   Scripts there can carry participant names; keep names out of the published
   `.html` and out of commits.
 - File names are kebab-case. After moving or renaming a file, grep for every
