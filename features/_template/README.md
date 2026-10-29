@@ -2,6 +2,8 @@
 
 Prototypes for **feature name** in Influencer Monitor.
 
+**Owner:** `github-username`
+
 They exist to answer one question:
 
 > The question, in one sentence.
@@ -12,6 +14,7 @@ Open `index.html` for the cover, or go straight to one:
 
 | | | |
 | --- | --- | --- |
+| **v0** | [`prototypes/surface-v0-skeleton.dc.html`](prototypes/surface-v0-skeleton.dc.html) | The real product screen, rebuilt from the material in `reference/`, before any of this feature's behaviour. |
 | **v1** | [`prototypes/surface-v1-short-name.dc.html`](prototypes/surface-v1-short-name.dc.html) | What it tries. |
 
 ## What changed between versions

@@ -3,6 +3,8 @@
 Interaction prototypes for the labels section of an evaluation post in
 **Influencer Monitor**, a social-media influencer and brand monitoring product.
 
+**Owner:** `vicentesarmento-deus`
+
 They exist to answer one question:
 
 > Is it better to resolve label changes **in place on the page**, or **inside a

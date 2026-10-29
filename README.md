@@ -29,43 +29,36 @@ features/<feature>/         One folder per feature
   reference/                  Screenshots and captures of the real product
   archive/                    Earlier builds no longer linked from the cover
 features/_template/         Starting point for a new feature
+docs/                       Procedures: starting a feature, running a test round
 _ds/monitoring-design-…/    The Monitoring Design System, shared by every feature
 shared/support.js           Runtime for the .dc.html pages
 shared/assets/              Assets used by more than one feature (the IM mark)
 .nojekyll                   Stops a GitHub Pages build from excluding _ds/
 ```
 
-## Adding a feature
+## Working here
 
-1. Copy `features/_template/` to `features/<feature-name>/`, in kebab-case.
-2. Fill in its `README.md` and the cover in its `index.html`.
-3. Put prototypes in `prototypes/`. A page there is three levels below the
-   root, so it loads shared files as `../../../_ds/…` and
-   `../../../shared/support.js`. A session copy in a test round is one level
-   deeper and uses `../../../../`.
-4. Add a row for the feature to the root `index.html` and to the table above.
+Several people work in this repository, each with their own Claude. The rules
+everyone follows, and which changes go straight to `main` and which go through
+a pull request, are in [`CLAUDE.md`](CLAUDE.md). The procedures:
+
+- [Starting a feature](docs/new-feature.md), including how a screen the repo
+  has not built yet gets its skeleton from screenshots, saved HTML or Figma
+  frames of the real product.
+- [Running a usability test round](docs/test-round.md), from the session copy
+  and the generic script to tagging the round and recording findings.
 
 File names are kebab-case: no spaces, brackets or commas, so links need no
 URL encoding. Prototypes name the surface they prototype, then the version
 (`post-v4-…`, `admin-v2-…`), so two surfaces of one feature never share a
-numbering. A test round's folder carries the session date and the prototype it
+numbering; `v0` is reserved for a surface's skeleton (`admin-v0-skeleton`). A test round's folder carries the session date and the prototype it
 tested (`2026-10-01-admin-v2/`); inside it the session copy is always
 `prototype.dc.html`, scripts are `script-vNN`, and `README.md` records the
 findings.
 
-## Usability test scripts
-
-There is one generic facilitator script, without tasks:
-[`features/_template/testing/yyyy-mm-dd-surface-vn/script-v01.html`](features/_template/testing/yyyy-mm-dd-surface-vn/script-v01.html).
-It holds what every session shares: the introduction, recording consent, first
-impression, wrap-up questions and facilitation rules. Each test round keeps its
-own copy of it with that test's tasks written in, so a round's script always
-shows exactly what was read to its participants. To start a round, copy the
-template's round folder into the feature's `testing/` and fill in the tasks.
-
-Change the generic script when something should apply to every future test;
-change a round's copy only for that round. Participant names never go into
-either: the name field stays `[PARTICIPANT NAME]` and is filled in on screen.
+There is one generic facilitator script, without tasks, at
+[`features/_template/testing/yyyy-mm-dd-surface-vn/script-v01.html`](features/_template/testing/yyyy-mm-dd-surface-vn/script-v01.html);
+each round keeps its own copy with its tasks written in.
 
 ## Design system
 
