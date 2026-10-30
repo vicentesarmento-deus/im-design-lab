@@ -3,8 +3,8 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>[admin] Labels and categories</title>
-<script src="./support.js"></script>
+<title>[admin v2] Labels and categories</title>
+<script src="../../../shared/support.js"></script>
 </head>
 <body>
 <x-dc>
@@ -20,12 +20,12 @@
     <rect x="26" y="52" width="60" height="2" fill="#1C00B7" opacity="0.35"/>
   </svg>
 </template>
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/fonts.css">
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/colors.css">
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/typography.css">
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/spacing.css">
-<link rel="stylesheet" href="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/styles.css">
-<script src="_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/_ds_bundle.js"></script>
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/fonts.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/colors.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/typography.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/spacing.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/styles.css">
+<script src="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/_ds_bundle.js"></script>
 <style>
 /* Tokens in three tiers. Primitive (--im-blue-700, --space-2 …) and semantic (--color-primary-main,
    --text-secondary, --divider …) come from the design system in _ds/. This page only adds the
@@ -58,6 +58,13 @@
   --grid-row-hover: var(--action-hover);
   --grid-row-selected: var(--color-primary-selected);
   --grid-thumb: var(--space-5);
+  --grid-preview-w: var(--space-10);
+  --grid-preview-h: var(--space-6);
+  --grid-avatar: var(--space-3);
+  --grid-avatar-bg: var(--bluegrey-100);
+  --grid-avatar-fg: var(--bluegrey-700);
+  --dlg-thumb-w: var(--space-6);
+  --dlg-thumb-h: var(--space-4);
 
   --field-h: var(--space-4);
   --field-w: calc(var(--space-12) * 2);
@@ -178,6 +185,17 @@ button{font:inherit}
 .grid__thumb{flex-shrink:0;width:var(--grid-thumb);height:var(--grid-thumb);border-radius:var(--radius);overflow:hidden;
   display:flex;align-items:center;justify-content:center;font-weight:var(--fw-medium);font-size:var(--fs-body2);
   background-size:cover;background-position:center}
+/* a post is known by its picture, not a name: most posts have none */
+.grid__preview{all:unset;flex-shrink:0;display:flex;align-items:center;justify-content:center;width:var(--grid-preview-w);height:var(--grid-preview-h);
+  border-radius:var(--radius);overflow:hidden;background-size:cover;background-position:center;font-weight:var(--fw-medium);font-size:var(--fs-body2)}
+button.grid__preview{cursor:pointer}
+.grid__preview:focus-visible{outline:2px solid var(--color-primary-main);outline-offset:2px}
+.grid__head-text{display:inline-flex;align-items:center}
+.grid__creator{display:flex;align-items:center;gap:var(--space-1);min-width:0;font-size:var(--fs-body2)}
+.grid__creator-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* a creator posts on several platforms, so the avatar never takes a platform's colour */
+.grid__avatar{flex-shrink:0;width:var(--grid-avatar);height:var(--grid-avatar);border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:var(--fs-caption);font-weight:var(--fw-medium);background:var(--grid-avatar-bg);color:var(--grid-avatar-fg)}
 .grid__platform{display:inline-flex;align-items:center;height:var(--space-3);padding:0 var(--space-1);border-radius:var(--space-1-5);
   font-size:var(--fs-caption)}
 .grid__menu-btn{opacity:0}
@@ -219,7 +237,8 @@ button{font:inherit}
 .dlg-item{display:flex;align-items:center;gap:var(--space-1);padding:var(--space-1) var(--space-1-5);
   border-bottom:1px solid var(--grid-rule);font-size:var(--fs-body2)}
 .dlg-item:last-child{border-bottom:0}
-.dlg-item__name{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* the post's own line never gives way; the labels on the right shrink first */
+.dlg-item__name{flex:1 0 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .dlg-item__prefix{color:var(--text-secondary);margin-right:var(--space-0-5)}
 .dlg-item__meta{font-size:var(--fs-caption);color:var(--text-secondary);white-space:nowrap}
 .dlg-item__status{font-size:var(--fs-caption);text-align:right;max-width:55%}
@@ -228,10 +247,10 @@ button{font:inherit}
 .dlg-item__status--merge{color:var(--color-warning-main)}
 .dlg-item__status--error{color:var(--color-error-main)}
 .dlg-item__status--new{color:var(--color-primary-main)}
-.dlg-item__thumb{flex-shrink:0;width:var(--space-4);height:var(--space-4);border-radius:var(--radius);overflow:hidden;
+.dlg-item__thumb{flex-shrink:0;width:var(--dlg-thumb-w);height:var(--dlg-thumb-h);border-radius:var(--radius);overflow:hidden;
   display:flex;align-items:center;justify-content:center;font-size:var(--fs-caption);font-weight:var(--fw-medium);
   background-size:cover;background-position:center}
-.dlg-item__tags{font-size:var(--fs-caption);color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:50%}
+.dlg-item__tags{flex:0 1 auto;min-width:0;font-size:var(--fs-caption);color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .choice{display:flex;align-items:flex-start;gap:var(--space-0-5);cursor:pointer;font-size:var(--fs-body2);margin-left:calc(var(--space-1) * -1)}
 .choice--disabled{cursor:default;opacity:.5}
 .choice__text{display:flex;flex-direction:column;padding-top:var(--space-1)}
@@ -255,13 +274,13 @@ button{font:inherit}
 
 <sc-if value="{{!chrome.hidden}}" hint-placeholder-val="{{true}}">
   <div class="gnav">
-    <span class="gnav__title">[admin] Labels &amp; categories</span>
+    <span class="gnav__title">[admin v2] Labels &amp; categories</span>
     <span class="gnav__sub">Manage the label catalogue &mdash; search, create, edit, merge, delete, export</span>
     <span class="gnav__spacer"></span>
     <button class="gnav__btn" onClick="{{chrome.onReset}}">Reset</button>
     <button class="gnav__btn" onClick="{{chrome.onHide}}">Hide</button>
     <span class="gnav__rule"></span>
-    <a class="gnav__link" href="%5Bv4%5D%20Save%20and%20create%2C%20in%20place.dc.html">[v4] Labels in a post &rsaquo;</a>
+    <a class="gnav__link" href="post-v4-save-and-create-in-place.dc.html">[v4] Labels in a post &rsaquo;</a>
   </div>
 </sc-if>
 <sc-if value="{{chrome.hidden}}" hint-placeholder-val="{{false}}">
@@ -403,7 +422,10 @@ button{font:inherit}
           </sc-if>
           <sc-for list="{{grid.columns}}" as="col" hint-placeholder-count="5">
             <span class="grid__cell" role="columnheader" aria-sort="{{col.ariaSort}}">
-              <button class="grid__sort" onClick="{{col.onSort}}">{{col.text}}<sc-if value="{{col.sorted}}" hint-placeholder-val="{{false}}"><span class="grid__sort-icon"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="{{col.icon}}" size="14" hint-size="14px,14px"></x-import></span></sc-if></button>
+              <sc-if value="{{col.sortable}}" hint-placeholder-val="{{true}}">
+                <button class="grid__sort" onClick="{{col.onSort}}">{{col.text}}<sc-if value="{{col.sorted}}" hint-placeholder-val="{{false}}"><span class="grid__sort-icon"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="{{col.icon}}" size="14" hint-size="14px,14px"></x-import></span></sc-if></button>
+              </sc-if>
+              <sc-if value="{{!col.sortable}}" hint-placeholder-val="{{false}}"><span class="grid__head-text">{{col.text}}</span></sc-if>
             </span>
           </sc-for>
           <sc-if value="{{grid.hasMenu}}" hint-placeholder-val="{{true}}"><span class="grid__cell" role="columnheader"></span></sc-if>
@@ -427,7 +449,15 @@ button{font:inherit}
                   <span class="rename__help {{rename.helpMod}}">{{rename.help}}</span>
                 </span>
               </sc-if>
-              <sc-if value="{{!row.renaming}}" hint-placeholder-val="{{true}}">
+              <sc-if value="{{row.isPreview}}" hint-placeholder-val="{{false}}">
+                <sc-if value="{{row.openable}}" hint-placeholder-val="{{false}}">
+                  <button class="grid__preview" style="background-color:{{row.thumbBg}};background-image:{{row.thumbImg}};color:{{row.thumbFg}}" onClick="{{row.onOpen}}" aria-label="{{row.previewAria}}">{{row.thumbText}}</button>
+                </sc-if>
+                <sc-if value="{{!row.openable}}" hint-placeholder-val="{{true}}">
+                  <span class="grid__preview" style="background-color:{{row.thumbBg}};background-image:{{row.thumbImg}};color:{{row.thumbFg}}" role="img" aria-label="{{row.previewAria}}">{{row.thumbText}}</span>
+                </sc-if>
+              </sc-if>
+              <sc-if value="{{!row.renaming}}" hint-placeholder-val="{{true}}"><sc-if value="{{!row.isPreview}}" hint-placeholder-val="{{true}}">
                 <span class="grid__title">
                   <sc-if value="{{row.hasThumb}}" hint-placeholder-val="{{false}}">
                     <span class="grid__thumb" style="background-color:{{row.thumbBg}};background-image:{{row.thumbImg}};color:{{row.thumbFg}}" aria-hidden="true">{{row.thumbText}}</span>
@@ -442,13 +472,14 @@ button{font:inherit}
                     <sc-if value="{{row.hint}}" hint-placeholder-val="{{false}}"><span class="grid__hint">{{row.hint}}</span></sc-if>
                   </span>
                 </span>
-              </sc-if>
+              </sc-if></sc-if>
             </span>
 
             <sc-for list="{{row.cells}}" as="cell" hint-placeholder-count="4">
               <span class="grid__cell {{cell.mod}}" role="cell">
                 <sc-if value="{{cell.pill}}" hint-placeholder-val="{{false}}"><span class="grid__platform" style="background:{{cell.pillBg}};color:{{cell.pillFg}}">{{cell.text}}</span></sc-if>
-                <sc-if value="{{!cell.pill}}" hint-placeholder-val="{{true}}">{{cell.text}}</sc-if>
+                <sc-if value="{{cell.avatar}}" hint-placeholder-val="{{false}}"><span class="grid__creator"><span class="grid__avatar" aria-hidden="true">{{cell.avatar}}</span><span class="grid__creator-name">{{cell.text}}</span></span></sc-if>
+                <sc-if value="{{!cell.pill}}" hint-placeholder-val="{{true}}"><sc-if value="{{!cell.avatar}}" hint-placeholder-val="{{true}}">{{cell.text}}</sc-if></sc-if>
               </span>
             </sc-for>
 
@@ -598,7 +629,7 @@ button{font:inherit}
                   <div class="dlg-item">
                     <span class="dlg-item__thumb" style="background-color:{{p.thumbBg}};background-image:{{p.thumbImg}};color:{{p.thumbFg}}" aria-hidden="true">{{p.thumbText}}</span>
                     <span class="dlg-item__name">{{p.handle}}<span class="dlg-item__meta"> &middot; {{p.meta}}</span></span>
-                    <span class="dlg-item__tags">{{p.tags}}</span>
+                    <span class="dlg-item__tags" title="{{p.tags}}">{{p.tags}}</span>
                   </div>
                 </sc-for>
                 <sc-if value="{{sec.more}}" hint-placeholder-val="{{false}}"><div class="dlg__more">{{sec.more}}</div></sc-if>
@@ -724,17 +755,25 @@ class Component extends DCLogic {
       'unboxing the new boots', 'what a night at the Bernabéu', 'training day', 'my go-to after the gym',
       'ad | partnership with the brand', 'weekend vibes', 'behind the scenes', 'the kit of the season'];
     const platforms = ['Instagram', 'TikTok', 'YouTube'];
-    const posts = [{ id: 1975517, handle: 'realmadrid', platform: 'Instagram', publishedAt: new Date('2026-02-01T13:20:00'),
-      caption: 'hala madrid #realmadridrayo', img: 'assets/real-madrid-post.jpg', inV4: true }];
+    // what the product shows next to the platform: "Instagram Post" on the post page, "IG: Story" in lists
+    const formats = { Instagram: ['Post', 'Reel', 'Story'], TikTok: ['Video'], YouTube: ['Video', 'Short'] };
+    // generic stock photos, two per caption, so a thumbnail matches the text the post would carry
+    const shots = this.postShots();
+    const posts = [{ id: 1975517, handle: 'realmadrid', platform: 'Instagram', format: 'Post', publishedAt: new Date('2026-02-01T13:20:00'),
+      caption: 'hala madrid #realmadridrayo', img: '../assets/real-madrid-post.jpg', inV4: true }];
     const start = d('2025-03-10').getTime(), span = d('2026-09-15').getTime() - start;
     for (let i = 0; i < 47; i++) {
+      // same draw order as the first admin, so both prototypes hold the same posts on the same dates
+      const platform = platforms[i % 3];
+      const publishedAt = new Date(start + Math.floor(rnd() * span));
+      const caption = captions[Math.floor(rnd() * captions.length)];
+      const pics = shots[caption] || [];
       posts.push({
         id: 1975518 + i,
         handle: handles[i % handles.length],
-        platform: platforms[i % 3],
-        publishedAt: new Date(start + Math.floor(rnd() * span)),
-        caption: captions[Math.floor(rnd() * captions.length)],
-        img: null, inV4: false,
+        platform, format: formats[platform][Math.floor(i / 3) % formats[platform].length],
+        publishedAt, caption,
+        img: pics.length ? '../assets/posts/' + pics[i % pics.length] + '.jpg' : null, inV4: false,
       });
     }
 
@@ -783,7 +822,26 @@ class Component extends DCLogic {
   clean(s) { return (s || '').trim().replace(/\s+/g, ' '); }
   q(s) { return '‘' + s + '’'; }
   plural(n, one, many) { return n + ' ' + (n === 1 ? one : (many || one + 's')); }
+  joinAnd(list) { return list.length < 2 ? list.join('') : list.slice(0, -1).join(', ') + ' and ' + list[list.length - 1]; }
+
+  /** What the snackbar says after a creation: up to three labels by name, then a count; a category is named
+      when every new label went to the same one. */
+  createdMessage(plan) {
+    const made = plan.rows.filter((r) => r.create);
+    const names = made.map((r) => r.name);
+    const n = names.length;
+    const catOf = (r) => (r.catNew ? r.catName : r.catId != null ? this.catName(r.catId) : null);
+    const cats = made.map(catOf);
+    const shared = cats.length && cats[0] && cats.every((c) => c && this.norm(c) === this.norm(cats[0])) ? cats[0] : null;
+    const subject = n === 1 ? 'Label ' + names[0] + ' was' : n <= 3 ? 'Labels ' + this.joinAnd(names) + ' were' : n + ' labels were';
+    const where = shared ? ' to ' + (made.every((r) => r.catNew) ? 'the new category ' : '') + shared : '';
+    const created = !shared && plan.newCats.length ? ' ' + this.plural(plan.newCats.length, 'new category', 'new categories') + ' created.' : '';
+    return subject + ' added' + where + '.' + created;
+  }
   fmtDate(dt) { return dt ? dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; }
+  fmtDateTime(dt) { return dt ? this.fmtDate(dt) + ', ' + dt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '—'; }
+  /** "IG: Story" — how the product's post lists name a platform and format. */
+  postKind(p) { return ({ Instagram: 'IG', TikTok: 'TT', YouTube: 'YT' }[p.platform] || p.platform) + ': ' + p.format; }
   isoDate(dt) { return dt ? dt.toISOString().slice(0, 10) : ''; }
 
   label(id, data) { return (data || this.state.data).labels.find((l) => l.id === id); }
@@ -817,6 +875,24 @@ class Component extends DCLogic {
   categoryNamed(name, exceptIds, data) {
     const n = this.norm(name);
     return (data || this.state.data).categories.find((c) => this.norm(c.name) === n && !(exceptIds || []).includes(c.id));
+  }
+
+  /** Stock photos in assets/posts/ (Unsplash; credits in the README), by caption. A caption with none falls back to the handle's initial. */
+  postShots() {
+    return {
+      'matchday ready': ['matchday-1', 'matchday-2'],
+      'new drop, link in bio': ['drop-1', 'drop-2'],
+      'summer in the city': ['city-1', 'city-2'],
+      'giveaway time — tag a friend': ['giveaway-1', 'giveaway-2'],
+      'unboxing the new boots': ['boots-1'],
+      'what a night at the Bernabéu': ['night-1', 'night-2'],
+      'training day': ['training-1', 'training-2'],
+      'my go-to after the gym': ['gym-1', 'gym-2'],
+      'ad | partnership with the brand': ['ad-1', 'ad-2'],
+      'weekend vibes': ['weekend-1', 'weekend-2'],
+      'behind the scenes': ['backstage-1', 'backstage-2'],
+      'the kit of the season': ['kit-1', 'kit-2'],
+    };
   }
 
   platformColors(p) {
@@ -983,9 +1059,7 @@ class Component extends DCLogic {
   // ================= operations =================
 
   opCreate(plan) {
-    const nNew = plan.rows.filter((r) => r.create).length;
-    const nCats = plan.newCats.length;
-    const message = 'Added ' + this.plural(nNew, 'label') + (nCats ? ' and ' + this.plural(nCats, 'category', 'categories') : '');
+    const message = this.createdMessage(plan);
     this.commit(message, (D) => {
       const catIds = {};
       plan.newCats.forEach((name) => {
@@ -1002,7 +1076,7 @@ class Component extends DCLogic {
   }
 
   opCreateCategory(name, labelNames) {
-    const message = 'Added category ' + this.q(name) + (labelNames.length ? ' with ' + this.plural(labelNames.length, 'label') : '');
+    const message = 'Category ' + name + ' was created' + (labelNames.length ? ' with ' + this.plural(labelNames.length, 'label') : '') + '.';
     this.commit(message, (D) => {
       const id = this.newId(D);
       D.categories.push({ id, name, createdBy: 'You', createdAt: this.now(), editedAt: this.now() });
@@ -1198,7 +1272,7 @@ class Component extends DCLogic {
     const items = posts.slice(0, limit).map((p) => {
       const col = this.platformColors(p.platform);
       const tags = (this.idx().byPost.get(p.id) || []).filter((id) => tagIds.includes(id)).map((id) => this.label(id).name);
-      return { key: 'p' + p.id, handle: p.handle, meta: p.platform + ', ' + this.fmtDate(p.publishedAt),
+      return { key: 'p' + p.id, handle: p.handle, meta: this.postKind(p) + ', ' + this.fmtDate(p.publishedAt),
         thumbImg: p.img ? "url('" + p.img + "')" : 'none', thumbText: p.img ? '' : p.handle[0].toUpperCase(), thumbBg: col.bg, thumbFg: col.fg,
         tags: tags.length ? tags.join(' + ') : '' };
     });
@@ -1324,26 +1398,38 @@ class Component extends DCLogic {
     };
   }
 
+  /* ---------- add labels or a category, from the catalogue's home. The category is optional:
+     a label can start out loose and be sorted later, as it can when created on a post ---------- */
   dlgAddCategory(d) {
-    const name = this.clean(d.name);
-    const taken = name && this.categoryNamed(name);
+    const catName = this.clean(d.name);
+    const existing = catName ? this.categoryNamed(catName) : null;
+    const isNew = !!catName && !existing;
     const entries = this.stagedEntries(d, 'staged', 'input');
-    const seen = new Set();
-    const rows = entries.map((e, i) => {
-      const n = e.text;
-      const dup = seen.has(this.norm(n)); seen.add(this.norm(n));
-      return { key: 'l' + i, name: n, prefix: name ? name + ' /' : '', status: dup ? 'Repeated — skipped' : 'New label', statusMod: dup ? 'dlg-item__status--skip' : 'dlg-item__status--ok', create: !dup };
-    });
+    // a new category's labels go through the same planner as "Category / Label", so namesakes and repeats read the same
+    const lines = entries.map((e) => (isNew && !e.text.includes('/') ? catName + ' / ' + e.text : e.text));
+    const plan = this.planCreate(lines, existing ? existing.id : null);
+    if (isNew && !plan.newCats.some((n) => this.norm(n) === this.norm(catName))) plan.newCats.unshift(catName);
+    const n = plan.rows.filter((r) => r.create).length;
+    const nCats = plan.newCats.length;
+    const catHelper = !catName ? 'Leave it empty to add loose labels, without a category, and sort them later.'
+      : existing ? 'Adds to the existing category ' + this.q(existing.name) + '.'
+      : 'Creates the category ' + this.q(catName) + '.';
     const sections = [
-      this.field('Name', 'name', { error: !!taken, helper: taken ? 'There is already a category called ' + this.q(taken.name) + '.' : '' }),
-      this.stager(d, 'staged', 'input', { label: 'Labels (optional)', placeholder: 'e.g. Positive, Negative, Neutral',
-        helper: 'Separate labels with commas or new lines. You can also add labels later, or move existing ones in.' }),
+      this.field('Category (optional)', 'name', { helper: catHelper }),
+      this.stager(d, 'staged', 'input', {
+        label: catName ? 'Labels (optional)' : 'Labels', placeholder: 'e.g. Giveaway, Unboxing',
+        helper: 'Separate labels with commas or new lines — pasting a list works too.',
+      }),
     ];
-    if (rows.length) sections.push(this.sec('items', { heading: 'To add', listMod: 'dlg__list--follow', items: this.withRemove(rows, entries, 'staged', 'input') }));
+    if (plan.rows.length) sections.push(this.sec('items', { heading: 'To add', listMod: 'dlg__list--follow', items: this.withRemove(plan.rows, entries, 'staged', 'input') }));
+    const confirmText = !n && !nCats ? 'Add'
+      : !nCats ? 'Add ' + this.plural(n, 'label')
+      : !n ? 'Add category'
+      : 'Add ' + (nCats === 1 ? 'category' : this.plural(nCats, 'category', 'categories')) + ' + ' + this.plural(n, 'label');
     return {
-      title: 'Add category', width: 'sm', sections,
-      confirmText: 'Add category', confirmDisabled: !name || !!taken,
-      onConfirm: () => this.opCreateCategory(name, rows.filter((i) => i.create).map((i) => i.name)),
+      title: 'Add labels or a category', width: 'sm', sections,
+      confirmText, confirmDisabled: n === 0 && nCats === 0,
+      onConfirm: () => (n ? this.opCreate(plan) : this.opCreateCategory(catName, [])),
     };
   }
 
@@ -1583,27 +1669,29 @@ class Component extends DCLogic {
     };
   }
 
-  /* ---------- delete categories: ask what happens to their labels ---------- */
+  /* ---------- delete a category: ask what happens to its labels. One at a time, never in bulk ---------- */
   dlgDeleteCategories(d) {
-    const cats = d.ids.map((id) => this.category(id));
-    const labels = this.state.data.labels.filter((l) => d.ids.includes(l.categoryId));
+    const ids = d.ids.slice(0, 1);
+    const cats = ids.map((id) => this.category(id));
+    const name = this.q(cats[0].name);
+    const labels = this.state.data.labels.filter((l) => ids.includes(l.categoryId));
     const nPosts = this.postsOfMany(labels.map((l) => l.id)).length;
-    const others = this.state.data.categories.filter((c) => !d.ids.includes(c.id));
+    const others = this.state.data.categories.filter((c) => !ids.includes(c.id));
     const mode = labels.length ? (d.mode || 'keep') : 'none';
     const plan = { cats, mode, nLabels: labels.length, moves: [], destId: null, destName: '' };
-    const title = 'Delete ' + (cats.length === 1 ? this.q(cats[0].name) : this.plural(cats.length, 'category', 'categories'));
+    const title = 'Delete ' + name;
     const sections = [];
 
     if (!labels.length) {
-      sections.push(this.text((cats.length === 1 ? this.q(cats[0].name) + ' has' : 'These categories have') + ' no labels. Nothing else changes.'));
+      sections.push(this.text(name + ' has no labels. Nothing else changes.'));
     } else {
-      sections.push(this.text((cats.length === 1 ? this.q(cats[0].name) + ' holds ' : 'They hold ') + this.plural(labels.length, 'label') + ', on ' + this.plural(nPosts, 'post') + '. What should happen to them?'));
+      sections.push(this.text(name + ' holds ' + this.plural(labels.length, 'label') + ', on ' + this.plural(nPosts, 'post') + '. What should happen to them?'));
       sections.push(this.sec('radios', { label: 'What happens to the labels', name: 'del-cat', options: [
         { key: 'keep', text: 'Keep them, without a category', sub: 'They stay on their posts; the category name disappears from them.', checked: mode === 'keep', onPick: () => this.setDialog({ mode: 'keep' }), disabled: false, mod: '' },
         { key: 'move', text: 'Move them to another category', sub: others.length ? 'They stay on their posts under a different category.' : 'There is no other category to move them to.', checked: mode === 'move', onPick: () => this.setDialog({ mode: 'move' }), disabled: !others.length, mod: others.length ? '' : 'choice--disabled' },
         { key: 'delete', text: 'Delete the labels too', sub: nPosts ? 'Removes them from ' + this.plural(nPosts, 'post') + '.' : 'None of them is on a post.', checked: mode === 'delete', onPick: () => this.setDialog({ mode: 'delete' }), disabled: false, mod: '' },
       ] }));
-      if (mode === 'move') sections.push(this.sec('select', { label: 'Move to', value: d.dest || '', options: this.destOptions(false, d.ids).filter((o) => o.value !== 'none'), onChange: (v) => this.setDialog({ dest: v }), mod: 'dlg__indent' }));
+      if (mode === 'move') sections.push(this.sec('select', { label: 'Move to', value: d.dest || '', options: this.destOptions(false, ids).filter((o) => o.value !== 'none'), onChange: (v) => this.setDialog({ dest: v }), mod: 'dlg__indent' }));
       if (mode === 'keep' || (mode === 'move' && d.dest)) {
         plan.destId = mode === 'move' ? Number(d.dest.slice(2)) : null;
         plan.destName = this.catName(plan.destId);
@@ -1624,7 +1712,7 @@ class Component extends DCLogic {
     }
     return {
       title, width: 'sm', sections, confirmColor: 'error',
-      confirmText: 'Delete ' + this.plural(cats.length, 'category', 'categories'),
+      confirmText: 'Delete category',
       confirmDisabled: mode === 'move' && !d.dest,
       onConfirm: () => this.opDeleteCategories(plan),
     };
@@ -1825,7 +1913,7 @@ class Component extends DCLogic {
   columns(defs, sort) {
     return defs.map((c) => {
       const sorted = sort.key === c.key;
-      return { key: c.key, text: c.text, sorted, icon: sort.dir === 'asc' ? 'ArrowUpwardFilled' : 'ArrowDownwardFilled',
+      return { key: c.key, text: c.text, sortable: c.sortable !== false, sorted, icon: sort.dir === 'asc' ? 'ArrowUpwardFilled' : 'ArrowDownwardFilled',
         ariaSort: sorted ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none',
         onSort: () => this.setState((s) => {
           const cur = s.sort || sort;
@@ -1876,7 +1964,8 @@ class Component extends DCLogic {
     const links = data.links.filter((l) => l.labelId === labelId);
     let rows = links.map((l) => ({ ...data.posts.find((p) => p.id === l.postId), by: l.by, at: l.at, name: '' }));
     rows.forEach((r) => { r.name = r.handle; });
-    if (q) rows = rows.filter((p) => this.norm(p.handle).includes(q) || this.norm(p.caption).includes(q));
+    // search what the table shows: the caption is no longer on screen, so it no longer matches
+    if (q) rows = rows.filter((p) => this.norm(p.handle).includes(q) || this.norm(this.postKind(p)).includes(q));
     return rows;
   }
 
@@ -1954,7 +2043,7 @@ class Component extends DCLogic {
       const sel = s.sel.map((id) => this.category(id)).filter(Boolean);
       out.head = {
         ...exportHead, title: 'Labels', total: rows.length, showTotal: rows.length > 0, meta: '',
-        buttons: [{ key: 'add', text: 'Add category', variant: 'contained', color: 'primary', onClick: () => this.openDialog('addCategory', { name: '', staged: [], input: '' }) }],
+        buttons: [{ key: 'add', text: 'Add label or category', variant: 'contained', color: 'primary', onClick: () => this.openDialog('addCategory', { name: '', staged: [], input: '' }) }],
         tools: this.toolsFor('category', sel),
       };
       out.tabs = tabs;
@@ -2043,7 +2132,7 @@ class Component extends DCLogic {
       const l = this.label(r.id);
       if (!l) return null;
       const sort = s.sort || { key: 'at', dir: 'desc' };
-      const getters = { name: (p) => p.handle, platform: (p) => p.platform, published: (p) => p.publishedAt.getTime(), by: (p) => p.by, at: (p) => p.at.getTime() };
+      const getters = { creator: (p) => p.handle, published: (p) => p.publishedAt.getTime(), platform: (p) => this.postKind(p), by: (p) => p.by, at: (p) => p.at.getTime() };
       const rows = this.sortBy(this.postRows(l.id), sort, getters);
       const pg = this.page(rows);
       const n = this.postsOf(l.id).length;
@@ -2065,22 +2154,25 @@ class Component extends DCLogic {
       out.searchPlaceholder = 'Search posts';
       out.grid = {
         aria: 'Posts with this label', selectable: false, hasMenu: false,
-        cols: 'minmax(0,2.6fr) repeat(4,minmax(0,1fr))',
-        columns: this.columns([{ key: 'name', text: 'Post' }, { key: 'platform', text: 'Platform' }, { key: 'published', text: 'Published', firstDir: 'desc' }, { key: 'by', text: 'Label added by' }, { key: 'at', text: 'Added', firstDir: 'desc' }], sort),
+        // the first columns follow the product's Violations list: a post is known by its picture, then who posted it
+        cols: 'calc(var(--grid-preview-w) + var(--space-4)) minmax(0,1.6fr) minmax(0,1.3fr) minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr)',
+        columns: this.columns([{ key: 'preview', text: 'Preview', sortable: false }, { key: 'creator', text: 'Creator' }, { key: 'published', text: 'Posting time', firstDir: 'desc' }, { key: 'platform', text: 'Platform' }, { key: 'by', text: 'Label added by' }, { key: 'at', text: 'Added', firstDir: 'desc' }], sort),
         rows: pg.visible.map((p) => {
           const col = this.platformColors(p.platform);
-          const open = () => { if (p.inV4) location.href = '%5Bv4%5D%20Save%20and%20create%2C%20in%20place.dc.html'; };
+          const open = () => { if (p.inV4) location.href = 'post-v4-save-and-create-in-place.dc.html'; };
           return {
             key: 'p' + p.id, selectable: false, checked: false, renaming: false, hasMenu: false, menuOpen: false, menuItems: [],
             onRowClick: (e) => { if (!e.target.closest('button, a')) open(); }, onOpen: open, openable: p.inV4,
             mod: p.inV4 ? '' : 'grid__row--static',
-            name: p.handle, prefix: '', hint: p.caption + (p.inV4 ? ' — open it in the v4 prototype' : ''), nameMod: '',
+            name: p.handle, prefix: '', hint: '', nameMod: '',
+            isPreview: true, previewAria: (p.inV4 ? 'Open ' : '') + this.postKind(p) + ' by ' + p.handle + (p.inV4 ? ' in the v4 prototype' : ''),
             hasThumb: true, thumbImg: p.img ? "url('" + p.img + "')" : 'none', thumbText: p.img ? '' : p.handle[0].toUpperCase(), thumbBg: col.bg, thumbFg: col.fg,
             cells: [
-              { key: 'platform', text: p.platform, mod: '', pill: true, pillBg: col.bg, pillFg: col.fg },
-              { key: 'published', text: this.fmtDate(p.publishedAt), mod: '', pill: false },
-              { key: 'by', text: p.by, mod: '', pill: false },
-              { key: 'at', text: this.fmtDate(p.at), mod: '', pill: false },
+              { key: 'creator', text: p.handle, mod: '', pill: false, avatar: p.handle[0].toUpperCase() },
+              { key: 'published', text: this.fmtDateTime(p.publishedAt), mod: '', pill: false, avatar: '' },
+              { key: 'platform', text: this.postKind(p), mod: '', pill: true, pillBg: col.bg, pillFg: col.fg, avatar: '' },
+              { key: 'by', text: p.by, mod: '', pill: false, avatar: '' },
+              { key: 'at', text: this.fmtDate(p.at), mod: '', pill: false, avatar: '' },
             ],
           };
         }),
@@ -2094,7 +2186,7 @@ class Component extends DCLogic {
   emptyFor(kind, catId) {
     const E = {
       search: { icon: 'SearchFilled', title: 'No Results Found', text: 'Try adjusting your search to find what you\'re looking for.' },
-      noCats: { icon: 'FolderFilled', title: 'No categories yet', text: 'Categories group labels so everyone reads them in context.', actionText: 'Add category', onAction: () => this.openDialog('addCategory', { name: '', staged: [], input: '' }) },
+      noCats: { icon: 'FolderFilled', title: 'No categories yet', text: 'Categories group labels so everyone reads them in context.', actionText: 'Add label or category', onAction: () => this.openDialog('addCategory', { name: '', staged: [], input: '' }) },
       noLabels: { icon: 'FolderFilled', title: 'No labels yet', text: 'Add labels here, or create them straight from a post.', actionText: 'Add labels', onAction: () => this.openDialog('addLabels', { catId: null, staged: [], input: '' }) },
       emptyCat: { icon: 'FolderFilled', title: 'No labels in this category', text: 'Add labels to it, or move existing ones in from another category.', actionText: 'Add labels', onAction: () => this.openDialog('addLabels', { catId, staged: [], input: '' }) },
       noUnused: { icon: 'CheckCircleOutlined', title: 'Every label here is on a post', text: 'Turn off “0 posts only” to see them all.' },
@@ -2112,7 +2204,8 @@ class Component extends DCLogic {
       return [
         tool('merge', '', n < 2 ? 'Select two or more categories to merge' : 'Merge ' + n + ' categories', n < 2, () => this.openDialog('mergeCategories', { ids, choice: '', other: '' })),
         tool('rename', 'EditFilled', n !== 1 ? 'Select one category to rename' : 'Rename', n !== 1, () => this.startRename('category', ids[0], 'row')),
-        tool('delete', 'DeleteFilled', n ? 'Delete ' + this.plural(n, 'category', 'categories') : 'Select categories to delete', !n, () => this.openDialog('deleteCategories', { ids })),
+        // one at a time on purpose: deleting a category is heavy enough that a little friction helps
+        tool('delete', 'DeleteFilled', n === 0 ? 'Select a category to delete' : n === 1 ? 'Delete ' + this.q(sel[0].name) : 'Delete one category at a time', n !== 1, () => this.openDialog('deleteCategories', { ids })),
       ];
     }
     const ids = sel.map((l) => l.id);

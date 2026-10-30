@@ -1,2 +1,6 @@
 _bkp/
 .DS_Store
+
+# Test scripts and answer keys stay local; only the .html script is published
+features/*/testing/**/*.docx
+features/*/testing/**/script-*.md

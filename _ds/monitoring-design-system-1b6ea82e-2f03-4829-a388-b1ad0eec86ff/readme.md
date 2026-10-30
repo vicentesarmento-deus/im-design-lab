@@ -1,11 +1,11 @@
 # Monitoring Design System
 
-Design system for **Influence Monitor**, a social-media influencer/brand monitoring product. Built from Material UI's official Figma kit ("0. MUI for Figma v7.2.0 — Material UI — Standard") with Influence Monitor's own theme layered on top via the kit's Figma Variables — specifically the **palette mode "IM/Light"** and the **typography mode "IM/desktop"**. This is the only mode this design system implements; MUI's stock light/dark palettes and other typography modes in the source file are out of scope.
+Design system for **Influencer Monitor**, a social-media influencer/brand monitoring product. Built from Material UI's official Figma kit ("0. MUI for Figma v7.2.0 — Material UI — Standard") with Influencer Monitor's own theme layered on top via the kit's Figma Variables — specifically the **palette mode "IM/Light"** and the **typography mode "IM/desktop"**. This is the only mode this design system implements; MUI's stock light/dark palettes and other typography modes in the source file are out of scope.
 
 ## Sources
 - Figma file: "0. MUI for Figma v7.2.0 - Material UI - Standard.fig" (mounted read-only; not a shareable URL). Scope: 238 frames across component pages (Button, Checkbox, Table, Dialog, Navigation, Layout, MUI‑X Data Grid / Date-Time / Charts / Tree View, and example Screens).
 - Uploaded fonts: `uploads/Rubik-*.ttf` (14 weight/style files) — copied to `assets/fonts/`.
-- No product codebase or existing Influence Monitor screens were attached. The kit's "Screens" page (Log-in, Job-directory, User-management) is MUI's own generic documentation demo — not Influence Monitor product screens — so the UI kit in `ui_kits/influence-monitor/` is an original composition of Influence Monitor's information (mentions, creators, alerts, sentiment) using this design system's tokens and components, not a copy of an existing screen.
+- No product codebase or existing Influencer Monitor screens were attached. The kit's "Screens" page (Log-in, Job-directory, User-management) is MUI's own generic documentation demo — not Influencer Monitor product screens — so the UI kit in `ui_kits/influencer-monitor/` is an original composition of Influencer Monitor's information (mentions, creators, alerts, sentiment) using this design system's tokens and components, not a copy of an existing screen.
 
 ## Component coverage
 The Figma kit's "Component families" inventory (see its METADATA.md) lists **237 families** in the frames the user selected. This system implements **117 components** — every everyday Material primitive, the "advanced" form/navigation families, lightweight MUI‑X‑adjacent primitives (DataGrid + toolbar buttons, TreeView/TreeItem, a full Date/Time picker set — DateField/DatePicker/DateCalendar/TimePicker/TimeClock/DateRangeCalendar), and a chart set (BarChart/LineChart/PieChart/ScatterChart + axis labels) built as plain SVG/div rather than the full MUI‑X Charts engine.
@@ -21,7 +21,7 @@ None of the above were invented or approximated beyond what's stated. Ask if a s
 - **ProgressCircular** / **ProgressLinear** (aliased as `ProgressCircular`/`ProgressLinear`, MUI's real names) — renamed to align with the kit's "Progress | Circular" and "Progress | Linear" family names; the MUI alias ships alongside since that's the name most consumers will look for.
 
 ## Content fundamentals
-No product copy, marketing site, or writing-style guide was attached — Influence Monitor is a name only. Placeholder/sample copy in the UI kit (mention text, creator names, alert labels) is invented for demonstration and is plain, factual, and lower-case-led (sentence case, no exclamation points, no emoji) as a neutral default for a monitoring/analytics tool. Flag if there's an existing voice/tone guide to align to instead.
+No product copy, marketing site, or writing-style guide was attached — Influencer Monitor is a name only. Placeholder/sample copy in the UI kit (mention text, creator names, alert labels) is invented for demonstration and is plain, factual, and lower-case-led (sentence case, no exclamation points, no emoji) as a neutral default for a monitoring/analytics tool. Flag if there's an existing voice/tone guide to align to instead.
 
 ## Visual foundations
 - **Color**: Primary is **IM Blue** `#1C00B7` (`--im-blue-700`), a deep blue-violet — this is the palette's "IM/Light" primary, replacing MUI's default blue. Secondary is **IM Malachite** `#1BDE48` (`--im-green-500`), a saturated green. Both read as monitoring/status colors (a signal-blue + a health/positive green), reinforced by dedicated semantic error/warning/info/success colors and three social-platform accent pairs (Instagram, TikTok, YouTube) for platform tagging in chips/badges.
@@ -36,7 +36,7 @@ No product copy, marketing site, or writing-style guide was attached — Influen
 - **Borders vs shadows**: Paper/Card default to elevation (shadow, no border); an explicit `variant="outlined"` swaps to a 1px `--divider` border with no shadow — both patterns exist side-by-side in MUI and are preserved here.
 
 ## Iconography
-The kit ships Material Icons as individual Figma vector components (filled style, a few outlined). 110 of the most-used glyphs were extracted as real SVG path data into `assets/icons/icon-data.js` (materialized from the kit, not redrawn) and wrapped in a single `<Icon name="…" size={20}/>` component — see the Iconography card. Icons are single-color and paint with `currentColor`. No emoji or Unicode-glyph icons appear anywhere in the source. No logo/brand mark exists in the source file, so the Influence Monitor name always renders as type (see thumbnail and AppBar in the UI kit) — never invent one.
+The kit ships Material Icons as individual Figma vector components (filled style, a few outlined). 110 of the most-used glyphs were extracted as real SVG path data into `assets/icons/icon-data.js` (materialized from the kit, not redrawn) and wrapped in a single `<Icon name="…" size={20}/>` component — see the Iconography card. Icons are single-color and paint with `currentColor`. No emoji or Unicode-glyph icons appear anywhere in the source. No logo/brand mark exists in the source file, so the Influencer Monitor name always renders as type (see thumbnail and AppBar in the UI kit) — never invent one.
 
 ## Components
 Organized under `components/<group>/`:
@@ -49,19 +49,19 @@ Organized under `components/<group>/`:
 - **assets/icons/**: Icon (110 glyphs)
 
 ## UI kit
-`ui_kits/influence-monitor/` — Dashboard, Mentions feed, Creator profile, and Alerts/Settings screens for Influence Monitor, composed entirely from the components above.
+`ui_kits/influencer-monitor/` — Dashboard, Mentions feed, Creator profile, and Alerts/Settings screens for Influencer Monitor, composed entirely from the components above.
 
 ## Index
 - `styles.css` — root stylesheet, imports `tokens/fonts.css`, `tokens/colors.css`, `tokens/typography.css`, `tokens/spacing.css`
 - `tokens/` — colors, typography, spacing/shadows, `@font-face`
 - `assets/fonts/` — Rubik (14 files); `assets/icons/` — Icon component + data
 - `components/` — see above
-- `ui_kits/influence-monitor/` — product screens
+- `ui_kits/influencer-monitor/` — product screens
 - `SKILL.md` — Claude-Code-compatible skill wrapper
 
 ## Caveats
-- **Epilogue** (title font) has no uploaded binary — substituted from Google Fonts via `@import` in `tokens/fonts.css`. If Influence Monitor uses a specific Epilogue license/weight set, please attach the files and I'll swap the self-hosted `@font-face` in.
+- **Epilogue** (title font) has no uploaded binary — substituted from Google Fonts via `@import` in `tokens/fonts.css`. If Influencer Monitor uses a specific Epilogue license/weight set, please attach the files and I'll swap the self-hosted `@font-face` in.
 - 183 of 237 Figma component families are intentionally deferred (see "Component coverage" above) — ask to continue building any of them.
 - Button padding uses the simplified doubling rule (see Visual foundations) rather than the kit's literal per-variant padding values, per explicit instruction for this build.
 
-**Ask**: which deferred component families matter most for Influence Monitor's actual screens (Autocomplete + Slider + ToggleButton for filters? Drawer + Stepper for onboarding? Data Grid for the mentions table?) — tell me and I'll build those next, and I'm happy to iterate on the IM Blue/Malachite palette pairing or the Rubik/Epilogue type pairing if you'd like to see alternatives.
+**Ask**: which deferred component families matter most for Influencer Monitor's actual screens (Autocomplete + Slider + ToggleButton for filters? Drawer + Stepper for onboarding? Data Grid for the mentions table?) — tell me and I'll build those next, and I'm happy to iterate on the IM Blue/Malachite palette pairing or the Rubik/Epilogue type pairing if you'd like to see alternatives.
