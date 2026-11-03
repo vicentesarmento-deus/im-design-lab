@@ -156,6 +156,36 @@ button{font:inherit}
 .filter__label{color:var(--text-secondary)}
 .filter--on{border-color:var(--color-primary-main);background:var(--color-primary-selected);color:var(--color-primary-main)}
 .filter--on .filter__label{color:var(--color-primary-main)}
+.intro{grid-column:1 / -1;display:flex;align-items:flex-start;gap:var(--space-1-5);margin-bottom:var(--space-2);
+  padding:var(--space-1) var(--space-1) var(--space-1) var(--space-2);border-radius:var(--radius);
+  background:var(--color-primary-light);color:var(--color-primary-dark);font-size:var(--fs-body2);line-height:var(--lh-body)}
+.intro__icon{display:inline-flex;padding-top:var(--space-0-5);color:var(--color-primary-main)}
+.intro__body{flex:1;min-width:0;padding-top:var(--space-0-5)}
+.intro__list{margin:var(--space-1) 0 0;padding-left:var(--space-2-5, var(--space-2))}
+.intro__list b{font-weight:var(--fw-medium)}
+.intro__acts{display:flex;gap:var(--space-0-5);flex-shrink:0}
+
+.bulk{display:flex;align-items:center;flex-wrap:wrap;gap:var(--space-1);padding:var(--space-1) var(--space-2);
+  background:var(--color-primary-light);border-bottom:1px solid var(--grid-rule);border-radius:var(--radius) var(--radius) 0 0}
+.bulk--idle{background:var(--background-paper)}
+.bulk--idle .bulk__count{color:var(--text-secondary);font-weight:var(--fw-regular, 400)}
+.bulk{min-height:calc(var(--space-6) + var(--space-0-5))}
+.bulk__count{font-size:var(--fs-body2);font-weight:var(--fw-medium);color:var(--color-primary-main);margin-right:var(--space-1)}
+.bulk__acts{display:flex;flex-wrap:wrap;gap:var(--space-1)}
+.bulk__clear{margin-left:auto}
+
+.dest{max-height:var(--dlg-list-max);overflow:auto;border:1px solid var(--grid-rule);border-radius:var(--radius)}
+.dest__opt{all:unset;box-sizing:border-box;cursor:pointer;display:flex;flex-direction:column;gap:2px;width:100%;
+  padding:var(--space-1) var(--space-1-5);border-bottom:1px solid var(--grid-rule);font-size:var(--fs-body2)}
+.dest__opt:last-child{border-bottom:0}
+.dest__opt:hover{background:var(--action-hover)}
+.dest__opt:focus-visible{box-shadow:inset 0 0 0 2px var(--color-primary-main)}
+.dest__opt--on{background:var(--color-primary-selected)}
+.dest__opt--new .dest__name{color:var(--color-primary-main);font-weight:var(--fw-medium);display:inline-flex;align-items:center;gap:var(--space-0-5)}
+.dest__labels{font-size:var(--fs-caption);color:var(--text-secondary)}
+.dest__more{color:var(--color-primary-main);text-decoration:underline dotted;cursor:help}
+.dlg-item{flex-wrap:wrap}
+.dlg-item__acts{flex-basis:100%;display:flex;justify-content:flex-end;gap:var(--space-1)}
 .search__clear{all:unset;cursor:pointer;display:inline-flex;color:var(--action-active)}
 
 .merge-icon{width:calc(var(--space-2) + var(--space-0-5));height:calc(var(--space-2) + var(--space-0-5));fill:currentColor}
@@ -377,18 +407,6 @@ button.grid__preview{cursor:pointer}
           </sc-for>
         </div>
         <div class="head__toolbar">
-          <sc-for list="{{head.tools}}" as="t" hint-placeholder-count="2">
-            <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Tooltip" title="{{t.tip}}" hint-size="auto,auto">
-              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.IconButton" size="small" disabled="{{t.disabled}}" onClick="{{t.onClick}}" aria-label="{{t.aria}}" hint-size="32px,32px">
-                <sc-if value="{{t.isMerge}}" hint-placeholder-val="{{false}}">
-                  <svg class="merge-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 20.41L18.41 19 15 15.59 13.59 17 17 20.41zM7.5 8H11v5.59L5.59 19 7 20.41l6-6V8h3.5L12 3.5 7.5 8z"/></svg>
-                </sc-if>
-                <sc-if value="{{!t.isMerge}}" hint-placeholder-val="{{true}}">
-                  <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="{{t.icon}}" size="20" hint-size="20px,20px"></x-import>
-                </sc-if>
-              </x-import>
-            </x-import>
-          </sc-for>
           <sc-if value="{{head.posts.show}}" hint-placeholder-val="{{true}}">
             <span class="anchor">
               <button class="filter {{head.posts.mod}}" onClick="{{head.posts.onToggle}}" aria-haspopup="menu" aria-expanded="{{head.posts.open}}" aria-label="Filter by number of posts">
@@ -417,6 +435,24 @@ button.grid__preview{cursor:pointer}
         </div>
       </div>
 
+      <sc-if value="{{intro.show}}" hint-placeholder-val="{{false}}">
+        <div class="intro" role="note" aria-label="What labels are for">
+          <span class="intro__icon"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="InfoOutlined" size="20" hint-size="20px,20px"></x-import></span>
+          <div class="intro__body">
+            <span>Labels help you track brands across evaluations, assign posts to your team and group ads by product category.</span>
+            <sc-if value="{{intro.open}}" hint-placeholder-val="{{false}}">
+              <ul class="intro__list">
+                <sc-for list="{{intro.uses}}" as="u" hint-placeholder-count="3"><li><b>{{u.title}}</b> &mdash; {{u.text}}</li></sc-for>
+              </ul>
+            </sc-if>
+          </div>
+          <span class="intro__acts">
+            <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Button" variant="text" size="small" onClick="{{intro.onMore}}" hint-size="auto,32px">{{intro.moreText}}</x-import>
+            <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Button" variant="text" size="small" onClick="{{intro.onDismiss}}" hint-size="auto,32px">Got it</x-import>
+          </span>
+        </div>
+      </sc-if>
+
       <sc-if value="{{tabs.show}}" hint-placeholder-val="{{true}}">
         <div class="head__tabs">
           <div class="head__tablist" role="tablist">
@@ -433,6 +469,19 @@ button.grid__preview{cursor:pointer}
          template out of the live DOM, and the browser's parser would hoist the loop tags out of a
          real table before the runtime ever saw them. -->
     <section class="sheet">
+      <sc-if value="{{bulk.show}}" hint-placeholder-val="{{false}}">
+        <div class="bulk {{bulk.mod}}" role="toolbar" aria-label="Actions for the selected rows">
+          <span class="bulk__count">{{bulk.count}}</span>
+          <span class="bulk__acts">
+            <sc-for list="{{bulk.actions}}" as="t" hint-placeholder-count="4">
+              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Tooltip" title="{{t.tip}}" hint-size="auto,auto">
+                <span><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Button" variant="outlined" size="small" color="{{t.color}}" disabled="{{t.disabled}}" onClick="{{t.onClick}}" hint-size="auto,32px">{{t.text}}</x-import></span>
+              </x-import>
+            </sc-for>
+          </span>
+          <sc-if value="{{bulk.hasSel}}" hint-placeholder-val="{{false}}"><span class="bulk__clear"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Button" variant="text" size="small" onClick="{{bulk.onClear}}" hint-size="auto,32px">Clear selection</x-import></span></sc-if>
+        </div>
+      </sc-if>
       <div class="grid" role="table" aria-label="{{grid.aria}}" style="--grid-cols:{{grid.cols}}">
         <div class="grid__row grid__row--head" role="row">
           <sc-if value="{{grid.selectable}}" hint-placeholder-val="{{true}}">
@@ -605,6 +654,23 @@ button.grid__preview{cursor:pointer}
               <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Select" label="{{sec.label}}" value="{{sec.value}}" options="{{sec.options}}" onChange="{{sec.onChange}}" size="small" full-width="{{true}}" hint-size="auto,40px"></x-import>
             </div>
           </sc-if>
+          <sc-if value="{{sec.is.dest}}" hint-placeholder-val="{{false}}">
+            <div>
+              <div class="dlg__heading">{{sec.heading}}</div>
+              <div class="dest" role="listbox" aria-label="{{sec.heading}}">
+                <sc-for list="{{sec.options}}" as="o" hint-placeholder-count="4">
+                  <button class="dest__opt {{o.mod}}" role="option" aria-selected="{{o.selected}}" onClick="{{o.onPick}}">
+                    <span class="dest__name">
+                      <sc-if value="{{o.isNew}}" hint-placeholder-val="{{false}}"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="AddFilled" size="18" hint-size="18px,18px"></x-import></sc-if>{{o.name}}
+                    </span>
+                    <sc-if value="{{o.labels}}" hint-placeholder-val="{{false}}">
+                      <span class="dest__labels">{{o.labels}}<sc-if value="{{o.more}}" hint-placeholder-val="{{false}}"> <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Tooltip" title="{{o.moreList}}" hint-size="auto,auto"><span class="dest__more" tabindex="0" aria-label="{{o.moreAria}}">{{o.more}}</span></x-import></sc-if></span>
+                    </sc-if>
+                  </button>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
           <sc-if value="{{sec.is.radios}}" hint-placeholder-val="{{false}}">
             <div role="radiogroup" aria-label="{{sec.label}}">
               <sc-for list="{{sec.options}}" as="opt" hint-placeholder-count="3">
@@ -635,6 +701,13 @@ button.grid__preview{cursor:pointer}
                     <span class="dlg-item__status {{it.statusMod}}">{{it.status}}</span>
                     <sc-if value="{{it.removable}}" hint-placeholder-val="{{false}}">
                       <button class="dlg-item__remove" onClick="{{it.onRemove}}" aria-label="{{it.removeAria}}"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="CloseFilled" size="16" hint-size="16px,16px"></x-import></button>
+                    </sc-if>
+                    <sc-if value="{{it.hasActions}}" hint-placeholder-val="{{false}}">
+                      <span class="dlg-item__acts">
+                        <sc-for list="{{it.actions}}" as="a" hint-placeholder-count="2">
+                          <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Button" variant="{{a.variant}}" size="small" onClick="{{a.onClick}}" hint-size="auto,28px">{{a.text}}</x-import>
+                        </sc-for>
+                      </span>
                     </sc-if>
                   </div>
                 </sc-for>
@@ -688,8 +761,13 @@ class Component extends DCLogic {
       rename: null,         // { kind: 'label' | 'category', id, value, where: 'row' | 'head' }
       dialog: null,         // { type, ...form }
       chromeHidden: false,
+      introDismissed: this.introSeen(), introOpen: false,
     };
   }
+
+  /** The first-visit banner stays closed once dismissed, in this browser; Reset brings it back. */
+  introSeen() { try { return localStorage.getItem('im-labels-admin-v3-intro') === 'seen'; } catch (e) { return false; } }
+  dismissIntro() { try { localStorage.setItem('im-labels-admin-v3-intro', 'seen'); } catch (e) {} this.setState({ introDismissed: true }); }
 
   // ================= seed =================
   /* Seeded so every path is demoable in the first minute:
@@ -1079,7 +1157,9 @@ class Component extends DCLogic {
   // ================= operations =================
 
   opCreate(plan) {
-    const message = this.createdMessage(plan);
+    const nMade = plan.rows.filter((r) => r.create).length, moved = plan.rows.filter((r) => r.move);
+    const message = (nMade ? this.createdMessage(plan) + ' ' : '')
+      + (moved.length ? (moved.length === 1 ? 'Label ' + moved[0].name + ' was' : this.plural(moved.length, 'label') + ' were') + ' moved' + (nMade ? '' : ' to ' + (moved[0].catNew ? moved[0].catName : this.catName(moved[0].catId))) + '.' : '');
     this.commit(message, (D) => {
       const catIds = {};
       plan.newCats.forEach((name) => {
@@ -1090,6 +1170,14 @@ class Component extends DCLogic {
       plan.rows.filter((r) => r.create).forEach((r) => {
         const categoryId = r.catNew ? catIds[this.norm(r.catName)] : r.catId;
         D.labels.push({ id: this.newId(D), categoryId, name: r.name, createdBy: 'You', createdAt: this.now(), editedAt: this.now() });
+        this.touchCategory(D, categoryId);
+      });
+      plan.rows.filter((r) => r.move).forEach((r) => {
+        const categoryId = r.catNew ? catIds[this.norm(r.catName)] : r.catId;
+        const l = D.labels.find((x) => x.id === r.move);
+        if (!l) return;
+        this.touchCategory(D, l.categoryId);
+        l.categoryId = categoryId; l.editedAt = this.now();
         this.touchCategory(D, categoryId);
       });
     });
@@ -1362,7 +1450,8 @@ class Component extends DCLogic {
   }
 
   /* ---------- add labels: "Category / Label" puts one in a category ---------- */
-  planCreate(entries, ctxCat) {
+  planCreate(entries, ctxCat, resolve) {
+    resolve = resolve || {};
     const data = this.state.data;
     const rows = [], newCats = [], seen = new Set();
     entries.forEach((line, i) => {
@@ -1389,13 +1478,35 @@ class Component extends DCLogic {
       else if (!catNew && this.namesake(catId, name, [], data)) { row.status = 'Already exists — skipped'; row.statusMod = 'dlg-item__status--skip'; }
       else if (seen.has(key)) { row.status = 'Repeated — skipped'; row.statusMod = 'dlg-item__status--skip'; }
       else {
-        seen.add(key); row.create = true;
-        row.status = catNew ? 'New label, in a new category' : 'New label'; row.statusMod = catNew ? 'dlg-item__status--new' : 'dlg-item__status--ok';
+        seen.add(key);
+        const others = this.elsewhere(name, catId, catNew, data);
+        const choice = others.length === 1 ? resolve[others[0].id] : null;
+        if (others.length === 1 && choice !== 'keep') {
+          // the label already exists somewhere else: say where, and let it come here instead of a second one
+          const o = others[0];
+          row.exist = o; row.existIn = this.catName(o.categoryId);
+          if (choice === 'move') { row.move = o.id; row.status = 'Moves here from ' + row.existIn; row.statusMod = 'dlg-item__status--new'; }
+          else { row.pending = true; row.status = 'Already exists in ' + row.existIn; row.statusMod = 'dlg-item__status--merge'; }
+        } else {
+          row.create = true;
+          row.status = catNew ? 'New label, in a new category' : 'New label'; row.statusMod = catNew ? 'dlg-item__status--new' : 'dlg-item__status--ok';
+          if (others.length === 1) { row.exist = others[0]; row.existIn = this.catName(others[0].categoryId); row.status += ' — the one in ' + row.existIn + ' stays too'; }
+          else if (others.length > 1) row.status += ' — also in ' + this.joinAnd(others.map((l) => this.catName(l.categoryId)));
+        }
       }
       rows.push(row);
     });
-    const used = new Set(rows.filter((r) => r.create && r.catNew).map((r) => this.norm(r.catName)));
+    const used = new Set(rows.filter((r) => (r.create || r.move) && r.catNew).map((r) => this.norm(r.catName)));
     return { rows, newCats: newCats.filter((n) => used.has(this.norm(n))) };
+  }
+
+  /** The add dialog opened from a category starts with that category filled in. */
+  addName(catId) { return catId == null || catId === 'all' ? '' : this.catName(catId); }
+
+  /** A label of this name outside the destination: in another category, or loose. */
+  elsewhere(name, destId, destIsNew, data) {
+    const n = this.norm(name);
+    return (data || this.state.data).labels.filter((l) => this.norm(l.name) === n && (destIsNew || l.categoryId !== destId));
   }
 
   dlgAddLabels(d) {
@@ -1427,7 +1538,20 @@ class Component extends DCLogic {
     const entries = this.stagedEntries(d, 'staged', 'input');
     // a new category's labels go through the same planner as "Category / Label", so namesakes and repeats read the same
     const lines = entries.map((e) => (isNew && !e.text.includes('/') ? catName + ' / ' + e.text : e.text));
-    const plan = this.planCreate(lines, existing ? existing.id : null);
+    const resolve = d.resolve || {};
+    const plan = this.planCreate(lines, existing ? existing.id : null, resolve);
+    const setRes = (id, v) => this.setDialog((cur) => { const r = { ...(cur.resolve || {}) }; if (v) r[id] = v; else delete r[id]; return { resolve: r }; });
+    plan.rows.forEach((r) => {
+      if (!r.exist) return;
+      const dest = r.catNew ? r.catName : r.catId != null ? this.catName(r.catId) : 'No category';
+      r.hasActions = true;
+      r.actions = r.pending
+        ? [{ key: 'mv', text: 'Move to ' + dest, variant: 'outlined', onClick: () => setRes(r.exist.id, 'move') },
+           { key: 'kp', text: 'Keep both', variant: 'text', onClick: () => setRes(r.exist.id, 'keep') }]
+        : [{ key: 'ch', text: 'Change', variant: 'text', onClick: () => setRes(r.exist.id, null) }];
+    });
+    const pending = plan.rows.filter((r) => r.pending);
+    const nMove = plan.rows.filter((r) => r.move).length;
     if (isNew && !plan.newCats.some((n) => this.norm(n) === this.norm(catName))) plan.newCats.unshift(catName);
     const n = plan.rows.filter((r) => r.create).length;
     const nCats = plan.newCats.length;
@@ -1442,14 +1566,15 @@ class Component extends DCLogic {
       }),
     ];
     if (plan.rows.length) sections.push(this.sec('items', { heading: 'To add', listMod: 'dlg__list--follow', items: this.withRemove(plan.rows, entries, 'staged', 'input') }));
-    const confirmText = !n && !nCats ? 'Add'
-      : !nCats ? 'Add ' + this.plural(n, 'label')
+    if (pending.length) sections.push(this.note(this.joinAnd(pending.map((r) => r.name)) + (pending.length === 1 ? ' already exists' : ' already exist') + '. Move ' + (pending.length === 1 ? 'it' : 'each one') + ' here, or keep both — or change the category above.', 'warning'));
+    const base = !n && !nCats ? '' : !nCats ? 'Add ' + this.plural(n, 'label')
       : !n ? 'Add category'
       : 'Add ' + (nCats === 1 ? 'category' : this.plural(nCats, 'category', 'categories')) + ' + ' + this.plural(n, 'label');
+    const confirmText = [base, nMove ? (base ? 'move ' : 'Move ') + this.plural(nMove, 'label') : ''].filter(Boolean).join(', ') || 'Add';
     return {
       title: 'Add labels or a category', width: 'sm', sections,
-      confirmText, confirmDisabled: n === 0 && nCats === 0,
-      onConfirm: () => (n ? this.opCreate(plan) : this.opCreateCategory(catName, [])),
+      confirmText, confirmDisabled: pending.length > 0 || (n === 0 && nCats === 0 && nMove === 0),
+      onConfirm: () => (n || nMove ? this.opCreate(plan) : this.opCreateCategory(catName, [])),
     };
   }
 
@@ -1530,9 +1655,22 @@ class Component extends DCLogic {
     const plan = this.planMove(d);
     const labels = d.ids.map((id) => this.label(id));
     const same = labels.every((l) => l.categoryId === labels[0].categoryId);
+    // every destination shows the labels it already holds, so the right one is recognised before moving
+    const preview = (catId) => {
+      const names = this.labelsIn(catId).map((l) => l.name).sort((a, b) => a.localeCompare(b));
+      if (!names.length) return { labels: 'No labels yet', more: '', moreList: '', moreAria: '' };
+      const rest = names.slice(5);
+      return { labels: names.slice(0, 5).join(', '), more: rest.length ? '+' + rest.length : '', moreList: rest.join(', '), moreAria: rest.length ? 'And ' + rest.join(', ') : '' };
+    };
+    const opts = this.destOptions(true, same && labels[0].categoryId != null ? [labels[0].categoryId] : []);
+    const ordered = [opts.find((o) => o.value === 'new'), ...opts.filter((o) => o.value !== 'new')];
     const sections = [
-      this.sec('select', { label: 'Move to', value: d.dest || '', options: this.destOptions(true, same && labels[0].categoryId != null ? [labels[0].categoryId] : []),
-        onChange: (v) => this.setDialog({ dest: v }), mod: '' }),
+      this.sec('dest', { heading: 'Move to', options: ordered.map((o) => {
+        const isNew = o.value === 'new', on = d.dest === o.value;
+        const p = isNew ? { labels: '', more: '', moreList: '', moreAria: '' } : preview(o.value === 'none' ? null : Number(o.value.slice(2)));
+        return { key: o.value, name: isNew ? 'New category' : o.label, isNew, selected: on ? 'true' : 'false',
+          mod: (isNew ? 'dest__opt--new ' : '') + (on ? 'dest__opt--on' : ''), ...p, onPick: () => this.setDialog({ dest: o.value }) };
+      }) }),
     ];
     if (d.dest === 'new') sections.push(this.field('New category name', 'newName', { error: plan.error === 'taken', helper: plan.error === 'taken' ? 'That category exists — pick it from the list instead.' : '' }));
     if (d.dest) {
@@ -2092,7 +2230,7 @@ class Component extends DCLogic {
             menuItems: c.pinned ? [] : [
               { key: 'open', text: 'Open', onClick: open, disabled: false },
               { key: 'rename', text: 'Rename', onClick: () => this.startRename('category', c.id, 'row'), disabled: false },
-              { key: 'add', text: 'Add labels…', onClick: () => this.openDialog('addLabels', { catId: c.id, staged: [], input: '' }), disabled: false },
+              { key: 'add', text: 'Add labels…', onClick: () => this.openDialog('addCategory', { name: this.addName(c.id), staged: [], input: '' }), disabled: false },
               { key: 'del', text: 'Delete', onClick: () => this.openDialog('deleteCategories', { ids: [c.id] }), disabled: false },
             ],
             cells: [
@@ -2133,7 +2271,7 @@ class Component extends DCLogic {
         items: postsOpts.map((o) => ({ key: o.key, text: o.menu, selected: s.postsFilter === o.key,
           onClick: () => this.setState({ postsFilter: o.key, page: 0, sel: [], menu: null }) })),
       };
-      const addBtn = { key: 'add', text: 'Add labels', variant: 'contained', color: 'primary', onClick: () => this.openDialog('addLabels', { catId: scope === 'all' ? null : scope, staged: [], input: '' }) };
+      const addBtn = { key: 'add', text: 'Add label or category', variant: 'contained', color: 'primary', onClick: () => this.openDialog('addCategory', { name: this.addName(scope === 'all' ? null : scope), staged: [], input: '' }) };
 
       if (r.view === 'labels') {
         out.head = { ...exportHead, title: 'Labels', total: rows.length, showTotal: rows.length > 0, meta: '', posts, buttons: [addBtn], tools: this.toolsFor('label', sel) };
@@ -2225,8 +2363,8 @@ class Component extends DCLogic {
     const E = {
       search: { icon: 'SearchFilled', title: 'No Results Found', text: 'Try adjusting your search to find what you\'re looking for.' },
       noCats: { icon: 'FolderFilled', title: 'No categories yet', text: 'Categories group labels so everyone reads them in context.', actionText: 'Add label or category', onAction: () => this.openDialog('addCategory', { name: '', staged: [], input: '' }) },
-      noLabels: { icon: 'FolderFilled', title: 'No labels yet', text: 'Add labels here, or create them straight from a post.', actionText: 'Add labels', onAction: () => this.openDialog('addLabels', { catId: null, staged: [], input: '' }) },
-      emptyCat: { icon: 'FolderFilled', title: 'No labels in this category', text: 'Add labels to it, or move existing ones in from another category.', actionText: 'Add labels', onAction: () => this.openDialog('addLabels', { catId, staged: [], input: '' }) },
+      noLabels: { icon: 'FolderFilled', title: 'No labels yet', text: 'Add labels here, or create them straight from a post.', actionText: 'Add label or category', onAction: () => this.openDialog('addCategory', { name: '', staged: [], input: '' }) },
+      emptyCat: { icon: 'FolderFilled', title: 'No labels in this category', text: 'Add labels to it, or move existing ones in from another category.', actionText: 'Add labels', onAction: () => this.openDialog('addCategory', { name: this.addName(catId), staged: [], input: '' }) },
       noUnused: { icon: 'CheckCircleOutlined', title: 'No labels match this filter', text: 'Set “Posts” back to “Any” to see them all.' },
       noPosts: { icon: 'PhotoOutlined', title: 'Not on any post yet', text: 'Labels are added to posts from the post page. Open a post from Evaluations, Violations or an Influencer page.' },
     };
@@ -2236,7 +2374,8 @@ class Component extends DCLogic {
   /** Selection toolbar. A disabled tool always says why, in its tooltip. */
   toolsFor(kind, sel) {
     const n = sel.length;
-    const tool = (key, icon, tip, disabled, onClick) => ({ key, icon, tip, aria: tip, disabled, onClick, isMerge: key === 'merge' });
+    const names = { merge: 'Merge', rename: 'Rename', move: 'Move', duplicate: 'Duplicate', delete: 'Delete' };
+    const tool = (key, icon, tip, disabled, onClick) => ({ key, icon, tip, aria: tip, disabled, onClick, isMerge: key === 'merge', text: names[key], color: key === 'delete' ? 'error' : 'primary' });
     if (kind === 'category') {
       const ids = sel.map((c) => c.id);
       return [
@@ -2253,16 +2392,16 @@ class Component extends DCLogic {
     const mergeTip = n < 2 ? 'Select two or more labels to merge' : !sameCat ? 'Only labels in the same category can be merged' : 'Merge ' + n + ' labels';
     const renameTip = n === 0 ? 'Select labels to rename' : n === 1 ? 'Rename' : distinct ? 'Rename ' + n + ' labels to one spelling' : 'Two of these share a category — merge them instead';
     return [
+      tool('move', 'SwapHorizOutlined', n ? 'Move ' + this.plural(n, 'label') + ' to…' : 'Select labels to move', !n, () => this.openDialog('move', { ids, dest: '' })),
       tool('merge', '', mergeTip, n < 2 || !sameCat, () => this.openDialog('mergeLabels', { ids, choice: '', other: '' })),
       tool('rename', 'EditFilled', renameTip, n === 0 || (n > 1 && !distinct), () => (n === 1 ? this.startRename('label', ids[0], 'row') : this.openDialog('bulkRename', { ids, name: '' }))),
-      tool('move', 'SwapHorizOutlined', n ? 'Move ' + this.plural(n, 'label') + ' to…' : 'Select labels to move', !n, () => this.openDialog('move', { ids, dest: '' })),
       tool('duplicate', 'ContentCopyFilled', n ? 'Duplicate ' + this.plural(n, 'label') + ' to…' : 'Select labels to duplicate', !n, () => this.openDialog('duplicate', { ids, dest: '', withPosts: false })),
       tool('delete', 'DeleteFilled', n ? 'Delete ' + this.plural(n, 'label') : 'Select labels to delete', !n, () => this.openDialog('deleteLabels', { ids })),
     ];
   }
 
   renderVals() {
-    const s = this.state;
+    const s = this.state, r0 = s.route;
     const v = this.buildView() || { head: { tools: [], buttons: [] }, grid: { rows: [], columns: [] }, empty: { show: false }, tabs: { show: false }, pg: { visible: [], page: 0, pages: 1, start: 0, total: 0 } };
     const pg = v.pg;
     const selectableIds = v.grid.rows.filter((r) => r.selectable).map((r) => {
@@ -2296,13 +2435,31 @@ class Component extends DCLogic {
       chrome: {
         hidden: s.chromeHidden, appMod: s.chromeHidden ? 'app--bare' : '',
         onHide: () => this.setState({ chromeHidden: true }), onShow: () => this.setState({ chromeHidden: false }),
-        onReset: () => { this.setState({ ...this.initialState(), route: { view: 'categories' } }); this.go({ view: 'categories' }); },
+        onReset: () => { try { localStorage.removeItem('im-labels-admin-v3-intro'); } catch (e) {} this.setState({ ...this.initialState(), route: { view: 'categories' } }); this.go({ view: 'categories' }); },
       },
       head: (() => {
         const h = { hasCrumbs: false, crumbs: [], here: '', prefix: '', renaming: false, canRename: false, canDelete: false, posts: { show: false }, showExport: false, buttons: [], tools: [], ...v.head };
         return { ...h, titleMod: h.hasCrumbs ? 'head__title--crumb' : '', renameMod: h.hasCrumbs ? '' : 'rename__input--head', ariaCurrent: h.hasCrumbs ? 'page' : null };
       })(),
       tabs: v.tabs,
+      intro: {
+        show: !s.introDismissed && (r0.view === 'categories' || r0.view === 'labels'), open: s.introOpen,
+        moreText: s.introOpen ? 'Show less' : 'Learn more',
+        onMore: () => this.setState((cur) => ({ introOpen: !cur.introOpen })), onDismiss: () => this.dismissIntro(),
+        uses: [
+          { key: 'u1', title: 'Track brands across evaluations', text: 'put Brand / Nike on every post that shows Nike, then see them all from the label.' },
+          { key: 'u2', title: 'Assign posts to team members', text: 'a label per person, such as Review / Maria, says who looks at which post.' },
+          { key: 'u3', title: 'Group ads by product category', text: 'Product / Water bottle or Product / Boots keeps ads of one kind together.' },
+        ],
+      },
+      bulk: (() => {
+        const tools = (v.head && v.head.tools) || [];
+        // always there, so its actions can be found before anything is selected; they wake up with a selection
+        const kind = r0.view === 'categories' ? 'categories' : 'labels';
+        return { show: tools.length > 0, hasSel: s.sel.length > 0, mod: s.sel.length ? '' : 'bulk--idle',
+          count: s.sel.length ? this.plural(s.sel.length, 'row') + ' selected' : 'Select ' + kind + ' to act on them',
+          actions: tools, onClear: () => this.setState({ sel: [] }) };
+      })(),
       exp: {
         open: s.menu === 'export',
         onToggle: () => this.toggleMenu('export'), onClose: () => this.closeMenu('export'),

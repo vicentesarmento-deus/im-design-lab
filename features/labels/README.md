@@ -177,6 +177,30 @@ Admin v2 is kept as it was, for comparison.
   and More than 5 posts, each with its count, and while a filter is on the
   button stays highlighted and reads, for example, "Posts: No posts".
 
+- **A first-visit banner says what labels are for.** Above the tabs, on
+  Categories and All labels: track brands across evaluations, assign posts to
+  team members, group ads by product category. "Learn more" opens an example of
+  each; "Got it" hides it for good in that browser. The facilitator bar's Reset
+  brings it back.
+- **One dialog adds labels or a category, from everywhere.** "Add label or
+  category" is the button on both tabs and on a category's page (where the
+  category comes filled in); the category stays optional, and empty still means
+  the labels go in without one. When a label being added already exists in
+  another category, or without one, its row says where ("Already exists in No
+  category") and offers **Move to Brand** — the existing label, with its posts,
+  moves here — or **Keep both**, which creates a second one as before
+  (different categories still mean different things). Nothing is added until
+  each of these rows is answered, and the answer can be changed.
+- **The table's actions are written out, in a bar above it.** The icon buttons
+  next to the search are gone. A bar over the table always shows the actions —
+  Move, Merge, Rename, Duplicate, Delete on labels; Merge, Rename, Delete on
+  categories — disabled until rows are selected, so they can be found before
+  anything is picked, and the table doesn't jump when the first row is
+  ticked. The ⋮ menu on each row is unchanged.
+- **Move shows what each category already holds.** "Move to" is a list instead
+  of a drop-down: each category shows its first five labels, and a "+N" whose
+  tooltip names the rest. **New category** is the first row, with a +.
+
 ### A clean copy for sessions
 
 `testing/2026-10-01-admin-v2/prototype.dc.html` is admin v2 with everything a
