@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>[admin v3] Labels and categories</title>
+<title>[admin v3] Labels and label groups</title>
 <script src="../../../shared/support.js"></script>
 </head>
 <body>
@@ -210,6 +210,7 @@ button{font:inherit}
 .grid__sort{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:var(--space-0-5)}
 .grid__sort:focus-visible{outline:2px solid var(--color-primary-main);outline-offset:2px}
 .grid__sort-icon{display:inline-flex;color:var(--action-active)}
+.grid__sort-icon--idle{color:var(--text-disabled)}
 .grid__title{display:flex;align-items:center;gap:var(--space-1-5);min-width:0}
 .grid__title-text{display:flex;flex-direction:column;min-width:0}
 .grid__name{all:unset;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -312,7 +313,7 @@ button.grid__preview{cursor:pointer}
 
 <sc-if value="{{!chrome.hidden}}" hint-placeholder-val="{{true}}">
   <div class="gnav">
-    <span class="gnav__title">[admin v3] Labels &amp; categories</span>
+    <span class="gnav__title">[admin v3] Labels &amp; label groups</span>
     <span class="gnav__sub">Manage the label catalogue &mdash; search, create, edit, merge, delete, export</span>
     <span class="gnav__spacer"></span>
     <button class="gnav__btn" onClick="{{chrome.onReset}}">Reset</button>
@@ -492,7 +493,7 @@ button.grid__preview{cursor:pointer}
           <sc-for list="{{grid.columns}}" as="col" hint-placeholder-count="5">
             <span class="grid__cell" role="columnheader" aria-sort="{{col.ariaSort}}">
               <sc-if value="{{col.sortable}}" hint-placeholder-val="{{true}}">
-                <button class="grid__sort" onClick="{{col.onSort}}">{{col.text}}<sc-if value="{{col.sorted}}" hint-placeholder-val="{{false}}"><span class="grid__sort-icon"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="{{col.icon}}" size="14" hint-size="14px,14px"></x-import></span></sc-if></button>
+                <button class="grid__sort" onClick="{{col.onSort}}">{{col.text}}<span class="grid__sort-icon {{col.iconMod}}"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="{{col.icon}}" size="14" hint-size="14px,14px"></x-import></span></button>
               </sc-if>
               <sc-if value="{{!col.sortable}}" hint-placeholder-val="{{false}}"><span class="grid__head-text">{{col.text}}</span></sc-if>
             </span>
@@ -932,8 +933,8 @@ class Component extends DCLogic {
     const cats = made.map(catOf);
     const shared = cats.length && cats[0] && cats.every((c) => c && this.norm(c) === this.norm(cats[0])) ? cats[0] : null;
     const subject = n === 1 ? 'Label ' + names[0] + ' was' : n <= 3 ? 'Labels ' + this.joinAnd(names) + ' were' : n + ' labels were';
-    const where = shared ? ' to ' + (made.every((r) => r.catNew) ? 'the new category ' : '') + shared : '';
-    const created = !shared && plan.newCats.length ? ' ' + this.plural(plan.newCats.length, 'new category', 'new categories') + ' created.' : '';
+    const where = shared ? ' to ' + (made.every((r) => r.catNew) ? 'the new label group ' : '') + shared : '';
+    const created = !shared && plan.newCats.length ? ' ' + this.plural(plan.newCats.length, 'new label group', 'new label groups') + ' created.' : '';
     return subject + ' added' + where + '.' + created;
   }
   fmtDate(dt) { return dt ? dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; }
@@ -944,7 +945,7 @@ class Component extends DCLogic {
 
   label(id, data) { return (data || this.state.data).labels.find((l) => l.id === id); }
   category(id, data) { return (data || this.state.data).categories.find((c) => c.id === id); }
-  catName(catId, data) { const c = catId == null ? null : this.category(catId, data); return c ? c.name : 'No category'; }
+  catName(catId, data) { const c = catId == null ? null : this.category(catId, data); return c ? c.name : 'No label group'; }
   labelsIn(catId, data) { return (data || this.state.data).labels.filter((l) => l.categoryId === catId); }
 
   /** Post ids per label and label ids per post, rebuilt only when the data object changes. */
@@ -1184,7 +1185,7 @@ class Component extends DCLogic {
   }
 
   opCreateCategory(name, labelNames) {
-    const message = 'Category ' + name + ' was created' + (labelNames.length ? ' with ' + this.plural(labelNames.length, 'label') : '') + '.';
+    const message = 'Label group ' + name + ' was created' + (labelNames.length ? ' with ' + this.plural(labelNames.length, 'label') : '') + '.';
     this.commit(message, (D) => {
       const id = this.newId(D);
       D.categories.push({ id, name, createdBy: 'You', createdAt: this.now(), editedAt: this.now() });
@@ -1200,7 +1201,7 @@ class Component extends DCLogic {
       });
     } else {
       const c = this.category(id);
-      this.commit('Renamed category ' + this.q(c.name) + ' to ' + this.q(name), (D) => {
+      this.commit('Renamed label group ' + this.q(c.name) + ' to ' + this.q(name), (D) => {
         const x = D.categories.find((y) => y.id === id); x.name = name; x.editedAt = this.now();
       });
     }
@@ -1262,7 +1263,7 @@ class Component extends DCLogic {
   }
 
   opMergeCategories(plan) {
-    const message = 'Merged ' + this.plural(plan.allIds.length, 'category', 'categories') + ' into ' + this.q(plan.finalName);
+    const message = 'Merged ' + this.plural(plan.allIds.length, 'label group', 'label groups') + ' into ' + this.q(plan.finalName);
     this.commit(message, (D) => {
       const keep = D.categories.find((c) => c.id === plan.keepId);
       keep.name = plan.finalName; keep.editedAt = this.now();
@@ -1275,8 +1276,8 @@ class Component extends DCLogic {
 
   opDeleteCategories(plan) {
     const names = plan.cats.map((c) => this.q(c.name)).join(', ');
-    const tail = plan.nLabels === 0 ? '' : plan.mode === 'delete' ? ' and its labels' : plan.mode === 'move' ? '; labels moved to ' + plan.destName : '; labels kept without a category';
-    const message = 'Deleted ' + (plan.cats.length === 1 ? 'category ' + names : this.plural(plan.cats.length, 'category', 'categories')) + tail;
+    const tail = plan.nLabels === 0 ? '' : plan.mode === 'delete' ? ' and its labels' : plan.mode === 'move' ? '; labels moved to ' + plan.destName : '; labels kept without a label group';
+    const message = 'Deleted ' + (plan.cats.length === 1 ? 'label group ' + names : this.plural(plan.cats.length, 'label group', 'label groups')) + tail;
     this.commit(message, (D) => {
       const ids = plan.cats.map((c) => c.id);
       if (plan.mode === 'delete') {
@@ -1334,10 +1335,10 @@ class Component extends DCLogic {
       return { kind: 'ok', name, help: n ? 'On ' + this.plural(n, 'post') + ' — they will all show the new name. Enter to save.' : 'Not on any post yet. Enter to save.' };
     }
     const c = this.category(r.id);
-    if (!name) return { kind: 'error', help: 'A category needs a name.' };
+    if (!name) return { kind: 'error', help: 'A label group needs a name.' };
     if (name === c.name) return { kind: 'same', help: 'Enter to save · Esc to cancel' };
     const twin = this.categoryNamed(name, [c.id]);
-    if (twin) return { kind: 'collide', twin, help: 'There is already a category called ' + this.q(twin.name) + ' — press Enter to merge them.' };
+    if (twin) return { kind: 'collide', twin, help: 'There is already a label group called ' + this.q(twin.name) + ' — press Enter to merge them.' };
     const n = this.labelsIn(c.id).length;
     return { kind: 'ok', name, help: n ? this.plural(n, 'label') + ' will show the new name on their posts. Enter to save.' : 'Enter to save.' };
   }
@@ -1449,7 +1450,7 @@ class Component extends DCLogic {
     });
   }
 
-  /* ---------- add labels: "Category / Label" puts one in a category ---------- */
+  /* ---------- add labels: "Label group / Label" puts one in a category ---------- */
   planCreate(entries, ctxCat, resolve) {
     resolve = resolve || {};
     const data = this.state.data;
@@ -1489,7 +1490,7 @@ class Component extends DCLogic {
           else { row.pending = true; row.status = 'Already exists in ' + row.existIn; row.statusMod = 'dlg-item__status--merge'; }
         } else {
           row.create = true;
-          row.status = catNew ? 'New label, in a new category' : 'New label'; row.statusMod = catNew ? 'dlg-item__status--new' : 'dlg-item__status--ok';
+          row.status = catNew ? 'New label, in a new label group' : 'New label'; row.statusMod = catNew ? 'dlg-item__status--new' : 'dlg-item__status--ok';
           if (others.length === 1) { row.exist = others[0]; row.existIn = this.catName(others[0].categoryId); row.status += ' — the one in ' + row.existIn + ' stays too'; }
           else if (others.length > 1) row.status += ' — also in ' + this.joinAnd(others.map((l) => this.catName(l.categoryId)));
         }
@@ -1514,17 +1515,17 @@ class Component extends DCLogic {
     const entries = this.stagedEntries(d, 'staged', 'input');
     const plan = this.planCreate(entries.map((e) => e.text), ctx);
     const n = plan.rows.filter((r) => r.create).length;
-    const where = ctx == null ? 'without a category' : 'in ' + this.catName(ctx);
+    const where = ctx == null ? 'without a label group' : 'in ' + this.catName(ctx);
     const sections = [
       this.stager(d, 'staged', 'input', {
         label: 'Add labels', placeholder: ctx == null ? 'e.g. Giveaway, Brand / Heineken' : 'e.g. Heineken, Carlsberg',
-        helper: 'Separate labels with commas or new lines — pasting a list works too. They go ' + where + '; type Category / Label to put one in a category, even a new one.',
+        helper: 'Separate labels with commas or new lines — pasting a list works too. They go ' + where + '; type Label group / Label to put one in a label group, even a new one.',
       }),
     ];
     if (plan.rows.length) sections.push(this.sec('items', { heading: 'To add', listMod: 'dlg__list--follow', items: this.withRemove(plan.rows, entries, 'staged', 'input') }));
     return {
       title: ctx == null ? 'Add labels' : 'Add labels to ' + this.catName(ctx), width: 'sm', sections,
-      confirmText: n ? 'Add ' + this.plural(n, 'label') + (plan.newCats.length ? ' + ' + this.plural(plan.newCats.length, 'category', 'categories') : '') : 'Add labels',
+      confirmText: n ? 'Add ' + this.plural(n, 'label') + (plan.newCats.length ? ' + ' + this.plural(plan.newCats.length, 'label group', 'label groups') : '') : 'Add labels',
       confirmDisabled: n === 0, onConfirm: () => this.opCreate(plan),
     };
   }
@@ -1536,14 +1537,14 @@ class Component extends DCLogic {
     const existing = catName ? this.categoryNamed(catName) : null;
     const isNew = !!catName && !existing;
     const entries = this.stagedEntries(d, 'staged', 'input');
-    // a new category's labels go through the same planner as "Category / Label", so namesakes and repeats read the same
+    // a new category's labels go through the same planner as "Label group / Label", so namesakes and repeats read the same
     const lines = entries.map((e) => (isNew && !e.text.includes('/') ? catName + ' / ' + e.text : e.text));
     const resolve = d.resolve || {};
     const plan = this.planCreate(lines, existing ? existing.id : null, resolve);
     const setRes = (id, v) => this.setDialog((cur) => { const r = { ...(cur.resolve || {}) }; if (v) r[id] = v; else delete r[id]; return { resolve: r }; });
     plan.rows.forEach((r) => {
       if (!r.exist) return;
-      const dest = r.catNew ? r.catName : r.catId != null ? this.catName(r.catId) : 'No category';
+      const dest = r.catNew ? r.catName : r.catId != null ? this.catName(r.catId) : 'No label group';
       r.hasActions = true;
       r.actions = r.pending
         ? [{ key: 'mv', text: 'Move to ' + dest, variant: 'outlined', onClick: () => setRes(r.exist.id, 'move') },
@@ -1555,24 +1556,24 @@ class Component extends DCLogic {
     if (isNew && !plan.newCats.some((n) => this.norm(n) === this.norm(catName))) plan.newCats.unshift(catName);
     const n = plan.rows.filter((r) => r.create).length;
     const nCats = plan.newCats.length;
-    const catHelper = !catName ? 'Leave it empty to add loose labels, without a category, and sort them later.'
-      : existing ? 'Adds to the existing category ' + this.q(existing.name) + '.'
-      : 'Creates the category ' + this.q(catName) + '.';
+    const catHelper = !catName ? 'Leave it empty to add loose labels, without a label group, and sort them later.'
+      : existing ? 'Adds to the existing label group ' + this.q(existing.name) + '.'
+      : 'Creates the label group ' + this.q(catName) + '.';
     const sections = [
-      this.field('Category (optional)', 'name', { helper: catHelper }),
+      this.field('Label group (optional)', 'name', { helper: catHelper }),
       this.stager(d, 'staged', 'input', {
         label: catName ? 'Labels (optional)' : 'Labels', placeholder: 'e.g. Giveaway, Unboxing',
         helper: 'Separate labels with commas or new lines — pasting a list works too.',
       }),
     ];
     if (plan.rows.length) sections.push(this.sec('items', { heading: 'To add', listMod: 'dlg__list--follow', items: this.withRemove(plan.rows, entries, 'staged', 'input') }));
-    if (pending.length) sections.push(this.note(this.joinAnd(pending.map((r) => r.name)) + (pending.length === 1 ? ' already exists' : ' already exist') + '. Move ' + (pending.length === 1 ? 'it' : 'each one') + ' here, or keep both — or change the category above.', 'warning'));
+    if (pending.length) sections.push(this.note(this.joinAnd(pending.map((r) => r.name)) + (pending.length === 1 ? ' already exists' : ' already exist') + '. Move ' + (pending.length === 1 ? 'it' : 'each one') + ' here, or keep both — or change the label group above.', 'warning'));
     const base = !n && !nCats ? '' : !nCats ? 'Add ' + this.plural(n, 'label')
-      : !n ? 'Add category'
-      : 'Add ' + (nCats === 1 ? 'category' : this.plural(nCats, 'category', 'categories')) + ' + ' + this.plural(n, 'label');
+      : !n ? 'Add label group'
+      : 'Add ' + (nCats === 1 ? 'label group' : this.plural(nCats, 'label group', 'label groups')) + ' + ' + this.plural(n, 'label');
     const confirmText = [base, nMove ? (base ? 'move ' : 'Move ') + this.plural(nMove, 'label') : ''].filter(Boolean).join(', ') || 'Add';
     return {
-      title: 'Add labels or a category', width: 'sm', sections,
+      title: 'Add labels or a label group', width: 'sm', sections,
       confirmText, confirmDisabled: pending.length > 0 || (n === 0 && nCats === 0 && nMove === 0),
       onConfirm: () => (n || nMove ? this.opCreate(plan) : this.opCreateCategory(catName, [])),
     };
@@ -1585,7 +1586,7 @@ class Component extends DCLogic {
     let bad = 0, n = 0;
     const items = labels.map((l) => {
       const count = this.postsOf(l.id).length;
-      const row = { key: 'l' + l.id, prefix: l.categoryId == null ? 'No category /' : this.catName(l.categoryId) + ' /', name: l.name, meta: this.plural(count, 'post') };
+      const row = { key: 'l' + l.id, prefix: l.categoryId == null ? 'No label group /' : this.catName(l.categoryId) + ' /', name: l.name, meta: this.plural(count, 'post') };
       if (!name) return { ...row, status: '', statusMod: '' };
       const twin = this.namesake(l.categoryId, name, d.ids);
       if (twin) { bad++; return { ...row, status: this.catName(l.categoryId) + ' already has ' + this.q(twin.name) + ' — merge it there instead', statusMod: 'dlg-item__status--error' }; }
@@ -1597,7 +1598,7 @@ class Component extends DCLogic {
     return {
       title: 'Rename ' + this.plural(labels.length, 'label'), width: 'sm',
       sections: [
-        this.text('Each label keeps its own category and its own posts — this only makes their spelling match. Labels in different categories stay separate labels.'),
+        this.text('Each label keeps its own label group and its own posts — this only makes their spelling match. Labels in different label groups stay separate labels.'),
         this.field('New name', 'name', { placeholder: labels[0].name }),
         this.sec('items', { heading: 'Labels', items }),
         this.note(total ? 'The new name shows on ' + this.plural(total, 'post') + ' as soon as you rename.' : 'None of these are on a post yet.', 'info'),
@@ -1610,8 +1611,8 @@ class Component extends DCLogic {
   destOptions(includeNew, excludeIds) {
     const cats = this.state.data.categories.filter((c) => !(excludeIds || []).includes(c.id)).slice().sort((a, b) => a.name.localeCompare(b.name));
     const opts = cats.map((c) => ({ value: 'c:' + c.id, label: c.name }));
-    opts.push({ value: 'none', label: 'No category' });
-    if (includeNew) opts.push({ value: 'new', label: 'New category…' });
+    opts.push({ value: 'none', label: 'No label group' });
+    if (includeNew) opts.push({ value: 'new', label: 'New label group…' });
     return opts;
   }
 
@@ -1621,17 +1622,17 @@ class Component extends DCLogic {
     if (!d.dest) return out;
     if (d.dest === 'new') {
       out.newName = this.clean(d.newName);
-      out.destName = out.newName ? this.q(out.newName) : 'a new category';
+      out.destName = out.newName ? this.q(out.newName) : 'a new label group';
       if (!out.newName) out.error = 'empty';
       else if (this.categoryNamed(out.newName)) out.error = 'taken';
-    } else if (d.dest === 'none') { out.destId = null; out.destName = 'No category'; }
+    } else if (d.dest === 'none') { out.destId = null; out.destName = 'No label group'; }
     else { out.destId = Number(d.dest.slice(2)); out.destName = this.catName(out.destId); }
 
     const inDest = new Map(); // normalised name -> label id already (or about to be) in the destination
     if (d.dest !== 'new') this.labelsIn(out.destId).forEach((l) => inDest.set(this.norm(l.name), l.id));
     d.ids.map((id) => this.label(id)).forEach((l) => {
       const count = this.postsOf(l.id).length;
-      const row = { key: 'm' + l.id, id: l.id, prefix: (l.categoryId == null ? 'No category' : this.catName(l.categoryId)) + ' /', name: l.name, meta: this.plural(count, 'post'), hasCheck: false };
+      const row = { key: 'm' + l.id, id: l.id, prefix: (l.categoryId == null ? 'No label group' : this.catName(l.categoryId)) + ' /', name: l.name, meta: this.plural(count, 'post'), hasCheck: false };
       if (d.dest !== 'new' && l.categoryId === out.destId) { out.rows.push({ ...row, action: 'skip', status: 'Already in ' + out.destName, statusMod: 'dlg-item__status--skip' }); return; }
       const intoId = inDest.get(this.norm(l.name));
       if (intoId != null) {
@@ -1668,17 +1669,17 @@ class Component extends DCLogic {
       this.sec('dest', { heading: 'Move to', options: ordered.map((o) => {
         const isNew = o.value === 'new', on = d.dest === o.value;
         const p = isNew ? { labels: '', more: '', moreList: '', moreAria: '' } : preview(o.value === 'none' ? null : Number(o.value.slice(2)));
-        return { key: o.value, name: isNew ? 'New category' : o.label, isNew, selected: on ? 'true' : 'false',
+        return { key: o.value, name: isNew ? 'New label group' : o.label, isNew, selected: on ? 'true' : 'false',
           mod: (isNew ? 'dest__opt--new ' : '') + (on ? 'dest__opt--on' : ''), ...p, onPick: () => this.setDialog({ dest: o.value }) };
       }) }),
     ];
-    if (d.dest === 'new') sections.push(this.field('New category name', 'newName', { error: plan.error === 'taken', helper: plan.error === 'taken' ? 'That category exists — pick it from the list instead.' : '' }));
+    if (d.dest === 'new') sections.push(this.field('New label group name', 'newName', { error: plan.error === 'taken', helper: plan.error === 'taken' ? 'That label group exists — pick it from the list instead.' : '' }));
     if (d.dest) {
       sections.push(this.sec('items', { heading: 'Labels', items: plan.rows }));
       const merges = plan.rows.filter((r) => r.action === 'merge');
       sections.push(this.note(merges.length
-        ? this.plural(merges.length, 'label') + ' already exist' + (merges.length === 1 ? 's' : '') + (plan.destId == null && !plan.newName ? ' without a category' : ' in ' + plan.destName) + '. Merging moves their posts onto the existing label and deletes the duplicate — untick one to leave it where it is.'
-        : 'Moving doesn\'t change which posts carry these labels — only the category shown before their name.', merges.length ? 'warning' : 'info'));
+        ? this.plural(merges.length, 'label') + ' already exist' + (merges.length === 1 ? 's' : '') + (plan.destId == null && !plan.newName ? ' without a label group' : ' in ' + plan.destName) + '. Merging moves their posts onto the existing label and deletes the duplicate — untick one to leave it where it is.'
+        : 'Moving doesn\'t change which posts carry these labels — only the label group shown before their name.', merges.length ? 'warning' : 'info'));
     }
     const n = plan.rows.filter((r) => r.action !== 'skip').length;
     return {
@@ -1696,7 +1697,7 @@ class Component extends DCLogic {
     out.destName = this.catName(out.destId);
     const taken = new Set(this.labelsIn(out.destId).map((l) => this.norm(l.name)));
     d.ids.map((id) => this.label(id)).forEach((l) => {
-      const row = { key: 'd' + l.id, id: l.id, prefix: (l.categoryId == null ? 'No category' : this.catName(l.categoryId)) + ' /', name: l.name, meta: this.plural(this.postsOf(l.id).length, 'post') };
+      const row = { key: 'd' + l.id, id: l.id, prefix: (l.categoryId == null ? 'No label group' : this.catName(l.categoryId)) + ' /', name: l.name, meta: this.plural(this.postsOf(l.id).length, 'post') };
       if (taken.has(this.norm(l.name))) {
         const inside = l.categoryId === out.destId;
         out.rows.push({ ...row, action: 'skip', status: inside ? 'Already in ' + out.destName : out.destName + ' already has ' + this.q(l.name) + ' — skipped', statusMod: 'dlg-item__status--skip' });
@@ -1809,11 +1810,11 @@ class Component extends DCLogic {
     options.push({ key: 'other', text: 'Another name', sub: '', checked: choice === 'other', onPick: () => this.setDialog({ choice: 'other' }), disabled: false, mod: '' });
 
     const sections = [
-      this.text('Merging says these categories mean the same thing: their labels end up in one category and the others are deleted.'),
+      this.text('Merging says these label groups mean the same thing: their labels end up in one label group and the others are deleted.'),
       this.sec('radios', { label: 'Name to keep', name: 'merge-cat', options }),
     ];
     if (choice === 'other') sections.push(this.field('Name', 'other', { mod: 'dlg__indent' }));
-    if (extra) sections.push(this.note('There is already a category called ' + this.q(extra.name) + ' — it will be merged in too.', 'warning'));
+    if (extra) sections.push(this.note('There is already a label group called ' + this.q(extra.name) + ' — it will be merged in too.', 'warning'));
     if (collisions.length) {
       sections.push(this.sec('items', { heading: 'Labels with the same name — each pair becomes one label', items: collisions.map((c) => ({
         key: 'c' + c.keepId, prefix: '', name: c.labels.map((l) => l.name + ' (' + this.catName(l.categoryId) + ')').join(' + '),
@@ -1821,8 +1822,8 @@ class Component extends DCLogic {
     }
     sections.push(this.note(finalName ? this.plural(nLabels, 'label') + ' will be in ' + this.q(finalName) + '.' : 'Choose a name.', 'info'));
     return {
-      title: 'Merge ' + this.plural(allIds.length, 'category', 'categories'), width: 'md', sections,
-      confirmText: 'Merge ' + this.plural(allIds.length, 'category', 'categories'), confirmDisabled: !finalName,
+      title: 'Merge ' + this.plural(allIds.length, 'label group', 'label groups'), width: 'md', sections,
+      confirmText: 'Merge ' + this.plural(allIds.length, 'label group', 'label groups'), confirmDisabled: !finalName,
       onConfirm: () => this.opMergeCategories({ allIds, keepId, finalName, collisions }),
     };
   }
@@ -1845,8 +1846,8 @@ class Component extends DCLogic {
     } else {
       sections.push(this.text(name + ' holds ' + this.plural(labels.length, 'label') + ', on ' + this.plural(nPosts, 'post') + '. What should happen to them?'));
       sections.push(this.sec('radios', { label: 'What happens to the labels', name: 'del-cat', options: [
-        { key: 'keep', text: 'Keep them, without a category', sub: 'They stay on their posts; the category name disappears from them.', checked: mode === 'keep', onPick: () => this.setDialog({ mode: 'keep' }), disabled: false, mod: '' },
-        { key: 'move', text: 'Move them to another category', sub: others.length ? 'They stay on their posts under a different category.' : 'There is no other category to move them to.', checked: mode === 'move', onPick: () => this.setDialog({ mode: 'move' }), disabled: !others.length, mod: others.length ? '' : 'choice--disabled' },
+        { key: 'keep', text: 'Keep them, without a label group', sub: 'They stay on their posts; the label group name disappears from them.', checked: mode === 'keep', onPick: () => this.setDialog({ mode: 'keep' }), disabled: false, mod: '' },
+        { key: 'move', text: 'Move them to another label group', sub: others.length ? 'They stay on their posts under a different label group.' : 'There is no other label group to move them to.', checked: mode === 'move', onPick: () => this.setDialog({ mode: 'move' }), disabled: !others.length, mod: others.length ? '' : 'choice--disabled' },
         { key: 'delete', text: 'Delete the labels too', sub: nPosts ? 'Removes them from ' + this.plural(nPosts, 'post') + '.' : 'None of them is on a post.', checked: mode === 'delete', onPick: () => this.setDialog({ mode: 'delete' }), disabled: false, mod: '' },
       ] }));
       if (mode === 'move') sections.push(this.sec('select', { label: 'Move to', value: d.dest || '', options: this.destOptions(false, ids).filter((o) => o.value !== 'none'), onChange: (v) => this.setDialog({ dest: v }), mod: 'dlg__indent' }));
@@ -1860,7 +1861,7 @@ class Component extends DCLogic {
           if (into != null) { plan.moves.push({ id: l.id, intoId: into }); merged.push(l.name); }
           else { plan.moves.push({ id: l.id, intoId: null }); inDest.set(this.norm(l.name), l.id); }
         });
-        const where = plan.destId == null ? 'without a category' : 'in ' + plan.destName;
+        const where = plan.destId == null ? 'without a label group' : 'in ' + plan.destName;
         if (merged.length) sections.push(this.note(merged.join(', ') + (merged.length === 1 ? ' already exists ' : ' already exist ') + where + '. ' + (merged.length === 1 ? 'It' : 'They') + ' will be merged, so each post keeps one.', 'warning'));
       }
       if (mode === 'delete' && nPosts) {
@@ -1870,7 +1871,7 @@ class Component extends DCLogic {
     }
     return {
       title, width: 'sm', sections, confirmColor: 'error',
-      confirmText: 'Delete category',
+      confirmText: 'Delete label group',
       confirmDisabled: mode === 'move' && !d.dest,
       onConfirm: () => this.opDeleteCategories(plan),
     };
@@ -1895,7 +1896,7 @@ class Component extends DCLogic {
       sections.push(this.sec('radios', { label: 'What happens on these posts', name: 'del-label', options: [
         { key: 'remove', text: 'Remove ' + (labels.length === 1 ? 'it' : 'them') + ' from these posts', sub: 'The posts simply lose the label.', checked: mode === 'remove', onPick: () => this.setDialog({ mode: 'remove' }), disabled: false, mod: '' },
         { key: 'replace', text: 'Replace with another label on these posts',
-          sub: canReplace ? 'Pick a label from ' + this.catName(labels[0].categoryId) + '.' : !oneCat ? 'Only possible when the labels are in the same category.' : 'There is no other label in ' + this.catName(labels[0].categoryId) + '.',
+          sub: canReplace ? 'Pick a label from ' + this.catName(labels[0].categoryId) + '.' : !oneCat ? 'Only possible when the labels are in the same label group.' : 'There is no other label in ' + this.catName(labels[0].categoryId) + '.',
           checked: mode === 'replace', onPick: () => this.setDialog({ mode: 'replace' }), disabled: !canReplace, mod: canReplace ? '' : 'choice--disabled' },
       ] }));
       if (mode === 'replace') sections.push(this.sec('select', { label: 'Replace with', value: d.replacement || '', mod: 'dlg__indent',
@@ -1974,7 +1975,7 @@ class Component extends DCLogic {
   }
 
   toXlsx(rows) {
-    const head = ['Category', 'Label', 'Posts', 'Created', 'Created by', 'Last edited'];
+    const head = ['Label group', 'Label', 'Posts', 'Created', 'Created by', 'Last edited'];
     const col = (i) => String.fromCharCode(65 + i);
     const str = (r, i, v, s) => '<c r="' + col(i) + r + '" t="inlineStr"' + (s ? ' s="1"' : '') + '><is><t xml:space="preserve">' + this.xml(v) + '</t></is></c>';
     let sheet = '<row r="1">' + head.map((h, i) => str(1, i, h, true)).join('') + '</row>';
@@ -2004,10 +2005,10 @@ class Component extends DCLogic {
     const table = (ls) => '<w:tbl><w:tblPr><w:tblW w:w="5000" w:type="pct"/>' + border + '</w:tblPr>' +
       '<w:tr>' + ['Label', 'Posts', 'Created by', 'Created', 'Last edited'].map((h) => cell(h, { b: true })).join('') + '</w:tr>' +
       ls.map((l) => '<w:tr>' + [l.name, String(this.postsOf(l.id).length), l.createdBy, this.fmtDate(l.createdAt), this.fmtDate(l.editedAt)].map((v) => cell(v)).join('') + '</w:tr>').join('') + '</w:tbl>';
-    let body = para('Labels and categories', { b: true, sz: 36, after: 80 }) +
-      para('Exported ' + this.fmtDate(new Date()) + ' · ' + this.plural(data.categories.length, 'category', 'categories') + ' · ' + this.plural(data.labels.length, 'label'), { grey: true, after: 240 });
+    let body = para('Labels and label groups', { b: true, sz: 36, after: 80 }) +
+      para('Exported ' + this.fmtDate(new Date()) + ' · ' + this.plural(data.categories.length, 'label group', 'label groups') + ' · ' + this.plural(data.labels.length, 'label'), { grey: true, after: 240 });
     const groups = data.categories.slice().sort((a, b) => a.name.localeCompare(b.name)).map((c) => ({ name: c.name, labels: this.labelsIn(c.id) }));
-    groups.push({ name: 'No category', labels: this.labelsIn(null) });
+    groups.push({ name: 'No label group', labels: this.labelsIn(null) });
     groups.forEach((g) => {
       body += para(g.name + ' — ' + this.plural(g.labels.length, 'label'), { b: true, sz: 26, after: 80 });
       body += g.labels.length ? table(g.labels.sort((a, b) => a.name.localeCompare(b.name))) + para('', { after: 160 }) : para('No labels.', { grey: true, after: 160 });
@@ -2039,7 +2040,7 @@ class Component extends DCLogic {
     const blob = kind === 'xlsx' ? this.toXlsx(this.exportRows()) : kind === 'docx' ? this.toDocx() : this.toJson();
     const a = document.createElement('a');
     a.href = URL.createObjectURL(blob);
-    a.download = 'labels-and-categories-' + this.isoDate(new Date()) + '.' + kind;
+    a.download = 'labels-and-label-groups-' + this.isoDate(new Date()) + '.' + kind;
     document.body.appendChild(a); a.click(); a.remove();
     setTimeout(() => URL.revokeObjectURL(a.href), 1000);
     this.setState({ menu: null, toast: { id: (this.__toastSeq = (this.__toastSeq || 0) + 1), message: 'Exported ' + this.plural(this.state.data.labels.length, 'label') + ' as .' + kind, undo: false } });
@@ -2071,7 +2072,7 @@ class Component extends DCLogic {
   columns(defs, sort) {
     return defs.map((c) => {
       const sorted = sort.key === c.key;
-      return { key: c.key, text: c.text, sortable: c.sortable !== false, sorted, icon: sort.dir === 'asc' ? 'ArrowUpwardFilled' : 'ArrowDownwardFilled',
+      return { key: c.key, text: c.text, sortable: c.sortable !== false, sorted, icon: !sorted ? 'UnfoldMoreOutlined' : sort.dir === 'asc' ? 'ArrowUpwardFilled' : 'ArrowDownwardFilled', iconMod: sorted ? '' : 'grid__sort-icon--idle',
         ariaSort: sorted ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none',
         onSort: () => this.setState((s) => {
           const cur = s.sort || sort;
@@ -2086,7 +2087,7 @@ class Component extends DCLogic {
     const q = this.norm(s.q);
     const all = data.categories.map((c) => ({ id: c.id, name: c.name, createdAt: c.createdAt, editedAt: c.editedAt, labels: this.labelsIn(c.id) }));
     const none = this.labelsIn(null);
-    if (none.length) all.push({ id: null, name: 'No category', createdAt: null, editedAt: null, labels: none, pinned: true });
+    if (none.length) all.push({ id: null, name: 'No label group', createdAt: null, editedAt: null, labels: none, pinned: true });
     let catQ = q, labQ = q;
     if (q.includes('/')) { catQ = this.norm(q.split('/')[0]); labQ = this.norm(q.split('/').slice(1).join('/')); }
     const rows = [];
@@ -2173,7 +2174,7 @@ class Component extends DCLogic {
     const open = () => this.go({ view: 'label', id: l.id });
     const base = this.rowBase(l.id, 'l' + l.id, true, open);
     const cells = [];
-    if (showCat) cells.push({ key: 'cat', text: l.categoryId == null ? 'No category' : this.catName(l.categoryId), mod: l.categoryId == null ? 'grid__name--muted' : '' });
+    if (showCat) cells.push({ key: 'cat', text: l.categoryId == null ? 'No label group' : this.catName(l.categoryId), mod: l.categoryId == null ? 'grid__name--muted' : '' });
     cells.push({ key: 'posts', text: String(n), mod: 'grid__cell--num' });
     cells.push({ key: 'created', text: this.fmtDate(l.createdAt), mod: '' });
     cells.push({ key: 'by', text: l.createdBy, mod: '' });
@@ -2191,7 +2192,7 @@ class Component extends DCLogic {
     const out = { head: {}, grid: {}, empty: { show: false }, tabs: { show: false }, searchPlaceholder: 'Search' };
     const nCats = data.categories.length, nLabels = data.labels.length;
     const tabs = { show: true, items: [
-      { key: 'categories', text: 'Categories (' + nCats + ')', active: r.view === 'categories', onClick: () => this.go({ view: 'categories' }) },
+      { key: 'categories', text: 'Label groups (' + nCats + ')', active: r.view === 'categories', onClick: () => this.go({ view: 'categories' }) },
       { key: 'labels', text: 'All labels (' + nLabels + ')', active: r.view === 'labels', onClick: () => this.go({ view: 'labels' }) },
     ] };
     const exportHead = { showExport: true };
@@ -2201,26 +2202,26 @@ class Component extends DCLogic {
       const getters = { name: (c) => c.name, labels: (c) => c.labels.length, posts: (c) => this.catPosts(c.id).length, created: (c) => (c.createdAt ? c.createdAt.getTime() : 0), edited: (c) => (c.editedAt ? c.editedAt.getTime() : 0) };
       const found = this.categoryRows();
       const pinned = found.filter((c) => c.pinned);
-      // "No category" is not a category: it sits outside the count and the paging, after the last page
+      // "No label group" is not a category: it sits outside the count and the paging, after the last page
       const rows = this.sortBy(found.filter((c) => !c.pinned), sort, getters);
       const pg = this.page(rows);
       if (pg.page === pg.pages - 1) pg.visible = pg.visible.concat(pinned);
       const sel = s.sel.map((id) => this.category(id)).filter(Boolean);
       out.head = {
-        ...exportHead, title: 'Labels', total: rows.length, showTotal: rows.length > 0, meta: '',
-        buttons: [{ key: 'add', text: 'Add label or category', variant: 'contained', color: 'primary', onClick: () => this.openDialog('addCategory', { name: '', staged: [], input: '' }) }],
+        ...exportHead, title: 'Labels', total: rows.length, showTotal: false, meta: '',
+        buttons: [{ key: 'add', text: 'Add label or label group', variant: 'contained', color: 'primary', onClick: () => this.openDialog('addCategory', { name: '', staged: [], input: '' }) }],
         tools: this.toolsFor('category', sel),
       };
       out.tabs = tabs;
       out.grid = {
-        aria: 'Categories', selectable: true, hasMenu: true,
+        aria: 'Label groups', selectable: true, hasMenu: true,
         cols: 'var(--grid-control-w) minmax(0,2.4fr) repeat(4,minmax(0,1fr)) var(--grid-control-w)',
         columns: this.columns([{ key: 'name', text: 'Title' }, { key: 'labels', text: 'Labels', firstDir: 'desc' }, { key: 'posts', text: 'Posts', firstDir: 'desc' }, { key: 'created', text: 'Created', firstDir: 'desc' }, { key: 'edited', text: 'Last edited', firstDir: 'desc' }], sort),
         rows: pg.visible.map((c) => {
           const open = () => this.go({ view: 'category', id: c.id });
           const base = this.rowBase(c.id, 'c' + (c.id == null ? 'none' : c.id), !c.pinned, open);
           const renaming = !!(s.rename && s.rename.kind === 'category' && s.rename.id === c.id && s.rename.where === 'row');
-          const hint = c.hits.length ? 'Matching labels: ' + c.hits.slice(0, 3).map((l) => l.name).join(', ') + (c.hits.length > 3 ? ' +' + (c.hits.length - 3) + ' more' : '') : c.pinned ? 'Labels created without a category' : '';
+          const hint = c.hits.length ? 'Matching labels: ' + c.hits.slice(0, 3).map((l) => l.name).join(', ') + (c.hits.length > 3 ? ' +' + (c.hits.length - 3) + ' more' : '') : c.pinned ? 'Labels created without a label group' : '';
           return {
             ...base, renaming, name: c.name, prefix: '', hint, hasThumb: false,
             nameMod: c.pinned ? 'grid__name--muted' : '',
@@ -2243,7 +2244,7 @@ class Component extends DCLogic {
         }),
       };
       out.pg = pg;
-      out.searchPlaceholder = 'Search categories and labels';
+      out.searchPlaceholder = 'Search label groups and labels';
       if (!rows.length && !pinned.length) out.empty = this.emptyFor(s.q ? 'search' : 'noCats');
     } else if (r.view === 'labels' || r.view === 'category') {
       const scope = r.view === 'labels' ? 'all' : r.id;
@@ -2256,7 +2257,7 @@ class Component extends DCLogic {
       const pg = this.page(rows);
       const sel = s.sel.map((id) => this.label(id)).filter(Boolean);
       const defs = [{ key: 'name', text: 'Label' }];
-      if (showCat) defs.push({ key: 'cat', text: 'Category' });
+      if (showCat) defs.push({ key: 'cat', text: 'Label group' });
       defs.push({ key: 'posts', text: 'Posts', firstDir: 'desc' }, { key: 'created', text: 'Created', firstDir: 'desc' }, { key: 'by', text: 'Created by' }, { key: 'edited', text: 'Last edited', firstDir: 'desc' });
       const postsOpts = [
         { key: 'any', text: 'Any', menu: 'Any number of posts' },
@@ -2265,16 +2266,16 @@ class Component extends DCLogic {
         { key: 'many', text: 'More than 5', menu: 'More than 5 posts (' + counts.many + ')' },
       ];
       const posts = {
-        show: true, open: s.menu === 'posts', mod: s.postsFilter !== 'any' ? 'filter--on' : '',
+        show: false, open: s.menu === 'posts', mod: s.postsFilter !== 'any' ? 'filter--on' : '',
         text: postsOpts.find((o) => o.key === s.postsFilter).text,
         onToggle: () => this.toggleMenu('posts'), onClose: () => this.closeMenu('posts'),
         items: postsOpts.map((o) => ({ key: o.key, text: o.menu, selected: s.postsFilter === o.key,
           onClick: () => this.setState({ postsFilter: o.key, page: 0, sel: [], menu: null }) })),
       };
-      const addBtn = { key: 'add', text: 'Add label or category', variant: 'contained', color: 'primary', onClick: () => this.openDialog('addCategory', { name: this.addName(scope === 'all' ? null : scope), staged: [], input: '' }) };
+      const addBtn = { key: 'add', text: r.view === 'category' && r.id != null && this.category(r.id) ? 'Add label to ' + this.category(r.id).name : 'Add label or label group', variant: 'contained', color: 'primary', onClick: () => this.openDialog('addCategory', { name: this.addName(scope === 'all' ? null : scope), staged: [], input: '' }) };
 
       if (r.view === 'labels') {
-        out.head = { ...exportHead, title: 'Labels', total: rows.length, showTotal: rows.length > 0, meta: '', posts, buttons: [addBtn], tools: this.toolsFor('label', sel) };
+        out.head = { ...exportHead, title: 'Labels', total: rows.length, showTotal: false, meta: '', posts, buttons: [addBtn], tools: this.toolsFor('label', sel) };
         out.tabs = tabs;
         out.searchPlaceholder = 'Search labels';
       } else {
@@ -2282,15 +2283,15 @@ class Component extends DCLogic {
         const renaming = !!(cat && s.rename && s.rename.kind === 'category' && s.rename.id === cat.id && s.rename.where === 'head');
         const catPostCount = this.catPosts(r.id).length;
         out.head = {
-          showExport: false, title: cat ? cat.name : 'No category', total: rows.length, showTotal: rows.length > 0, posts,
-          hasCrumbs: true, crumbs: [{ key: 'root', text: 'Labels', href: '#/categories' }], here: cat ? cat.name : 'No category',
+          showExport: false, title: cat ? cat.name : 'No label group', total: rows.length, showTotal: rows.length > 0, posts,
+          hasCrumbs: true, crumbs: [{ key: 'root', text: 'Labels', href: '#/categories' }], here: cat ? cat.name : 'No label group',
           meta: cat ? 'Created by ' + cat.createdBy + ', ' + this.fmtDate(cat.createdAt) + ' · on ' + this.plural(catPostCount, 'post')
-            : 'Labels that don\'t belong to a category — usually created straight from a post. Move them into one to give them context.',
-          renaming, canRename: !!cat, renameTip: 'Rename category', onRename: () => cat && this.startRename('category', cat.id, 'head'),
-          canDelete: !!cat, deleteTip: 'Delete category', onDelete: () => cat && this.openDialog('deleteCategories', { ids: [cat.id] }),
+            : 'Labels that don\'t belong to a label group — usually created straight from a post. Move them into one to give them context.',
+          renaming, canRename: !!cat, renameTip: 'Rename label group', onRename: () => cat && this.startRename('category', cat.id, 'head'),
+          canDelete: !!cat, deleteTip: 'Delete label group', onDelete: () => cat && this.openDialog('deleteCategories', { ids: [cat.id] }),
           buttons: [addBtn], tools: this.toolsFor('label', sel),
         };
-        out.searchPlaceholder = 'Search in ' + (cat ? cat.name : 'No category');
+        out.searchPlaceholder = 'Search in ' + (cat ? cat.name : 'No label group');
       }
       out.grid = {
         aria: 'Labels', selectable: true, hasMenu: true,
@@ -2313,7 +2314,7 @@ class Component extends DCLogic {
       const pg = this.page(rows);
       const n = this.postsOf(l.id).length;
       const renaming = !!(s.rename && s.rename.kind === 'label' && s.rename.id === l.id && s.rename.where === 'head');
-      const catCrumb = { key: 'cat', text: l.categoryId == null ? 'No category' : this.catName(l.categoryId), href: this.hashFor({ view: 'category', id: l.categoryId }) };
+      const catCrumb = { key: 'cat', text: l.categoryId == null ? 'No label group' : this.catName(l.categoryId), href: this.hashFor({ view: 'category', id: l.categoryId }) };
       out.head = {
         showExport: false, title: l.name, prefix: '',
         total: rows.length, showTotal: rows.length > 0,
@@ -2362,9 +2363,9 @@ class Component extends DCLogic {
   emptyFor(kind, catId) {
     const E = {
       search: { icon: 'SearchFilled', title: 'No Results Found', text: 'Try adjusting your search to find what you\'re looking for.' },
-      noCats: { icon: 'FolderFilled', title: 'No categories yet', text: 'Categories group labels so everyone reads them in context.', actionText: 'Add label or category', onAction: () => this.openDialog('addCategory', { name: '', staged: [], input: '' }) },
-      noLabels: { icon: 'FolderFilled', title: 'No labels yet', text: 'Add labels here, or create them straight from a post.', actionText: 'Add label or category', onAction: () => this.openDialog('addCategory', { name: '', staged: [], input: '' }) },
-      emptyCat: { icon: 'FolderFilled', title: 'No labels in this category', text: 'Add labels to it, or move existing ones in from another category.', actionText: 'Add labels', onAction: () => this.openDialog('addCategory', { name: this.addName(catId), staged: [], input: '' }) },
+      noCats: { icon: 'FolderFilled', title: 'No label groups yet', text: 'Label groups keep related labels together, so everyone reads them in context.', actionText: 'Add label or label group', onAction: () => this.openDialog('addCategory', { name: '', staged: [], input: '' }) },
+      noLabels: { icon: 'FolderFilled', title: 'No labels yet', text: 'Add labels here, or create them straight from a post.', actionText: 'Add label or label group', onAction: () => this.openDialog('addCategory', { name: '', staged: [], input: '' }) },
+      emptyCat: { icon: 'FolderFilled', title: 'No labels in this label group', text: 'Add labels to it, or move existing ones in from another label group.', actionText: 'Add labels', onAction: () => this.openDialog('addCategory', { name: this.addName(catId), staged: [], input: '' }) },
       noUnused: { icon: 'CheckCircleOutlined', title: 'No labels match this filter', text: 'Set “Posts” back to “Any” to see them all.' },
       noPosts: { icon: 'PhotoOutlined', title: 'Not on any post yet', text: 'Labels are added to posts from the post page. Open a post from Evaluations, Violations or an Influencer page.' },
     };
@@ -2379,18 +2380,18 @@ class Component extends DCLogic {
     if (kind === 'category') {
       const ids = sel.map((c) => c.id);
       return [
-        tool('merge', '', n < 2 ? 'Select two or more categories to merge' : 'Merge ' + n + ' categories', n < 2, () => this.openDialog('mergeCategories', { ids, choice: '', other: '' })),
-        tool('rename', 'EditFilled', n !== 1 ? 'Select one category to rename' : 'Rename', n !== 1, () => this.startRename('category', ids[0], 'row')),
+        tool('merge', '', n < 2 ? 'Select two or more label groups to merge' : 'Merge ' + n + ' label groups', n < 2, () => this.openDialog('mergeCategories', { ids, choice: '', other: '' })),
+        tool('rename', 'EditFilled', n !== 1 ? 'Select one label group to rename' : 'Rename', n !== 1, () => this.startRename('category', ids[0], 'row')),
         // one at a time on purpose: deleting a category is heavy enough that a little friction helps
-        tool('delete', 'DeleteFilled', n === 0 ? 'Select a category to delete' : n === 1 ? 'Delete ' + this.q(sel[0].name) : 'Delete one category at a time', n !== 1, () => this.openDialog('deleteCategories', { ids })),
+        tool('delete', 'DeleteFilled', n === 0 ? 'Select a label group to delete' : n === 1 ? 'Delete ' + this.q(sel[0].name) : 'Delete one label group at a time', n !== 1, () => this.openDialog('deleteCategories', { ids })),
       ];
     }
     const ids = sel.map((l) => l.id);
     const cats = new Set(sel.map((l) => l.categoryId));
     const sameCat = cats.size === 1;
     const distinct = cats.size === n;
-    const mergeTip = n < 2 ? 'Select two or more labels to merge' : !sameCat ? 'Only labels in the same category can be merged' : 'Merge ' + n + ' labels';
-    const renameTip = n === 0 ? 'Select labels to rename' : n === 1 ? 'Rename' : distinct ? 'Rename ' + n + ' labels to one spelling' : 'Two of these share a category — merge them instead';
+    const mergeTip = n < 2 ? 'Select two or more labels to merge' : !sameCat ? 'Only labels in the same label group can be merged' : 'Merge ' + n + ' labels';
+    const renameTip = n === 0 ? 'Select labels to rename' : n === 1 ? 'Rename' : distinct ? 'Rename ' + n + ' labels to one spelling' : 'Two of these share a label group — merge them instead';
     return [
       tool('move', 'SwapHorizOutlined', n ? 'Move ' + this.plural(n, 'label') + ' to…' : 'Select labels to move', !n, () => this.openDialog('move', { ids, dest: '' })),
       tool('merge', '', mergeTip, n < 2 || !sameCat, () => this.openDialog('mergeLabels', { ids, choice: '', other: '' })),
@@ -2455,7 +2456,7 @@ class Component extends DCLogic {
       bulk: (() => {
         const tools = (v.head && v.head.tools) || [];
         // always there, so its actions can be found before anything is selected; they wake up with a selection
-        const kind = r0.view === 'categories' ? 'categories' : 'labels';
+        const kind = r0.view === 'categories' ? 'label groups' : 'labels';
         return { show: tools.length > 0, hasSel: s.sel.length > 0, mod: s.sel.length ? '' : 'bulk--idle',
           count: s.sel.length ? this.plural(s.sel.length, 'row') + ' selected' : 'Select ' + kind + ' to act on them',
           actions: tools, onClear: () => this.setState({ sel: [] }) };

@@ -26,7 +26,7 @@ Open `index.html` for the cover, or go straight to one:
 
 | | | |
 | --- | --- | --- |
-| **admin v3** | [`prototypes/admin-v3-labels-and-categories.dc.html`](prototypes/admin-v3-labels-and-categories.dc.html) | **New — work in progress.** Admin v2 with a "Posts" filter beside the search for finding labels without posts; see [Admin v3 — what changed](#admin-v3--what-changed). |
+| **admin v3** | [`prototypes/admin-v3-labels-and-categories.dc.html`](prototypes/admin-v3-labels-and-categories.dc.html) | **New — work in progress.** Admin v2 with "label groups" instead of categories, visible sort icons, a first-visit banner, one add dialog and an action bar; see [Admin v3 — what changed](#admin-v3--what-changed). |
 | **admin v2** | [`prototypes/admin-v2-labels-and-categories.dc.html`](prototypes/admin-v2-labels-and-categories.dc.html) | The admin after the first round of feedback; see [Admin v2 — what changed](#admin-v2--what-changed). |
 | **admin v1** | [`prototypes/admin-v1-labels-and-categories.dc.html`](prototypes/admin-v1-labels-and-categories.dc.html) | Managing the catalogue — categories and their labels — laid out like the product's Keyword Groups screen. Not part of the in-place vs modal question; see [The admin](#the-admin). |
 | **v4** | [`prototypes/post-v4-save-and-create-in-place.dc.html`](prototypes/post-v4-save-and-create-in-place.dc.html) | **Current — used in interviews.** v3's winning candidate — everything resolved in place on the page — on its own, with the ability to create new labels (and, via "Category / New label", new categories) restored to the same combobox that already adds existing ones. |
@@ -176,6 +176,8 @@ Admin v2 is kept as it was, for comparison.
   category's page. Its menu offers Any number of posts, No posts, 1 to 5 posts
   and More than 5 posts, each with its count, and while a filter is on the
   button stays highlighted and reads, for example, "Posts: No posts".
+  *Later removed:* the filter went in the next round; the always-visible sort
+  icons below are how labels without posts are found now.
 
 - **A first-visit banner says what labels are for.** Above the tabs, on
   Categories and All labels: track brands across evaluations, assign posts to
@@ -200,6 +202,17 @@ Admin v2 is kept as it was, for comparison.
 - **Move shows what each category already holds.** "Move to" is a list instead
   of a drop-down: each category shows its first five labels, and a "+N" whose
   tooltip names the rest. **New category** is the first row, with a +.
+
+- **Categories are now called label groups.** The same idea as keywords and
+  keyword groups elsewhere in the product. Only the words on screen changed;
+  the code and the page addresses still say category.
+- **Every sortable column shows its sort icon.** Unsorted columns show a grey
+  up-and-down icon, so it is clear that Posts, Label and the rest can be
+  sorted; sorting by Posts replaces the Posts filter, which is gone.
+- **Inside a label group the button says where labels go:** "Add label to
+  Campaigns". Elsewhere it stays "Add label or label group".
+- **No total under the Labels title.** The tabs already show the counts. A
+  label group's own page keeps its total.
 
 ### A clean copy for sessions
 
