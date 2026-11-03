@@ -1,0 +1,2353 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>[admin v3] Labels and categories</title>
+<script src="../../../shared/support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<template id="__bundler_thumbnail" data-bg-color="#1C00B7">
+  <svg viewBox="0 0 100 70" xmlns="http://www.w3.org/2000/svg">
+    <rect x="0" y="0" width="12" height="70" fill="#fff" opacity="0.25"/>
+    <rect x="20" y="10" width="72" height="52" fill="#fff" opacity="0.9"/>
+    <rect x="26" y="18" width="30" height="4" fill="#1C00B7"/>
+    <rect x="26" y="28" width="60" height="2" fill="#1C00B7" opacity="0.35"/>
+    <rect x="26" y="36" width="60" height="2" fill="#1C00B7" opacity="0.35"/>
+    <rect x="26" y="44" width="60" height="2" fill="#1C00B7" opacity="0.35"/>
+    <rect x="26" y="52" width="60" height="2" fill="#1C00B7" opacity="0.35"/>
+  </svg>
+</template>
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/fonts.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/colors.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/typography.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/tokens/spacing.css">
+<link rel="stylesheet" href="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/styles.css">
+<script src="../../../_ds/monitoring-design-system-1b6ea82e-2f03-4829-a388-b1ad0eec86ff/_ds_bundle.js"></script>
+<style>
+/* Tokens in three tiers. Primitive (--im-blue-700, --space-2 …) and semantic (--color-primary-main,
+   --text-secondary, --divider …) come from the design system in _ds/. This page only adds the
+   component tier below, and every value in it points at one of the other two. The DS has no
+   outline token, so the one semantic addition is --outline-default: MUI's outlined border is
+   0.23 black; --action-disabled is the closest ink-based value the DS has. */
+:root{
+  --outline-default: var(--action-disabled);
+
+  --gnav-h: var(--space-6);
+  --gnav-bg: var(--bluegrey-900);
+  --gnav-fg: var(--background-paper);
+  --gnav-fg-muted: var(--bluegrey-200);
+  --gnav-rule: var(--bluegrey-700);
+
+  --rail-w: var(--space-6);
+  --rail-bg: var(--color-primary-main);
+  --rail-fg: var(--color-primary-contrast);
+  --rail-item-active: var(--color-primary-dark);
+
+  --page-pad-x: var(--space-4);
+  --page-bg: var(--background-default);
+  --head-bg: var(--background-paper);
+  --sheet-bg: var(--background-paper);
+
+  --grid-control-w: var(--space-7);
+  --grid-head-h: var(--space-5);
+  --grid-row-h: calc(var(--space-7) + var(--space-0-5));
+  --grid-rule: var(--divider);
+  --grid-row-hover: var(--action-hover);
+  --grid-row-selected: var(--color-primary-selected);
+  --grid-thumb: var(--space-5);
+  --grid-preview-w: var(--space-10);
+  --grid-preview-h: var(--space-6);
+  --grid-avatar: var(--space-3);
+  --grid-avatar-bg: var(--bluegrey-100);
+  --grid-avatar-fg: var(--bluegrey-700);
+  --dlg-thumb-w: var(--space-6);
+  --dlg-thumb-h: var(--space-4);
+
+  --field-h: var(--space-4);
+  --field-w: calc(var(--space-12) * 2);
+  --field-border: var(--outline-default);
+  --field-border-focus: var(--color-primary-main);
+
+  --menu-w: calc(var(--space-12) * 2);
+  /* the DS Dialog has no max-height, so the body caps itself: viewport minus title, actions, a
+     margin above and below, and the facilitator bar, which sits above the dialog's overlay —
+     title and buttons stay on screen, only the body scrolls */
+  --dlg-body-max: calc(100vh - (var(--space-12) * 2) - var(--space-2) - var(--gnav-h));
+  --dlg-list-max: min(calc(var(--space-12) * 3), 30vh);
+}
+
+*,*::before,*::after{box-sizing:border-box}
+html,body{margin:0}
+body{background:var(--page-bg);font:var(--fw-regular) var(--fs-body2)/var(--lh-body) var(--font-body);color:var(--text-primary)}
+button{font:inherit}
+
+/* ---- facilitator bar (prototype scaffolding, not product UI) ---- */
+.gnav{position:fixed;top:0;left:0;right:0;height:var(--gnav-h);z-index:100;display:flex;align-items:center;
+  gap:var(--space-1-5);padding:0 var(--space-2);background:var(--gnav-bg);color:var(--gnav-fg);overflow-x:auto}
+.gnav__title{font-size:var(--fs-caption);font-weight:var(--fw-semibold);white-space:nowrap}
+.gnav__sub{font-size:var(--fs-caption);color:var(--gnav-fg-muted);white-space:nowrap}
+.gnav__spacer{flex:1}
+.gnav__btn{all:unset;cursor:pointer;padding:var(--space-0-5) var(--space-1-5);border:1px solid var(--gnav-rule);
+  border-radius:var(--radius);font-size:var(--fs-caption);color:var(--gnav-fg-muted);white-space:nowrap}
+.gnav__btn:hover,.gnav__btn:focus-visible{color:var(--gnav-fg);border-color:var(--gnav-fg-muted)}
+.gnav__rule{width:1px;align-self:stretch;margin:var(--space-1-5) 0;background:var(--gnav-rule)}
+.gnav__link{font-size:var(--fs-caption);color:var(--gnav-fg-muted);text-decoration:none;white-space:nowrap}
+.gnav__link:hover{color:var(--gnav-fg)}
+.gnav-restore{all:unset;position:fixed;top:var(--space-1);right:var(--space-1);z-index:101;cursor:pointer;
+  padding:var(--space-0-5) var(--space-1-5);border-radius:var(--radius);font-size:var(--fs-caption);
+  background:var(--gnav-bg);color:var(--gnav-fg-muted)}
+
+/* ---- app frame: rail + main, mirroring the product's Keyword Groups screen ---- */
+.app{padding-top:var(--gnav-h);min-height:100vh}
+.app--bare{padding-top:0}
+.rail{position:fixed;top:var(--gnav-h);bottom:0;left:0;width:var(--rail-w);z-index:40;background:var(--rail-bg);
+  color:var(--rail-fg);display:flex;flex-direction:column;align-items:center;padding:var(--space-1-5) 0;gap:var(--space-0-5)}
+.app--bare .rail{top:0}
+.rail__mark{font:var(--fw-bold) var(--fs-subtitle1)/1 var(--font-title);letter-spacing:-0.5px;margin-bottom:var(--space-2)}
+.rail__item{width:var(--rail-w);height:var(--space-5);display:flex;align-items:center;justify-content:center;opacity:.8}
+.rail__item--active{background:var(--rail-item-active);opacity:1}
+.rail__spacer{flex:1}
+.main{margin-left:var(--rail-w)}
+
+/* ---- page head ---- */
+.head{background:var(--head-bg);border-bottom:1px solid var(--grid-rule);
+  padding:var(--space-2) var(--page-pad-x) 0;display:grid;grid-template-columns:minmax(0,1fr) auto;
+  column-gap:var(--space-3);align-items:start}
+.head__lead{min-width:0;padding-bottom:var(--space-2)}
+.head__crumbs{display:flex;align-items:center;gap:var(--space-0-5);min-width:0;flex-shrink:0;font-size:var(--fs-body2)}
+.head__crumb{color:var(--text-secondary);text-decoration:none;white-space:nowrap}
+.head__crumb:hover{color:var(--text-primary);text-decoration:underline}
+.head__crumb-sep{display:inline-flex;color:var(--action-active);margin-right:var(--space-0-5)}
+.head__title-row{display:flex;align-items:center;gap:var(--space-0-5);min-height:var(--space-5)}
+.head__title{font:var(--fw-regular) var(--fs-h5)/var(--lh-heading) var(--font-title);margin:0;
+  overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.head__title--crumb{font:var(--fw-medium) var(--fs-body2)/var(--lh-body) var(--font-body)}
+.head__meta{display:flex;align-items:center;flex-wrap:wrap;gap:var(--space-2);margin-top:var(--space-0-5);
+  font-size:var(--fs-body2);color:var(--text-primary)}
+.head__meta-sub{color:var(--text-secondary)}
+.head__tools{display:flex;flex-direction:column;align-items:flex-end;gap:var(--space-1-5);padding-bottom:var(--space-2)}
+.head__actions{display:flex;align-items:center;gap:var(--space-1)}
+.head__toolbar{display:flex;align-items:center;gap:var(--space-0-5)}
+.head__tabs{grid-column:1 / -1;margin-top:calc(var(--space-1) * -1)}
+.head__tablist{display:flex}
+
+.anchor{position:relative;display:inline-flex}
+.anchor__menu{position:absolute;right:0;top:100%;width:var(--menu-w);height:0}
+.anchor__menu--left{left:0;right:auto}
+/* opens upwards (rows per page sits at the bottom of the page). The DS Menu pins itself with inline
+   top:100%, so its own box is re-anchored to the bottom here. */
+.anchor__menu--up{top:auto;bottom:100%}
+.anchor__menu--up [style*="position: absolute"]{top:auto !important;bottom:0;margin-top:0 !important;margin-bottom:var(--space-0-5)}
+
+.search{display:flex;align-items:center;height:var(--field-h);width:var(--field-w);margin-left:var(--space-1);
+  border:1px solid var(--field-border);border-radius:var(--radius);padding:0 var(--space-1) 0 var(--space-1-5);
+  color:var(--action-active);background:var(--background-paper)}
+.search:focus-within{border-color:var(--field-border-focus);box-shadow:inset 0 0 0 1px var(--field-border-focus)}
+.search__input{all:unset;flex:1;min-width:0;font-size:var(--fs-body2);color:var(--text-primary)}
+.search__input::placeholder{color:var(--text-secondary)}
+.filter{all:unset;cursor:pointer;box-sizing:border-box;display:inline-flex;align-items:center;gap:var(--space-0-5);height:var(--field-h);
+  margin-left:var(--space-1);border:1px solid var(--field-border);border-radius:var(--radius);padding:0 var(--space-0-5) 0 var(--space-1-5);
+  font-size:var(--fs-body2);color:var(--text-primary);background:var(--background-paper);white-space:nowrap}
+.filter:hover{border-color:var(--text-primary)}
+.filter:focus-visible{border-color:var(--field-border-focus);box-shadow:inset 0 0 0 1px var(--field-border-focus)}
+.filter__label{color:var(--text-secondary)}
+.filter--on{border-color:var(--color-primary-main);background:var(--color-primary-selected);color:var(--color-primary-main)}
+.filter--on .filter__label{color:var(--color-primary-main)}
+.search__clear{all:unset;cursor:pointer;display:inline-flex;color:var(--action-active)}
+
+.merge-icon{width:calc(var(--space-2) + var(--space-0-5));height:calc(var(--space-2) + var(--space-0-5));fill:currentColor}
+
+/* ---- sheet + grid (a table made of divs, see the note in the template) ---- */
+.sheet{margin:var(--space-2) var(--page-pad-x) var(--space-8);background:var(--sheet-bg);border-radius:var(--radius)}
+.grid{--grid-cols:1fr}
+.grid__row{display:grid;grid-template-columns:var(--grid-cols);align-items:center;min-height:var(--grid-row-h);
+  border-bottom:1px solid var(--grid-rule);position:relative}
+.grid__row--head{min-height:var(--grid-head-h);font-size:var(--fs-caption);color:var(--text-primary)}
+.grid__row--body{cursor:pointer}
+.grid__row--body:hover{background:var(--grid-row-hover)}
+.grid__row--selected,.grid__row--selected:hover{background:var(--grid-row-selected)}
+.grid__row--pinned{background:var(--background-default)}
+.grid__row--static{cursor:default}
+.grid__row--renaming,.grid__row--renaming:hover{background:var(--color-primary-hover);cursor:default}
+.grid__cell{padding:0 var(--space-2);min-width:0;font-size:var(--fs-caption)}
+.grid__cell--control{padding:0 0 0 var(--space-0-5);display:flex;align-items:center}
+.grid__cell--title{font-size:var(--fs-body2);padding-top:var(--space-1);padding-bottom:var(--space-1)}
+.grid__cell--num{font-size:var(--fs-body2);font-variant-numeric:tabular-nums}
+.grid__cell--menu{display:flex;justify-content:flex-end;padding-right:var(--space-1)}
+.grid__sort{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:var(--space-0-5)}
+.grid__sort:focus-visible{outline:2px solid var(--color-primary-main);outline-offset:2px}
+.grid__sort-icon{display:inline-flex;color:var(--action-active)}
+.grid__title{display:flex;align-items:center;gap:var(--space-1-5);min-width:0}
+.grid__title-text{display:flex;flex-direction:column;min-width:0}
+.grid__name{all:unset;cursor:pointer;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grid__name:hover{text-decoration:underline}
+.grid__name:focus-visible{outline:2px solid var(--color-primary-main);outline-offset:2px}
+.grid__name--static{cursor:default}
+.grid__name--static:hover{text-decoration:none}
+.grid__name--muted{color:var(--text-secondary);font-style:italic}
+.grid__prefix{color:var(--text-secondary);margin-right:var(--space-0-5)}
+.grid__hint{font-size:var(--fs-caption);color:var(--text-secondary);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.grid__thumb{flex-shrink:0;width:var(--grid-thumb);height:var(--grid-thumb);border-radius:var(--radius);overflow:hidden;
+  display:flex;align-items:center;justify-content:center;font-weight:var(--fw-medium);font-size:var(--fs-body2);
+  background-size:cover;background-position:center}
+/* a post is known by its picture, not a name: most posts have none */
+.grid__preview{all:unset;flex-shrink:0;display:flex;align-items:center;justify-content:center;width:var(--grid-preview-w);height:var(--grid-preview-h);
+  border-radius:var(--radius);overflow:hidden;background-size:cover;background-position:center;font-weight:var(--fw-medium);font-size:var(--fs-body2)}
+button.grid__preview{cursor:pointer}
+.grid__preview:focus-visible{outline:2px solid var(--color-primary-main);outline-offset:2px}
+.grid__head-text{display:inline-flex;align-items:center}
+.grid__creator{display:flex;align-items:center;gap:var(--space-1);min-width:0;font-size:var(--fs-body2)}
+.grid__creator-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+/* a creator posts on several platforms, so the avatar never takes a platform's colour */
+.grid__avatar{flex-shrink:0;width:var(--grid-avatar);height:var(--grid-avatar);border-radius:50%;display:flex;align-items:center;justify-content:center;
+  font-size:var(--fs-caption);font-weight:var(--fw-medium);background:var(--grid-avatar-bg);color:var(--grid-avatar-fg)}
+.grid__platform{display:inline-flex;align-items:center;height:var(--space-3);padding:0 var(--space-1);border-radius:var(--space-1-5);
+  font-size:var(--fs-caption)}
+.grid__menu-btn{opacity:0}
+.grid__row:hover .grid__menu-btn,.grid__row:focus-within .grid__menu-btn,.grid__menu-btn--open{opacity:1}
+
+.rename{display:flex;flex-direction:column;gap:var(--space-0-5);width:100%}
+.rename__input{all:unset;font-size:var(--fs-body2);height:var(--field-h);padding:0 var(--space-1);
+  border:1px solid var(--field-border-focus);box-shadow:inset 0 0 0 1px var(--field-border-focus);
+  border-radius:var(--radius);background:var(--background-paper);max-width:calc(var(--field-w) * 2)}
+.rename__input--head{font:var(--fw-regular) var(--fs-h5)/var(--lh-heading) var(--font-title);height:var(--space-5)}
+.rename__help{font-size:var(--fs-caption);color:var(--text-secondary)}
+.rename__help--error{color:var(--color-error-main)}
+.rename__help--merge{color:var(--color-warning-main)}
+
+.foot{display:flex;align-items:center;gap:var(--space-3);min-height:var(--space-6);padding:0 var(--space-1) 0 var(--space-2);
+  font-size:var(--fs-caption)}
+.foot__selected{flex:1}
+.foot__rpp{all:unset;cursor:pointer;display:inline-flex;align-items:center;gap:var(--space-0-5)}
+.foot__rpp-wrap{display:flex;align-items:center;gap:var(--space-1)}
+.foot__pager{display:flex;align-items:center}
+
+.empty{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:var(--space-1);
+  padding:var(--space-12) var(--space-3);text-align:center;border-bottom:1px solid var(--grid-rule)}
+.empty__mark{width:var(--space-10);height:var(--space-10);border-radius:50%;background:var(--color-primary-light);
+  color:var(--color-primary-main);display:flex;align-items:center;justify-content:center;margin-bottom:var(--space-1)}
+.empty__title{font-size:var(--fs-subtitle1);color:var(--text-primary)}
+.empty__text{font-size:var(--fs-body2);color:var(--text-primary);max-width:60ch}
+
+/* ---- dialogs (one renderer; each dialog is a list of sections) ---- */
+.dlg{display:flex;flex-direction:column;gap:var(--space-2);padding-bottom:var(--space-1);color:var(--text-primary);
+  max-height:var(--dlg-body-max);overflow-y:auto;overscroll-behavior:contain}
+.dlg__text{margin:0;font-size:var(--fs-body2);line-height:var(--lh-body);color:var(--text-secondary)}
+.dlg__text--strong{color:var(--text-primary)}
+.dlg__field{padding-top:var(--space-1)}
+.dlg__heading{font-size:var(--fs-caption);font-weight:var(--fw-medium);letter-spacing:.4px;text-transform:uppercase;
+  color:var(--text-secondary);margin-bottom:var(--space-0-5)}
+.dlg__list{max-height:var(--dlg-list-max);overflow:auto;border:1px solid var(--grid-rule);border-radius:var(--radius)}
+.dlg__more{padding:var(--space-1) var(--space-1-5);font-size:var(--fs-caption);color:var(--text-secondary)}
+.dlg-item{display:flex;align-items:center;gap:var(--space-1);padding:var(--space-1) var(--space-1-5);
+  border-bottom:1px solid var(--grid-rule);font-size:var(--fs-body2)}
+.dlg-item:last-child{border-bottom:0}
+/* the post's own line never gives way; the labels on the right shrink first */
+.dlg-item__name{flex:1 0 auto;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.dlg-item__prefix{color:var(--text-secondary);margin-right:var(--space-0-5)}
+.dlg-item__meta{font-size:var(--fs-caption);color:var(--text-secondary);white-space:nowrap}
+.dlg-item__status{font-size:var(--fs-caption);text-align:right;max-width:55%}
+.dlg-item__status--ok{color:var(--color-success-main)}
+.dlg-item__status--skip{color:var(--text-secondary)}
+.dlg-item__status--merge{color:var(--color-warning-main)}
+.dlg-item__status--error{color:var(--color-error-main)}
+.dlg-item__status--new{color:var(--color-primary-main)}
+.dlg-item__thumb{flex-shrink:0;width:var(--dlg-thumb-w);height:var(--dlg-thumb-h);border-radius:var(--radius);overflow:hidden;
+  display:flex;align-items:center;justify-content:center;font-size:var(--fs-caption);font-weight:var(--fw-medium);
+  background-size:cover;background-position:center}
+.dlg-item__tags{flex:0 1 auto;min-width:0;font-size:var(--fs-caption);color:var(--text-secondary);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.choice{display:flex;align-items:flex-start;gap:var(--space-0-5);cursor:pointer;font-size:var(--fs-body2);margin-left:calc(var(--space-1) * -1)}
+.choice--disabled{cursor:default;opacity:.5}
+.choice__text{display:flex;flex-direction:column;padding-top:var(--space-1)}
+.choice__sub{font-size:var(--fs-caption);color:var(--text-secondary)}
+.dlg__indent{padding-left:var(--space-4)}
+.dlg-item__remove{all:unset;cursor:pointer;display:inline-flex;color:var(--action-active);border-radius:50%}
+.dlg-item__remove:hover,.dlg-item__remove:focus-visible{color:var(--text-primary);background:var(--action-hover)}
+
+.stager{display:flex;flex-direction:column;gap:var(--space-0-5);padding-top:var(--space-1)}
+.stager__field{position:relative;display:flex;align-items:center;gap:var(--space-0-5);height:calc(var(--space-6) - var(--space-0-5));
+  padding:0 var(--space-0-5) 0 var(--space-1-5);border:1px solid var(--field-border);border-radius:var(--radius)}
+.stager__field:focus-within{border-color:var(--field-border-focus);box-shadow:inset 0 0 0 1px var(--field-border-focus)}
+.stager__label{position:absolute;top:calc(var(--space-1) * -1);left:var(--space-1);padding:0 var(--space-0-5);
+  background:var(--background-paper);font-size:var(--fs-caption);line-height:1;color:var(--text-secondary)}
+.stager__field:focus-within .stager__label{color:var(--color-primary-main)}
+.stager__input{all:unset;flex:1;min-width:0;font-size:var(--fs-body1);color:var(--text-primary)}
+.stager__input::placeholder{color:var(--text-disabled)}
+.stager__help{font-size:var(--fs-caption);color:var(--text-secondary);padding-left:var(--space-1-5)}
+</style>
+</helmet>
+
+<sc-if value="{{!chrome.hidden}}" hint-placeholder-val="{{true}}">
+  <div class="gnav">
+    <span class="gnav__title">[admin v3] Labels &amp; categories</span>
+    <span class="gnav__sub">Manage the label catalogue &mdash; search, create, edit, merge, delete, export</span>
+    <span class="gnav__spacer"></span>
+    <button class="gnav__btn" onClick="{{chrome.onReset}}">Reset</button>
+    <button class="gnav__btn" onClick="{{chrome.onHide}}">Hide</button>
+    <span class="gnav__rule"></span>
+    <a class="gnav__link" href="post-v4-save-and-create-in-place.dc.html">[v4] Labels in a post &rsaquo;</a>
+  </div>
+</sc-if>
+<sc-if value="{{chrome.hidden}}" hint-placeholder-val="{{false}}">
+  <button class="gnav-restore" onClick="{{chrome.onShow}}">Show bar</button>
+</sc-if>
+
+<div class="app {{chrome.appMod}}">
+  <!-- static stand-in for the product's navigation rail; only "Labels" is live -->
+  <nav class="rail" aria-label="Product">
+    <span class="rail__mark">IM</span>
+    <span class="rail__item" title="Dashboard"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="SpaceDashboardFilled" size="20" hint-size="20px,20px"></x-import></span>
+    <span class="rail__item" title="Reports"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="PivotTableChartFilled" size="20" hint-size="20px,20px"></x-import></span>
+    <span class="rail__item" title="Alerts"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="InfoOutlined" size="20" hint-size="20px,20px"></x-import></span>
+    <span class="rail__item" title="Evaluations"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="CollectionsFilled" size="20" hint-size="20px,20px"></x-import></span>
+    <span class="rail__item" title="Keyword Groups"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="ViewHeadlineFilled" size="20" hint-size="20px,20px"></x-import></span>
+    <span class="rail__item rail__item--active" title="Labels">
+      <svg class="merge-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M17.63 5.84C17.27 5.33 16.67 5 16 5L5 5.01C3.9 5.01 3 5.9 3 7v10c0 1.1.9 1.99 2 1.99L16 19c.67 0 1.27-.33 1.63-.84L22 12l-4.37-6.16z"/></svg>
+    </span>
+    <span class="rail__spacer"></span>
+    <span class="rail__item" title="Help"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="InfoOutlined" size="20" hint-size="20px,20px"></x-import></span>
+    <span class="rail__item" title="Account"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="AccountCircleFilled" size="20" hint-size="20px,20px"></x-import></span>
+  </nav>
+
+  <main class="main">
+    <!-- ================= PAGE HEAD ================= -->
+    <header class="head">
+      <div class="head__lead">
+        <!-- on a detail page the breadcrumb is the title, as in Keyword Groups: "Labels › Brand" -->
+        <div class="head__title-row">
+          <sc-if value="{{head.hasCrumbs}}" hint-placeholder-val="{{false}}">
+            <nav class="head__crumbs" aria-label="Breadcrumb">
+              <sc-for list="{{head.crumbs}}" as="c" hint-placeholder-count="1">
+                <a class="head__crumb" href="{{c.href}}">{{c.text}}</a>
+                <span class="head__crumb-sep" aria-hidden="true"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="ChevronRightFilled" size="18" hint-size="18px,18px"></x-import></span>
+              </sc-for>
+            </nav>
+          </sc-if>
+          <sc-if value="{{head.renaming}}" hint-placeholder-val="{{false}}">
+            <span class="rename">
+              <input id="rename-input" class="rename__input {{head.renameMod}}" aria-label="{{rename.aria}}"
+                value="{{rename.value}}" onChange="{{rename.onInput}}" onKeyDown="{{rename.onKeyDown}}" onBlur="{{rename.onBlur}}" />
+              <span class="rename__help {{rename.helpMod}}">{{rename.help}}</span>
+            </span>
+          </sc-if>
+          <sc-if value="{{!head.renaming}}" hint-placeholder-val="{{true}}">
+            <h1 class="head__title {{head.titleMod}}" aria-current="{{head.ariaCurrent}}">{{head.title}}</h1>
+            <sc-if value="{{head.canRename}}" hint-placeholder-val="{{false}}">
+              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Tooltip" title="{{head.renameTip}}" hint-size="auto,auto">
+                <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.IconButton" size="small" onClick="{{head.onRename}}" aria-label="{{head.renameTip}}" hint-size="32px,32px">
+                  <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="EditFilled" size="18" hint-size="18px,18px"></x-import>
+                </x-import>
+              </x-import>
+            </sc-if>
+            <sc-if value="{{head.canDelete}}" hint-placeholder-val="{{false}}">
+              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Tooltip" title="{{head.deleteTip}}" hint-size="auto,auto">
+                <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.IconButton" size="small" onClick="{{head.onDelete}}" aria-label="{{head.deleteTip}}" hint-size="32px,32px">
+                  <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="DeleteFilled" size="18" hint-size="18px,18px"></x-import>
+                </x-import>
+              </x-import>
+            </sc-if>
+          </sc-if>
+        </div>
+
+        <div class="head__meta">
+          <sc-if value="{{head.showTotal}}" hint-placeholder-val="{{true}}"><span>Total: {{head.total}}</span></sc-if>
+          <sc-if value="{{head.meta}}" hint-placeholder-val="{{false}}"><span class="head__meta-sub">{{head.meta}}</span></sc-if>
+        </div>
+      </div>
+
+      <div class="head__tools">
+        <div class="head__actions">
+          <sc-if value="{{head.showExport}}" hint-placeholder-val="{{true}}">
+            <span class="anchor">
+              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Button" variant="outlined" size="small" onClick="{{exp.onToggle}}" aria-haspopup="menu" aria-expanded="{{exp.open}}" hint-size="auto,32px">Export</x-import>
+              <span class="anchor__menu">
+                <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Menu" open="{{exp.open}}" onClose="{{exp.onClose}}" hint-size="0,0">
+                  <sc-for list="{{exp.items}}" as="it" hint-placeholder-count="3">
+                    <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.MenuItem" onClick="{{it.onClick}}" hint-size="auto,32px">{{it.text}}</x-import>
+                  </sc-for>
+                </x-import>
+              </span>
+            </span>
+          </sc-if>
+          <sc-for list="{{head.buttons}}" as="b" hint-placeholder-count="1">
+            <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Button" variant="{{b.variant}}" color="{{b.color}}" size="small" onClick="{{b.onClick}}" hint-size="auto,32px">{{b.text}}</x-import>
+          </sc-for>
+        </div>
+        <div class="head__toolbar">
+          <sc-for list="{{head.tools}}" as="t" hint-placeholder-count="2">
+            <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Tooltip" title="{{t.tip}}" hint-size="auto,auto">
+              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.IconButton" size="small" disabled="{{t.disabled}}" onClick="{{t.onClick}}" aria-label="{{t.aria}}" hint-size="32px,32px">
+                <sc-if value="{{t.isMerge}}" hint-placeholder-val="{{false}}">
+                  <svg class="merge-icon" viewBox="0 0 24 24" aria-hidden="true"><path d="M17 20.41L18.41 19 15 15.59 13.59 17 17 20.41zM7.5 8H11v5.59L5.59 19 7 20.41l6-6V8h3.5L12 3.5 7.5 8z"/></svg>
+                </sc-if>
+                <sc-if value="{{!t.isMerge}}" hint-placeholder-val="{{true}}">
+                  <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="{{t.icon}}" size="20" hint-size="20px,20px"></x-import>
+                </sc-if>
+              </x-import>
+            </x-import>
+          </sc-for>
+          <sc-if value="{{head.posts.show}}" hint-placeholder-val="{{true}}">
+            <span class="anchor">
+              <button class="filter {{head.posts.mod}}" onClick="{{head.posts.onToggle}}" aria-haspopup="menu" aria-expanded="{{head.posts.open}}" aria-label="Filter by number of posts">
+                <span class="filter__label">Posts:</span><span>{{head.posts.text}}</span>
+                <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="ArrowDropDownFilled" size="20" hint-size="20px,20px"></x-import>
+              </button>
+              <span class="anchor__menu">
+                <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Menu" open="{{head.posts.open}}" onClose="{{head.posts.onClose}}" hint-size="0,0">
+                  <sc-for list="{{head.posts.items}}" as="it" hint-placeholder-count="4">
+                    <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.MenuItem" selected="{{it.selected}}" onClick="{{it.onClick}}" hint-size="auto,32px">{{it.text}}</x-import>
+                  </sc-for>
+                </x-import>
+              </span>
+            </span>
+          </sc-if>
+          <label class="search">
+            <input id="admin-search" class="search__input" type="text" placeholder="Search" aria-label="{{search.placeholder}}"
+              value="{{search.value}}" onChange="{{search.onInput}}" onKeyDown="{{search.onKeyDown}}" />
+            <sc-if value="{{search.value}}" hint-placeholder-val="{{false}}">
+              <button class="search__clear" onClick="{{search.onClear}}" aria-label="Clear search"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="CloseFilled" size="18" hint-size="18px,18px"></x-import></button>
+            </sc-if>
+            <sc-if value="{{!search.value}}" hint-placeholder-val="{{true}}">
+              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="SearchFilled" size="20" hint-size="20px,20px"></x-import>
+            </sc-if>
+          </label>
+        </div>
+      </div>
+
+      <sc-if value="{{tabs.show}}" hint-placeholder-val="{{true}}">
+        <div class="head__tabs">
+          <div class="head__tablist" role="tablist">
+            <sc-for list="{{tabs.items}}" as="tab" hint-placeholder-count="2">
+              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Tab" label="{{tab.text}}" active="{{tab.active}}" onClick="{{tab.onClick}}" hint-size="auto,48px"></x-import>
+            </sc-for>
+          </div>
+        </div>
+      </sc-if>
+    </header>
+
+    <!-- ================= SHEET =================
+         The grid is built from divs with ARIA table roles, not <table>: the runtime reads this
+         template out of the live DOM, and the browser's parser would hoist the loop tags out of a
+         real table before the runtime ever saw them. -->
+    <section class="sheet">
+      <div class="grid" role="table" aria-label="{{grid.aria}}" style="--grid-cols:{{grid.cols}}">
+        <div class="grid__row grid__row--head" role="row">
+          <sc-if value="{{grid.selectable}}" hint-placeholder-val="{{true}}">
+            <span class="grid__cell grid__cell--control" role="columnheader">
+              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Checkbox" size="small" checked="{{grid.allChecked}}" indeterminate="{{grid.someChecked}}" disabled="{{grid.noneSelectable}}" onChange="{{grid.onCheckAll}}" aria-label="Select all rows on this page" hint-size="30px,30px"></x-import>
+            </span>
+          </sc-if>
+          <sc-for list="{{grid.columns}}" as="col" hint-placeholder-count="5">
+            <span class="grid__cell" role="columnheader" aria-sort="{{col.ariaSort}}">
+              <sc-if value="{{col.sortable}}" hint-placeholder-val="{{true}}">
+                <button class="grid__sort" onClick="{{col.onSort}}">{{col.text}}<sc-if value="{{col.sorted}}" hint-placeholder-val="{{false}}"><span class="grid__sort-icon"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="{{col.icon}}" size="14" hint-size="14px,14px"></x-import></span></sc-if></button>
+              </sc-if>
+              <sc-if value="{{!col.sortable}}" hint-placeholder-val="{{false}}"><span class="grid__head-text">{{col.text}}</span></sc-if>
+            </span>
+          </sc-for>
+          <sc-if value="{{grid.hasMenu}}" hint-placeholder-val="{{true}}"><span class="grid__cell" role="columnheader"></span></sc-if>
+        </div>
+
+        <sc-for list="{{grid.rows}}" as="row" hint-placeholder-count="6">
+          <div class="grid__row grid__row--body {{row.mod}}" role="row" onClick="{{row.onRowClick}}" aria-selected="{{row.checked}}">
+            <sc-if value="{{grid.selectable}}" hint-placeholder-val="{{true}}">
+              <span class="grid__cell grid__cell--control" role="cell">
+                <sc-if value="{{row.selectable}}" hint-placeholder-val="{{true}}">
+                  <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Checkbox" size="small" checked="{{row.checked}}" onChange="{{row.onCheck}}" aria-label="{{row.checkAria}}" hint-size="30px,30px"></x-import>
+                </sc-if>
+              </span>
+            </sc-if>
+
+            <span class="grid__cell grid__cell--title" role="cell">
+              <sc-if value="{{row.renaming}}" hint-placeholder-val="{{false}}">
+                <span class="rename">
+                  <input id="rename-input" class="rename__input" aria-label="{{rename.aria}}"
+                    value="{{rename.value}}" onChange="{{rename.onInput}}" onKeyDown="{{rename.onKeyDown}}" onBlur="{{rename.onBlur}}" />
+                  <span class="rename__help {{rename.helpMod}}">{{rename.help}}</span>
+                </span>
+              </sc-if>
+              <sc-if value="{{row.isPreview}}" hint-placeholder-val="{{false}}">
+                <sc-if value="{{row.openable}}" hint-placeholder-val="{{false}}">
+                  <button class="grid__preview" style="background-color:{{row.thumbBg}};background-image:{{row.thumbImg}};color:{{row.thumbFg}}" onClick="{{row.onOpen}}" aria-label="{{row.previewAria}}">{{row.thumbText}}</button>
+                </sc-if>
+                <sc-if value="{{!row.openable}}" hint-placeholder-val="{{true}}">
+                  <span class="grid__preview" style="background-color:{{row.thumbBg}};background-image:{{row.thumbImg}};color:{{row.thumbFg}}" role="img" aria-label="{{row.previewAria}}">{{row.thumbText}}</span>
+                </sc-if>
+              </sc-if>
+              <sc-if value="{{!row.renaming}}" hint-placeholder-val="{{true}}"><sc-if value="{{!row.isPreview}}" hint-placeholder-val="{{true}}">
+                <span class="grid__title">
+                  <sc-if value="{{row.hasThumb}}" hint-placeholder-val="{{false}}">
+                    <span class="grid__thumb" style="background-color:{{row.thumbBg}};background-image:{{row.thumbImg}};color:{{row.thumbFg}}" aria-hidden="true">{{row.thumbText}}</span>
+                  </sc-if>
+                  <span class="grid__title-text">
+                    <sc-if value="{{row.openable}}" hint-placeholder-val="{{true}}">
+                      <button class="grid__name {{row.nameMod}}" onClick="{{row.onOpen}}"><sc-if value="{{row.prefix}}" hint-placeholder-val="{{false}}"><span class="grid__prefix">{{row.prefix}}</span></sc-if>{{row.name}}</button>
+                    </sc-if>
+                    <sc-if value="{{!row.openable}}" hint-placeholder-val="{{false}}">
+                      <span class="grid__name grid__name--static {{row.nameMod}}">{{row.name}}</span>
+                    </sc-if>
+                    <sc-if value="{{row.hint}}" hint-placeholder-val="{{false}}"><span class="grid__hint">{{row.hint}}</span></sc-if>
+                  </span>
+                </span>
+              </sc-if></sc-if>
+            </span>
+
+            <sc-for list="{{row.cells}}" as="cell" hint-placeholder-count="4">
+              <span class="grid__cell {{cell.mod}}" role="cell">
+                <sc-if value="{{cell.pill}}" hint-placeholder-val="{{false}}"><span class="grid__platform" style="background:{{cell.pillBg}};color:{{cell.pillFg}}">{{cell.text}}</span></sc-if>
+                <sc-if value="{{cell.avatar}}" hint-placeholder-val="{{false}}"><span class="grid__creator"><span class="grid__avatar" aria-hidden="true">{{cell.avatar}}</span><span class="grid__creator-name">{{cell.text}}</span></span></sc-if>
+                <sc-if value="{{!cell.pill}}" hint-placeholder-val="{{true}}"><sc-if value="{{!cell.avatar}}" hint-placeholder-val="{{true}}">{{cell.text}}</sc-if></sc-if>
+              </span>
+            </sc-for>
+
+            <sc-if value="{{grid.hasMenu}}" hint-placeholder-val="{{true}}">
+              <span class="grid__cell grid__cell--menu" role="cell">
+                <sc-if value="{{row.hasMenu}}" hint-placeholder-val="{{true}}">
+                  <span class="anchor">
+                    <span class="grid__menu-btn {{row.menuMod}}">
+                      <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.IconButton" size="small" onClick="{{row.onMenu}}" aria-label="{{row.menuAria}}" aria-haspopup="menu" hint-size="32px,32px">
+                        <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="MoreVertFilled" size="20" hint-size="20px,20px"></x-import>
+                      </x-import>
+                    </span>
+                    <span class="anchor__menu">
+                      <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Menu" open="{{row.menuOpen}}" onClose="{{row.onMenuClose}}" hint-size="0,0">
+                        <sc-for list="{{row.menuItems}}" as="mi" hint-placeholder-count="4">
+                          <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.MenuItem" onClick="{{mi.onClick}}" disabled="{{mi.disabled}}" hint-size="auto,32px">{{mi.text}}</x-import>
+                        </sc-for>
+                      </x-import>
+                    </span>
+                  </span>
+                </sc-if>
+              </span>
+            </sc-if>
+          </div>
+        </sc-for>
+      </div>
+
+      <sc-if value="{{empty.show}}" hint-placeholder-val="{{false}}">
+        <div class="empty">
+          <span class="empty__mark"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="{{empty.icon}}" size="36" hint-size="36px,36px"></x-import></span>
+          <span class="empty__title">{{empty.title}}</span>
+          <span class="empty__text">{{empty.text}}</span>
+          <sc-if value="{{empty.actionText}}" hint-placeholder-val="{{false}}">
+            <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Button" variant="outlined" size="small" onClick="{{empty.onAction}}" hint-size="auto,32px">{{empty.actionText}}</x-import>
+          </sc-if>
+        </div>
+      </sc-if>
+
+      <div class="foot">
+        <span class="foot__selected">{{foot.selected}}</span>
+        <span class="foot__rpp-wrap">
+          <span>Rows per page:</span>
+          <span class="anchor">
+            <button class="foot__rpp" onClick="{{foot.onRppToggle}}" aria-haspopup="menu" aria-label="Rows per page">{{foot.rpp}}<x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="ArrowDropDownFilled" size="18" hint-size="18px,18px"></x-import></button>
+            <span class="anchor__menu anchor__menu--left anchor__menu--up">
+              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Menu" open="{{foot.rppOpen}}" onClose="{{foot.onRppClose}}" hint-size="0,0">
+                <sc-for list="{{foot.rppItems}}" as="it" hint-placeholder-count="3">
+                  <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.MenuItem" selected="{{it.selected}}" onClick="{{it.onClick}}" hint-size="auto,32px">{{it.text}}</x-import>
+                </sc-for>
+              </x-import>
+            </span>
+          </span>
+        </span>
+        <span>{{foot.range}}</span>
+        <span class="foot__pager">
+          <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.IconButton" size="small" disabled="{{foot.prevDisabled}}" onClick="{{foot.onPrev}}" aria-label="Previous page" hint-size="32px,32px">
+            <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="ChevronLeftFilled" size="20" hint-size="20px,20px"></x-import>
+          </x-import>
+          <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.IconButton" size="small" disabled="{{foot.nextDisabled}}" onClick="{{foot.onNext}}" aria-label="Next page" hint-size="32px,32px">
+            <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="ChevronRightFilled" size="20" hint-size="20px,20px"></x-import>
+          </x-import>
+        </span>
+      </div>
+    </section>
+  </main>
+</div>
+
+<!-- ================= DIALOG — one renderer, each dialog is a list of sections ================= -->
+<sc-if value="{{dlg}}" hint-placeholder-val="{{false}}">
+  <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Dialog" open="{{true}}" onClose="{{dlg.onCancel}}" max-width="{{dlg.width}}" hint-size="0,0">
+    <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.DialogTitle" hint-size="auto,auto">{{dlg.title}}</x-import>
+    <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.DialogContent" hint-size="auto,auto">
+      <div class="dlg" role="group" aria-label="{{dlg.title}}">
+        <sc-for list="{{dlg.sections}}" as="sec" hint-placeholder-count="3">
+          <sc-if value="{{sec.is.text}}" hint-placeholder-val="{{true}}">
+            <p class="dlg__text {{sec.mod}}">{{sec.text}}</p>
+          </sc-if>
+          <sc-if value="{{sec.is.field}}" hint-placeholder-val="{{false}}">
+            <div class="dlg__field {{sec.mod}}">
+              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.TextField" label="{{sec.label}}" value="{{sec.value}}" onChange="{{sec.onChange}}" placeholder="{{sec.placeholder}}" helper-text="{{sec.helper}}" error="{{sec.error}}" size="small" full-width="{{true}}" hint-size="auto,40px"></x-import>
+            </div>
+          </sc-if>
+          <sc-if value="{{sec.is.area}}" hint-placeholder-val="{{false}}">
+            <div class="dlg__field">
+              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.TextField" label="{{sec.label}}" value="{{sec.value}}" onChange="{{sec.onChange}}" placeholder="{{sec.placeholder}}" helper-text="{{sec.helper}}" multiline="{{true}}" rows="{{sec.rows}}" size="small" full-width="{{true}}" hint-size="auto,120px"></x-import>
+            </div>
+          </sc-if>
+          <sc-if value="{{sec.is.stager}}" hint-placeholder-val="{{false}}">
+            <div class="stager">
+              <label class="stager__field">
+                <span class="stager__label">{{sec.label}}</span>
+                <input id="stager-input" class="stager__input" type="text" value="{{sec.value}}" placeholder="{{sec.placeholder}}"
+                  onChange="{{sec.onChange}}" onPaste="{{sec.onPaste}}" onKeyDown="{{sec.onKeyDown}}" aria-describedby="stager-help" />
+                <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.IconButton" size="small" color="primary" disabled="{{sec.addDisabled}}" onClick="{{sec.onAdd}}" aria-label="Add to the list" hint-size="32px,32px">
+                  <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="AddFilled" size="20" hint-size="20px,20px"></x-import>
+                </x-import>
+              </label>
+              <span id="stager-help" class="stager__help">{{sec.helper}}</span>
+            </div>
+          </sc-if>
+          <sc-if value="{{sec.is.select}}" hint-placeholder-val="{{false}}">
+            <div class="dlg__field {{sec.mod}}">
+              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Select" label="{{sec.label}}" value="{{sec.value}}" options="{{sec.options}}" onChange="{{sec.onChange}}" size="small" full-width="{{true}}" hint-size="auto,40px"></x-import>
+            </div>
+          </sc-if>
+          <sc-if value="{{sec.is.radios}}" hint-placeholder-val="{{false}}">
+            <div role="radiogroup" aria-label="{{sec.label}}">
+              <sc-for list="{{sec.options}}" as="opt" hint-placeholder-count="3">
+                <label class="choice {{opt.mod}}">
+                  <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Radio" size="small" checked="{{opt.checked}}" disabled="{{opt.disabled}}" onChange="{{opt.onPick}}" name="{{sec.name}}" hint-size="38px,38px"></x-import>
+                  <span class="choice__text"><span>{{opt.text}}</span><sc-if value="{{opt.sub}}" hint-placeholder-val="{{false}}"><span class="choice__sub">{{opt.sub}}</span></sc-if></span>
+                </label>
+              </sc-for>
+            </div>
+          </sc-if>
+          <sc-if value="{{sec.is.check}}" hint-placeholder-val="{{false}}">
+            <label class="choice {{sec.mod}}">
+              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Checkbox" size="small" checked="{{sec.checked}}" onChange="{{sec.onToggle}}" hint-size="30px,30px"></x-import>
+              <span class="choice__text"><span>{{sec.text}}</span><sc-if value="{{sec.sub}}" hint-placeholder-val="{{false}}"><span class="choice__sub">{{sec.sub}}</span></sc-if></span>
+            </label>
+          </sc-if>
+          <sc-if value="{{sec.is.items}}" hint-placeholder-val="{{false}}">
+            <div>
+              <div class="dlg__heading">{{sec.heading}}</div>
+              <div class="dlg__list {{sec.listMod}}">
+                <sc-for list="{{sec.items}}" as="it" hint-placeholder-count="3">
+                  <div class="dlg-item">
+                    <sc-if value="{{it.hasCheck}}" hint-placeholder-val="{{false}}">
+                      <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Checkbox" size="small" checked="{{it.checked}}" onChange="{{it.onToggle}}" aria-label="{{it.checkAria}}" hint-size="30px,30px"></x-import>
+                    </sc-if>
+                    <span class="dlg-item__name"><sc-if value="{{it.prefix}}" hint-placeholder-val="{{false}}"><span class="dlg-item__prefix">{{it.prefix}}</span></sc-if>{{it.name}}</span>
+                    <sc-if value="{{it.meta}}" hint-placeholder-val="{{false}}"><span class="dlg-item__meta">{{it.meta}}</span></sc-if>
+                    <span class="dlg-item__status {{it.statusMod}}">{{it.status}}</span>
+                    <sc-if value="{{it.removable}}" hint-placeholder-val="{{false}}">
+                      <button class="dlg-item__remove" onClick="{{it.onRemove}}" aria-label="{{it.removeAria}}"><x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="CloseFilled" size="16" hint-size="16px,16px"></x-import></button>
+                    </sc-if>
+                  </div>
+                </sc-for>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{sec.is.posts}}" hint-placeholder-val="{{false}}">
+            <div>
+              <div class="dlg__heading">{{sec.heading}}</div>
+              <div class="dlg__list">
+                <sc-for list="{{sec.items}}" as="p" hint-placeholder-count="3">
+                  <div class="dlg-item">
+                    <span class="dlg-item__thumb" style="background-color:{{p.thumbBg}};background-image:{{p.thumbImg}};color:{{p.thumbFg}}" aria-hidden="true">{{p.thumbText}}</span>
+                    <span class="dlg-item__name">{{p.handle}}<span class="dlg-item__meta"> &middot; {{p.meta}}</span></span>
+                    <span class="dlg-item__tags" title="{{p.tags}}">{{p.tags}}</span>
+                  </div>
+                </sc-for>
+                <sc-if value="{{sec.more}}" hint-placeholder-val="{{false}}"><div class="dlg__more">{{sec.more}}</div></sc-if>
+              </div>
+            </div>
+          </sc-if>
+          <sc-if value="{{sec.is.note}}" hint-placeholder-val="{{false}}">
+            <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Alert" severity="{{sec.severity}}" hint-size="auto,auto">{{sec.text}}</x-import>
+          </sc-if>
+        </sc-for>
+      </div>
+    </x-import>
+    <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.DialogActions" hint-size="auto,auto">
+      <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Button" variant="text" size="small" onClick="{{dlg.onCancel}}" hint-size="auto,32px">Cancel</x-import>
+      <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Button" variant="contained" size="small" color="{{dlg.confirmColor}}" disabled="{{dlg.confirmDisabled}}" onClick="{{dlg.onConfirm}}" hint-size="auto,32px">{{dlg.confirmText}}</x-import>
+    </x-import>
+  </x-import>
+</sc-if>
+
+<x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Snackbar" open="{{toast.open}}" message="{{toast.message}}" action="{{toast.action}}" onClose="{{toast.onClose}}" hint-size="0,0"></x-import>
+</x-dc>
+
+<script type="text/x-dc" data-dc-script>
+class Component extends DCLogic {
+  state = this.initialState();
+
+  initialState() {
+    return {
+      data: this.seed(),
+      history: [],          // [{ data, message }] — a snapshot taken before every change, for Undo
+      toast: null,          // { id, message, undo }
+      route: this.parseHash(),
+      q: '', page: 0, rpp: 10, sel: [], postsFilter: 'any',
+      sort: null,           // { key, dir } — null means the view's own default
+      menu: null,           // 'export' | 'rpp' | 'row:<id>'
+      rename: null,         // { kind: 'label' | 'category', id, value, where: 'row' | 'head' }
+      dialog: null,         // { type, ...form }
+      chromeHidden: false,
+    };
+  }
+
+  // ================= seed =================
+  /* Seeded so every path is demoable in the first minute:
+     - merge inside a category:        Brand / Coca-Cola + Brand / Coca Cola (two posts in common)
+     - rename across categories:       Brand / Coca-Cola and Product / cocacola — the drink is not the brand
+     - move, collide, then merge:      "nike" created on a post with no category, and Brand / Nike
+     - duplicate with its own meaning: Brand / Nike -> Competitor
+     - merge categories:               Campaign + Campaigns, both holding "Summer 2026" and "Champions League"
+     - labels on no post, an empty category (Events), and uncategorised leftovers ("test", "tmp label").
+     The Real Madrid post carries the same three labels as the v4 prototype. */
+
+  seed() {
+    const d = (s) => new Date(s + 'T10:00:00');
+    const YOU = 'You', MARIA = 'Maria Silva', TOMAS = 'Tomás Ferreira', JOSE = 'José Carneiro';
+
+    const categories = [
+      [1, 'Brand', MARIA, '2025-03-06', '2026-02-03'],
+      [2, 'Product', TOMAS, '2025-03-06', '2025-12-05'],
+      [3, 'Ad rules', YOU, '2025-07-09', '2025-09-01'],
+      [4, 'Campaign', MARIA, '2025-09-01', '2026-02-03'],
+      [5, 'Compliance', YOU, '2025-07-09', '2025-07-09'],
+      [6, 'Competitor', TOMAS, '2025-12-05', '2025-12-05'],
+      [7, 'Tone', JOSE, '2026-02-03', '2026-02-03'],
+      [8, 'Campaigns', TOMAS, '2026-07-27', '2026-07-27'],
+      [9, 'Events', YOU, '2026-07-29', '2026-07-29'],
+    ].map(([id, name, by, at, ed]) => ({ id, name, createdBy: by, createdAt: d(at), editedAt: d(ed) }));
+
+    // [id, categoryId, name, createdBy, createdAt, posts, share: [labelId, how many of its posts]]
+    const spec = [
+      [1, 1, 'Real Madrid', YOU, '2025-03-06', 18],
+      [2, 1, 'Coca-Cola', MARIA, '2025-03-06', 11],
+      [3, 1, 'Adidas', MARIA, '2025-03-06', 9],
+      [4, 1, 'Emirates', TOMAS, '2025-07-09', 6],
+      [5, 1, 'Nike', MARIA, '2025-03-06', 14],
+      [6, 1, 'Coca Cola', JOSE, '2026-02-03', 5, [2, 2]],
+      [7, 1, 'Audi', TOMAS, '2025-12-05', 3],
+      [8, 1, 'Heineken', JOSE, '2026-07-27', 0],
+      [9, 2, 'Football boots', TOMAS, '2025-03-06', 8],
+      [10, 2, 'Jersey', TOMAS, '2025-03-06', 7],
+      [11, 2, 'Energy drink', MARIA, '2025-07-09', 4],
+      [12, 2, 'cocacola', JOSE, '2026-07-27', 3],
+      [13, 2, 'Sneakers', MARIA, '2025-09-01', 5],
+      [14, 2, 'Water bottle', YOU, '2025-12-05', 0],
+      [15, 3, 'Disclosure missing', YOU, '2025-07-09', 6],
+      [16, 3, 'Misleading claim', YOU, '2025-07-09', 2],
+      [17, 3, 'Undisclosed partnership', MARIA, '2025-09-01', 4],
+      [18, 3, 'Late disclosure', JOSE, '2026-02-03', 0],
+      [19, 4, 'Champions League', MARIA, '2025-09-01', 12],
+      [20, 4, 'Summer 2026', MARIA, '2026-02-03', 6],
+      [21, 4, 'Back to school', TOMAS, '2025-09-01', 2],
+      [22, 5, 'GDPR', YOU, '2025-07-09', 1],
+      [23, 5, 'Minors', YOU, '2025-07-09', 3],
+      [24, 5, 'Alcohol', TOMAS, '2025-12-05', 2],
+      [25, 5, 'Gambling', TOMAS, '2025-12-05', 0],
+      [26, 6, 'Puma', TOMAS, '2025-12-05', 4],
+      [27, 6, 'Under Armour', TOMAS, '2025-12-05', 1],
+      [28, 6, 'New Balance', JOSE, '2026-02-03', 2],
+      [29, 7, 'Positive', JOSE, '2026-02-03', 15],
+      [30, 7, 'Negative', JOSE, '2026-02-03', 4],
+      [31, 7, 'Neutral', JOSE, '2026-02-03', 9],
+      [32, 7, 'Humour', MARIA, '2026-02-03', 3],
+      [33, 8, 'Summer 2026', TOMAS, '2026-07-27', 3, [20, 1]],
+      [34, 8, 'Black Friday', TOMAS, '2026-07-27', 0],
+      [35, 8, 'Champions league', TOMAS, '2026-07-27', 2, [19, 1]],
+      [36, null, 'Plastic', TOMAS, '2025-09-01', 5],
+      [37, null, 'Giveaway', MARIA, '2025-09-01', 6],
+      [38, null, 'Madridista', YOU, '2025-12-05', 7],
+      [39, null, 'Sponsored', MARIA, '2025-07-09', 8],
+      [40, null, 'nike', JOSE, '2026-07-29', 3, [5, 1]],
+      [41, null, 'Unboxing', JOSE, '2026-07-27', 2],
+      [42, null, 'test', JOSE, '2026-07-29', 0],
+      [43, null, 'tmp label', JOSE, '2026-07-29', 0],
+    ];
+    const labels = spec.map(([id, categoryId, name, by, at]) =>
+      ({ id, categoryId, name, createdBy: by, createdAt: d(at), editedAt: d(at) }));
+
+    const rnd = this.prng(20260923);
+    const handles = ['cristiano', 'fcbarcelona', 'nikefootball', 'adidasfootball', 'cocacola', 'sofia.lifts',
+      'joaomendes.fit', 'anapaula.vlogs', 'the.kit.room', 'bootroom.lx', 'matchday.mood', 'lisbon.eats',
+      'porto.running', 'laura.travels', 'bernabeu.nights', 'golazo.daily', 'footy.fits', 'drinks.lab',
+      'sneaker.shelf', 'summer.sessions', 'inês.cooks', 'marta.moves', 'goal.line', 'vintage.kits'];
+    const captions = ['matchday ready', 'new drop, link in bio', 'summer in the city', 'giveaway time — tag a friend',
+      'unboxing the new boots', 'what a night at the Bernabéu', 'training day', 'my go-to after the gym',
+      'ad | partnership with the brand', 'weekend vibes', 'behind the scenes', 'the kit of the season'];
+    const platforms = ['Instagram', 'TikTok', 'YouTube'];
+    // what the product shows next to the platform: "Instagram Post" on the post page, "IG: Story" in lists
+    const formats = { Instagram: ['Post', 'Reel', 'Story'], TikTok: ['Video'], YouTube: ['Video', 'Short'] };
+    // generic stock photos, two per caption, so a thumbnail matches the text the post would carry
+    const shots = this.postShots();
+    const posts = [{ id: 1975517, handle: 'realmadrid', platform: 'Instagram', format: 'Post', publishedAt: new Date('2026-02-01T13:20:00'),
+      caption: 'hala madrid #realmadridrayo', img: '../assets/real-madrid-post.jpg', inV4: true }];
+    const start = d('2025-03-10').getTime(), span = d('2026-09-15').getTime() - start;
+    for (let i = 0; i < 47; i++) {
+      // same draw order as the first admin, so both prototypes hold the same posts on the same dates
+      const platform = platforms[i % 3];
+      const publishedAt = new Date(start + Math.floor(rnd() * span));
+      const caption = captions[Math.floor(rnd() * captions.length)];
+      const pics = shots[caption] || [];
+      posts.push({
+        id: 1975518 + i,
+        handle: handles[i % handles.length],
+        platform, format: formats[platform][Math.floor(i / 3) % formats[platform].length],
+        publishedAt, caption,
+        img: pics.length ? '../assets/posts/' + pics[i % pics.length] + '.jpg' : null, inV4: false,
+      });
+    }
+
+    const people = [YOU, MARIA, TOMAS, JOSE];
+    const setOf = {};
+    const forced = { 1: [YOU], 2: [MARIA], 36: [TOMAS] }; // the v4 post's three labels, and who added them
+    const links = [];
+    spec.forEach(([id, , , , , n, share]) => {
+      const chosen = [];
+      if (forced[id]) chosen.push(posts[0].id);
+      if (share) this.shuffle(setOf[share[0]].slice(), rnd).slice(0, share[1]).forEach((p) => { if (!chosen.includes(p)) chosen.push(p); });
+      const pool = this.shuffle(posts.slice(1).map((p) => p.id).filter((p) => !chosen.includes(p) && !(share && setOf[share[0]].includes(p))), rnd);
+      while (chosen.length < n) chosen.push(pool.shift());
+      setOf[id] = chosen;
+      const label = labels.find((l) => l.id === id);
+      chosen.forEach((postId) => {
+        const post = posts.find((p) => p.id === postId);
+        const base = Math.max(post.publishedAt.getTime(), label.createdAt.getTime());
+        const by = postId === posts[0].id && forced[id] ? forced[id][0] : people[Math.floor(rnd() * people.length)];
+        links.push({ postId, labelId: id, by, at: new Date(base + Math.floor(rnd() * 6 + 1) * 86400000) });
+      });
+    });
+
+    return { categories, labels, posts, links, nextId: 100 };
+  }
+
+  prng(seed) {
+    let a = seed >>> 0;
+    return () => {
+      a = (a + 0x6D2B79F5) >>> 0;
+      let t = a;
+      t = Math.imul(t ^ (t >>> 15), t | 1);
+      t ^= t + Math.imul(t ^ (t >>> 7), t | 61);
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  shuffle(a, rnd) {
+    for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(rnd() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; }
+    return a;
+  }
+
+  // ================= helpers =================
+
+  norm(s) { return (s || '').trim().replace(/\s+/g, ' ').toLowerCase(); }
+  clean(s) { return (s || '').trim().replace(/\s+/g, ' '); }
+  q(s) { return '‘' + s + '’'; }
+  plural(n, one, many) { return n + ' ' + (n === 1 ? one : (many || one + 's')); }
+  joinAnd(list) { return list.length < 2 ? list.join('') : list.slice(0, -1).join(', ') + ' and ' + list[list.length - 1]; }
+
+  /** What the snackbar says after a creation: up to three labels by name, then a count; a category is named
+      when every new label went to the same one. */
+  createdMessage(plan) {
+    const made = plan.rows.filter((r) => r.create);
+    const names = made.map((r) => r.name);
+    const n = names.length;
+    const catOf = (r) => (r.catNew ? r.catName : r.catId != null ? this.catName(r.catId) : null);
+    const cats = made.map(catOf);
+    const shared = cats.length && cats[0] && cats.every((c) => c && this.norm(c) === this.norm(cats[0])) ? cats[0] : null;
+    const subject = n === 1 ? 'Label ' + names[0] + ' was' : n <= 3 ? 'Labels ' + this.joinAnd(names) + ' were' : n + ' labels were';
+    const where = shared ? ' to ' + (made.every((r) => r.catNew) ? 'the new category ' : '') + shared : '';
+    const created = !shared && plan.newCats.length ? ' ' + this.plural(plan.newCats.length, 'new category', 'new categories') + ' created.' : '';
+    return subject + ' added' + where + '.' + created;
+  }
+  fmtDate(dt) { return dt ? dt.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' }) : '—'; }
+  fmtDateTime(dt) { return dt ? this.fmtDate(dt) + ', ' + dt.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' }) : '—'; }
+  /** "IG: Story" — how the product's post lists name a platform and format. */
+  postKind(p) { return ({ Instagram: 'IG', TikTok: 'TT', YouTube: 'YT' }[p.platform] || p.platform) + ': ' + p.format; }
+  isoDate(dt) { return dt ? dt.toISOString().slice(0, 10) : ''; }
+
+  label(id, data) { return (data || this.state.data).labels.find((l) => l.id === id); }
+  category(id, data) { return (data || this.state.data).categories.find((c) => c.id === id); }
+  catName(catId, data) { const c = catId == null ? null : this.category(catId, data); return c ? c.name : 'No category'; }
+  labelsIn(catId, data) { return (data || this.state.data).labels.filter((l) => l.categoryId === catId); }
+
+  /** Post ids per label and label ids per post, rebuilt only when the data object changes. */
+  idx(data) {
+    data = data || this.state.data;
+    if (this.__idxFor === data) return this.__idx;
+    const byLabel = new Map(), byPost = new Map();
+    data.links.forEach((l) => {
+      if (!byLabel.has(l.labelId)) byLabel.set(l.labelId, []);
+      byLabel.get(l.labelId).push(l.postId);
+      if (!byPost.has(l.postId)) byPost.set(l.postId, []);
+      byPost.get(l.postId).push(l.labelId);
+    });
+    this.__idxFor = data; this.__idx = { byLabel, byPost };
+    return this.__idx;
+  }
+  postsOf(labelId, data) { return this.idx(data).byLabel.get(labelId) || []; }
+  postsOfMany(ids, data) { const s = new Set(); ids.forEach((id) => this.postsOf(id, data).forEach((p) => s.add(p))); return [...s]; }
+  catPosts(catId, data) { return this.postsOfMany(this.labelsIn(catId, data).map((l) => l.id), data); }
+
+  /** A label with this (normalised) name already living in the category, other than `exceptIds`. */
+  namesake(catId, name, exceptIds, data) {
+    const n = this.norm(name);
+    return (data || this.state.data).labels.find((l) => l.categoryId === catId && this.norm(l.name) === n && !(exceptIds || []).includes(l.id));
+  }
+  categoryNamed(name, exceptIds, data) {
+    const n = this.norm(name);
+    return (data || this.state.data).categories.find((c) => this.norm(c.name) === n && !(exceptIds || []).includes(c.id));
+  }
+
+  /** Stock photos in assets/posts/ (Unsplash; credits in the README), by caption. A caption with none falls back to the handle's initial. */
+  postShots() {
+    return {
+      'matchday ready': ['matchday-1', 'matchday-2'],
+      'new drop, link in bio': ['drop-1', 'drop-2'],
+      'summer in the city': ['city-1', 'city-2'],
+      'giveaway time — tag a friend': ['giveaway-1', 'giveaway-2'],
+      'unboxing the new boots': ['boots-1'],
+      'what a night at the Bernabéu': ['night-1', 'night-2'],
+      'training day': ['training-1', 'training-2'],
+      'my go-to after the gym': ['gym-1', 'gym-2'],
+      'ad | partnership with the brand': ['ad-1', 'ad-2'],
+      'weekend vibes': ['weekend-1', 'weekend-2'],
+      'behind the scenes': ['backstage-1', 'backstage-2'],
+      'the kit of the season': ['kit-1', 'kit-2'],
+    };
+  }
+
+  platformColors(p) {
+    const k = p.toLowerCase();
+    return { bg: 'var(--social-' + k + ')', fg: 'var(--social-' + k + '-text)' };
+  }
+
+  // ================= routing =================
+
+  parseHash() {
+    const h = (typeof location !== 'undefined' ? location.hash : '') || '';
+    let m;
+    if ((m = h.match(/^#\/category\/(none|\d+)$/))) return { view: 'category', id: m[1] === 'none' ? null : Number(m[1]) };
+    if ((m = h.match(/^#\/label\/(\d+)$/))) return { view: 'label', id: Number(m[1]) };
+    if (h === '#/labels') return { view: 'labels' };
+    return { view: 'categories' };
+  }
+
+  hashFor(route) {
+    if (route.view === 'category') return '#/category/' + (route.id == null ? 'none' : route.id);
+    if (route.view === 'label') return '#/label/' + route.id;
+    if (route.view === 'labels') return '#/labels';
+    return '#/categories';
+  }
+
+  go(route) {
+    const hash = this.hashFor(route);
+    if (location.hash === hash) this.onRoute();
+    else location.hash = hash;
+  }
+
+  freshView() { return { q: '', page: 0, sel: [], postsFilter: 'any', sort: null, menu: null, rename: null }; }
+  onRoute() { this.setState({ route: this.parseHash(), ...this.freshView() }); }
+
+  // ================= lifecycle =================
+
+  componentDidMount() {
+    window.__labelsAdmin = this; // handle for automated checks of the data invariants
+    this.__onHash = () => this.onRoute();
+    window.addEventListener('hashchange', this.__onHash);
+    this.__onKey = (e) => this.onKey(e);
+    window.addEventListener('keydown', this.__onKey);
+  }
+
+  componentWillUnmount() {
+    window.removeEventListener('hashchange', this.__onHash);
+    window.removeEventListener('keydown', this.__onKey);
+    clearTimeout(this.__toastTimer);
+  }
+
+  componentDidUpdate() {
+    const s = this.state;
+    // A route whose subject no longer exists (merged away, deleted, or undone) falls back to its parent.
+    const r = s.route;
+    if (r.view === 'label' && !this.label(r.id)) { this.go({ view: 'categories' }); return; }
+    if (r.view === 'category' && r.id != null && !this.category(r.id)) { this.go({ view: 'categories' }); return; }
+
+    const dlgKey = s.dialog ? s.dialog.type : null;
+    if (dlgKey !== this.__dlgOpened) {
+      this.__dlgOpened = dlgKey;
+      const first = document.querySelector(dlgKey === 'addCategory' ? '.dlg input' : '#stager-input');
+      if (first && (dlgKey === 'addLabels' || dlgKey === 'addCategory')) first.focus();
+    }
+    if (this.__focusStager) { this.__focusStager = false; const el = document.getElementById('stager-input'); if (el) el.focus(); }
+
+    // "To add" follows its newest entry: scroll to the end when an entry is added or the typed one
+    // changes, but never when one is removed — whoever removes is looking at that spot
+    const follow = document.querySelector('.dlg__list--follow');
+    if (s.dialog && follow) {
+      const count = (s.dialog.staged || []).length, typed = s.dialog.input || '';
+      const prev = this.__follow;
+      if (!prev || count > prev.count || (count === prev.count && typed !== prev.typed)) follow.scrollTop = follow.scrollHeight;
+      this.__follow = { count, typed };
+    } else this.__follow = null;
+
+    const renameKey = s.rename ? s.rename.kind + s.rename.id + s.rename.where : null;
+    if (renameKey && this.__renameFocused !== renameKey) {
+      const el = document.getElementById('rename-input');
+      if (el) { el.focus(); el.select(); this.__renameFocused = renameKey; }
+    }
+    if (!renameKey) this.__renameFocused = null;
+
+    if (s.toast && this.__toastFor !== s.toast.id) {
+      this.__toastFor = s.toast.id;
+      clearTimeout(this.__toastTimer);
+      const id = s.toast.id;
+      this.__toastTimer = setTimeout(() => this.setState((cur) => (cur.toast && cur.toast.id === id ? { toast: null } : {})), 8000);
+    }
+  }
+
+  onKey(e) {
+    const s = this.state;
+    const t = e.target;
+    const inField = t && (t.tagName === 'INPUT' || t.tagName === 'TEXTAREA');
+    if (s.dialog) {
+      if (e.key === 'Escape') { e.preventDefault(); this.closeDialog(); return; }
+      if (e.key === 'Enter' && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        const d = this.buildDialog();
+        if (d && !d.confirmDisabled) d.onConfirm();
+      }
+      return;
+    }
+    if (e.key === 'Escape') {
+      if (s.menu) { this.setState({ menu: null }); return; }
+      if (s.sel.length) { this.setState({ sel: [] }); return; }
+      if (s.q && inField) { this.setState({ q: '', page: 0 }); return; }
+      return;
+    }
+    if (inField || e.metaKey || e.ctrlKey || e.altKey) return;
+    if (e.key === '/') { e.preventDefault(); const el = document.getElementById('admin-search'); if (el) el.focus(); return; }
+    if (e.key === 'h' || e.key === 'H') { this.setState({ chromeHidden: !s.chromeHidden }); return; }
+    if ((e.key === 'z' || e.key === 'Z') && s.history.length) { this.undo(); }
+  }
+
+  // ================= change + undo =================
+
+  clone(data) { return structuredClone(data); }
+  now() { return new Date(); }
+  newId(D) { return D.nextId++; }
+
+  /** Every catalogue change goes through here: snapshot for Undo, apply, close whatever was open. */
+  commit(message, fn, nav) {
+    const prev = this.state.data;
+    const D = this.clone(prev);
+    const result = fn(D) || {};
+    const toastId = (this.__toastSeq = (this.__toastSeq || 0) + 1);
+    this.setState((s) => ({
+      data: D,
+      history: [...s.history, { data: prev, message }],
+      toast: { id: toastId, message: result.message || message, undo: true },
+      dialog: null, rename: null, menu: null, sel: [],
+    }), () => { if (nav) this.go(typeof nav === 'function' ? nav(D, result) : nav); });
+  }
+
+  undo() {
+    const h = this.state.history;
+    if (!h.length) return;
+    const last = h[h.length - 1];
+    const toastId = (this.__toastSeq = (this.__toastSeq || 0) + 1);
+    this.setState({ data: last.data, history: h.slice(0, -1), toast: { id: toastId, message: 'Undone: ' + last.message, undo: false },
+      dialog: null, rename: null, menu: null, sel: [] });
+  }
+
+  /** Move every post from `sourceIds` onto `targetId`; a post that already carries the target keeps one link. */
+  mergeLinks(D, targetId, sourceIds) {
+    const onTarget = new Set(D.links.filter((l) => l.labelId === targetId).map((l) => l.postId));
+    const moved = [];
+    D.links = D.links.filter((l) => {
+      if (!sourceIds.includes(l.labelId)) return true;
+      if (onTarget.has(l.postId)) return false;
+      onTarget.add(l.postId);
+      moved.push({ ...l, labelId: targetId });
+      return false;
+    });
+    D.links.push(...moved);
+    D.labels = D.labels.filter((l) => !sourceIds.includes(l.id));
+    const t = D.labels.find((l) => l.id === targetId);
+    if (t) t.editedAt = this.now();
+  }
+
+  touchCategory(D, catId) { const c = D.categories.find((x) => x.id === catId); if (c) c.editedAt = this.now(); }
+
+  // ================= operations =================
+
+  opCreate(plan) {
+    const message = this.createdMessage(plan);
+    this.commit(message, (D) => {
+      const catIds = {};
+      plan.newCats.forEach((name) => {
+        const id = this.newId(D);
+        D.categories.push({ id, name, createdBy: 'You', createdAt: this.now(), editedAt: this.now() });
+        catIds[this.norm(name)] = id;
+      });
+      plan.rows.filter((r) => r.create).forEach((r) => {
+        const categoryId = r.catNew ? catIds[this.norm(r.catName)] : r.catId;
+        D.labels.push({ id: this.newId(D), categoryId, name: r.name, createdBy: 'You', createdAt: this.now(), editedAt: this.now() });
+        this.touchCategory(D, categoryId);
+      });
+    });
+  }
+
+  opCreateCategory(name, labelNames) {
+    const message = 'Category ' + name + ' was created' + (labelNames.length ? ' with ' + this.plural(labelNames.length, 'label') : '') + '.';
+    this.commit(message, (D) => {
+      const id = this.newId(D);
+      D.categories.push({ id, name, createdBy: 'You', createdAt: this.now(), editedAt: this.now() });
+      labelNames.forEach((n) => D.labels.push({ id: this.newId(D), categoryId: id, name: n, createdBy: 'You', createdAt: this.now(), editedAt: this.now() }));
+    });
+  }
+
+  opRename(kind, id, name) {
+    if (kind === 'label') {
+      const l = this.label(id);
+      this.commit('Renamed ' + this.q(l.name) + ' to ' + this.q(name), (D) => {
+        const x = D.labels.find((y) => y.id === id); x.name = name; x.editedAt = this.now();
+      });
+    } else {
+      const c = this.category(id);
+      this.commit('Renamed category ' + this.q(c.name) + ' to ' + this.q(name), (D) => {
+        const x = D.categories.find((y) => y.id === id); x.name = name; x.editedAt = this.now();
+      });
+    }
+  }
+
+  opBulkRename(ids, name) {
+    this.commit('Renamed ' + this.plural(ids.length, 'label') + ' to ' + this.q(name), (D) => {
+      D.labels.forEach((l) => { if (ids.includes(l.id) && l.name !== name) { l.name = name; l.editedAt = this.now(); } });
+    });
+  }
+
+  opMove(plan) {
+    const moving = plan.rows.filter((r) => r.action === 'move' || r.action === 'merge');
+    const merges = plan.rows.filter((r) => r.action === 'merge').length;
+    const message = 'Moved ' + this.plural(moving.length, 'label') + ' to ' + plan.destName + (merges ? ' (' + merges + ' merged)' : '');
+    this.commit(message, (D) => {
+      let destId = plan.destId;
+      if (plan.newName) {
+        destId = this.newId(D);
+        D.categories.push({ id: destId, name: plan.newName, createdBy: 'You', createdAt: this.now(), editedAt: this.now() });
+      }
+      plan.rows.forEach((r) => {
+        if (r.action === 'move') {
+          const l = D.labels.find((x) => x.id === r.id); l.categoryId = destId; l.editedAt = this.now();
+        } else if (r.action === 'merge') {
+          this.mergeLinks(D, r.intoId, [r.id]);
+        }
+      });
+      this.touchCategory(D, destId);
+    }, this.state.route.view === 'label' && moving.some((r) => r.id === this.state.route.id)
+      ? (D) => { const r = plan.rows.find((x) => x.id === this.state.route.id); return { view: 'label', id: r.action === 'merge' ? r.intoId : r.id }; }
+      : null);
+  }
+
+  opDuplicate(plan, withPosts) {
+    const rows = plan.rows.filter((r) => r.action === 'copy');
+    const message = 'Duplicated ' + this.plural(rows.length, 'label') + ' into ' + plan.destName + (withPosts ? ', with their posts' : '');
+    this.commit(message, (D) => {
+      rows.forEach((r) => {
+        const src = D.labels.find((l) => l.id === r.id);
+        const id = this.newId(D);
+        D.labels.push({ id, categoryId: plan.destId, name: src.name, createdBy: 'You', createdAt: this.now(), editedAt: this.now() });
+        if (withPosts) {
+          D.links.filter((l) => l.labelId === r.id).forEach((l) => D.links.push({ postId: l.postId, labelId: id, by: 'You', at: this.now() }));
+        }
+      });
+      this.touchCategory(D, plan.destId);
+    });
+  }
+
+  opMergeLabels(plan) {
+    const message = 'Merged ' + this.plural(plan.allIds.length, 'label') + ' into ' + this.q(plan.finalName);
+    this.commit(message, (D) => {
+      const keep = D.labels.find((l) => l.id === plan.keepId);
+      keep.name = plan.finalName;
+      this.mergeLinks(D, plan.keepId, plan.allIds.filter((id) => id !== plan.keepId));
+      this.touchCategory(D, keep.categoryId);
+    }, this.state.route.view === 'label' ? { view: 'label', id: plan.keepId } : null);
+  }
+
+  opMergeCategories(plan) {
+    const message = 'Merged ' + this.plural(plan.allIds.length, 'category', 'categories') + ' into ' + this.q(plan.finalName);
+    this.commit(message, (D) => {
+      const keep = D.categories.find((c) => c.id === plan.keepId);
+      keep.name = plan.finalName; keep.editedAt = this.now();
+      const others = plan.allIds.filter((id) => id !== plan.keepId);
+      D.labels.forEach((l) => { if (others.includes(l.categoryId)) l.categoryId = plan.keepId; });
+      plan.collisions.forEach((c) => this.mergeLinks(D, c.keepId, c.otherIds));
+      D.categories = D.categories.filter((c) => !others.includes(c.id));
+    }, this.state.route.view === 'category' ? { view: 'category', id: plan.keepId } : null);
+  }
+
+  opDeleteCategories(plan) {
+    const names = plan.cats.map((c) => this.q(c.name)).join(', ');
+    const tail = plan.nLabels === 0 ? '' : plan.mode === 'delete' ? ' and its labels' : plan.mode === 'move' ? '; labels moved to ' + plan.destName : '; labels kept without a category';
+    const message = 'Deleted ' + (plan.cats.length === 1 ? 'category ' + names : this.plural(plan.cats.length, 'category', 'categories')) + tail;
+    this.commit(message, (D) => {
+      const ids = plan.cats.map((c) => c.id);
+      if (plan.mode === 'delete') {
+        const dead = D.labels.filter((l) => ids.includes(l.categoryId)).map((l) => l.id);
+        D.links = D.links.filter((l) => !dead.includes(l.labelId));
+        D.labels = D.labels.filter((l) => !dead.includes(l.id));
+      } else {
+        const destId = plan.mode === 'move' ? plan.destId : null;
+        plan.moves.forEach((m) => {
+          if (m.intoId != null) this.mergeLinks(D, m.intoId, [m.id]);
+          else { const l = D.labels.find((x) => x.id === m.id); l.categoryId = destId; l.editedAt = this.now(); }
+        });
+        if (destId != null) this.touchCategory(D, destId);
+      }
+      D.categories = D.categories.filter((c) => !ids.includes(c.id));
+    }, this.state.route.view === 'category' ? { view: 'categories' } : null);
+  }
+
+  opDeleteLabels(plan) {
+    const one = plan.labels.length === 1;
+    const what = one ? this.q(plan.labels[0].name) : this.plural(plan.labels.length, 'label');
+    const message = plan.mode === 'replace'
+      ? 'Deleted ' + what + '; its posts now carry ' + this.q(plan.replacement.name)
+      : 'Deleted ' + what + (plan.nPosts ? ' from ' + this.plural(plan.nPosts, 'post') : '');
+    const back = this.state.route.view === 'label' ? { view: 'category', id: plan.labels[0].categoryId } : null;
+    this.commit(message, (D) => {
+      const ids = plan.labels.map((l) => l.id);
+      if (plan.mode === 'replace') this.mergeLinks(D, plan.replacement.id, ids);
+      else {
+        D.links = D.links.filter((l) => !ids.includes(l.labelId));
+        D.labels = D.labels.filter((l) => !ids.includes(l.id));
+      }
+      plan.labels.forEach((l) => this.touchCategory(D, l.categoryId));
+    }, back);
+  }
+
+  // ================= inline rename =================
+
+  startRename(kind, id, where) {
+    const x = kind === 'label' ? this.label(id) : this.category(id);
+    this.setState({ rename: { kind, id, value: x.name, where }, menu: null });
+  }
+
+  /** What renaming to the current value would do: nothing, an error, a collision (so a merge), or a rename. */
+  renameCheck() {
+    const r = this.state.rename;
+    const name = this.clean(r.value);
+    if (r.kind === 'label') {
+      const l = this.label(r.id);
+      if (!name) return { kind: 'error', help: 'A label needs a name.' };
+      if (name === l.name) return { kind: 'same', help: 'Enter to save · Esc to cancel' };
+      const twin = this.namesake(l.categoryId, name, [l.id]);
+      if (twin) return { kind: 'collide', twin, help: this.catName(l.categoryId) + ' already has ' + this.q(twin.name) + ' — press Enter to merge them.' };
+      const n = this.postsOf(l.id).length;
+      return { kind: 'ok', name, help: n ? 'On ' + this.plural(n, 'post') + ' — they will all show the new name. Enter to save.' : 'Not on any post yet. Enter to save.' };
+    }
+    const c = this.category(r.id);
+    if (!name) return { kind: 'error', help: 'A category needs a name.' };
+    if (name === c.name) return { kind: 'same', help: 'Enter to save · Esc to cancel' };
+    const twin = this.categoryNamed(name, [c.id]);
+    if (twin) return { kind: 'collide', twin, help: 'There is already a category called ' + this.q(twin.name) + ' — press Enter to merge them.' };
+    const n = this.labelsIn(c.id).length;
+    return { kind: 'ok', name, help: n ? this.plural(n, 'label') + ' will show the new name on their posts. Enter to save.' : 'Enter to save.' };
+  }
+
+  submitRename(fromBlur) {
+    const r = this.state.rename;
+    if (!r) return;
+    const chk = this.renameCheck();
+    if (chk.kind === 'same') { this.setState({ rename: null }); return; }
+    if (chk.kind === 'error') { if (fromBlur) this.setState({ rename: null }); return; }
+    if (chk.kind === 'collide') {
+      if (fromBlur) { this.setState({ rename: null }); return; }
+      if (r.kind === 'label') this.openDialog('mergeLabels', { ids: [r.id, chk.twin.id], choice: 'id:' + chk.twin.id, other: '' });
+      else this.openDialog('mergeCategories', { ids: [r.id, chk.twin.id], choice: 'id:' + chk.twin.id, other: '' });
+      this.setState({ rename: null });
+      return;
+    }
+    this.opRename(r.kind, r.id, chk.name);
+  }
+
+  // ================= dialogs =================
+
+  openDialog(type, init) { this.setState({ dialog: { type, ...(init || {}) }, menu: null }); }
+  closeDialog() { this.setState({ dialog: null }); }
+  setDialog(patch) { this.setState((s) => ({ dialog: s.dialog ? { ...s.dialog, ...(typeof patch === 'function' ? patch(s.dialog) : patch) } : null })); }
+
+  sec(kind, o) { return { key: kind, kind, is: { [kind]: true }, listMod: '', ...o }; }
+  text(t, mod) { return this.sec('text', { text: t, mod: mod || '' }); }
+  note(t, severity) { return this.sec('note', { text: t, severity: severity || 'info' }); }
+  field(label, key, o) {
+    const d = this.state.dialog;
+    return this.sec('field', { label, value: d[key] || '', onChange: (e) => this.setDialog({ [key]: e.target.value }), placeholder: '', helper: '', error: false, mod: '', ...(o || {}) });
+  }
+
+  postItems(postIds, tagIds, limit) {
+    const data = this.state.data;
+    // posts carrying more than one of these labels are the ones that actually change shape, so they lead
+    const carried = (p) => (this.idx().byPost.get(p.id) || []).filter((id) => tagIds.includes(id)).length;
+    const posts = postIds.map((id) => data.posts.find((p) => p.id === id)).sort((a, b) => carried(b) - carried(a) || b.publishedAt - a.publishedAt);
+    const items = posts.slice(0, limit).map((p) => {
+      const col = this.platformColors(p.platform);
+      const tags = (this.idx().byPost.get(p.id) || []).filter((id) => tagIds.includes(id)).map((id) => this.label(id).name);
+      return { key: 'p' + p.id, handle: p.handle, meta: this.postKind(p) + ', ' + this.fmtDate(p.publishedAt),
+        thumbImg: p.img ? "url('" + p.img + "')" : 'none', thumbText: p.img ? '' : p.handle[0].toUpperCase(), thumbBg: col.bg, thumbFg: col.fg,
+        tags: tags.length ? tags.join(' + ') : '' };
+    });
+    const more = posts.length > limit ? 'and ' + this.plural(posts.length - limit, 'more post') : '';
+    return { items, more };
+  }
+
+  /* ---------- the "stager": type, then comma or Enter to add; a pasted list splits itself ----------
+     Keyword Groups' own dialog says "separated by comma" and then refuses the comma key. Here every
+     separator the help text names works — typed or pasted — and whatever is still in the field when
+     you save is saved too, instead of being silently dropped. */
+
+  splitEntries(text) { return text.split(/[,\n\r\t]+/).map((x) => this.clean(x)); }
+
+  /** Handlers for a stager whose staged list lives at dialog[listKey] and whose field at dialog[inputKey]. */
+  stager(d, listKey, inputKey, o) {
+    const staged = d[listKey] || [], input = d[inputKey] || '';
+    const stage = (parts, rest) => this.setDialog((cur) => ({ [listKey]: [...(cur[listKey] || []), ...parts.filter(Boolean)], [inputKey]: rest }));
+    return this.sec('stager', {
+      label: o.label, value: input, placeholder: o.placeholder, helper: o.helper,
+      addDisabled: !this.clean(input),
+      onChange: (e) => {
+        const v = e.target.value;
+        if (/[,\n\r\t]/.test(v)) { const parts = this.splitEntries(v); const rest = parts.pop(); stage(parts, rest); }
+        else this.setDialog({ [inputKey]: v });
+      },
+      onPaste: (e) => {
+        const text = (e.clipboardData || window.clipboardData).getData('text');
+        if (!/[,\n\r\t]/.test(text)) return; // a single name pastes normally
+        e.preventDefault();
+        const el = e.target;
+        const whole = el.value.slice(0, el.selectionStart) + text + el.value.slice(el.selectionEnd);
+        const parts = this.splitEntries(whole);
+        const endsWithSep = /[,\n\r\t]\s*$/.test(text) && el.selectionEnd === el.value.length;
+        const rest = endsWithSep ? '' : parts.pop();
+        stage(parts, rest);
+      },
+      onKeyDown: (e) => {
+        if (e.key === 'Enter' && !(e.metaKey || e.ctrlKey)) { e.preventDefault(); if (this.clean(input)) stage([this.clean(input)], ''); }
+        else if (e.key === 'Backspace' && !input && staged.length) {
+          // the last one comes back into the field to be edited, rather than vanishing
+          e.preventDefault();
+          this.setDialog({ [listKey]: staged.slice(0, -1), [inputKey]: staged[staged.length - 1] });
+        }
+      },
+      onAdd: () => { if (this.clean(input)) stage([this.clean(input)], ''); this.__focusStager = true; },
+    });
+  }
+
+  /** Staged entries plus whatever is still being typed, each with its origin so only staged ones can be removed. */
+  stagedEntries(d, listKey, inputKey) {
+    const out = (d[listKey] || []).map((text, i) => ({ text, index: i }));
+    const typing = this.clean(d[inputKey]);
+    if (typing) out.push({ text: typing, index: -1 });
+    return out;
+  }
+
+  withRemove(rows, entries, listKey, inputKey) {
+    return rows.map((r, i) => {
+      const e = entries[i];
+      // the entry still being typed is a row like any other; its X clears the field
+      const onRemove = e.index < 0
+        ? () => { this.setDialog({ [inputKey]: '' }); this.__focusStager = true; }
+        : () => this.setDialog((cur) => ({ [listKey]: (cur[listKey] || []).filter((_, j) => j !== e.index) }));
+      return { ...r, meta: '', removable: true, removeAria: 'Remove ' + e.text, onRemove };
+    });
+  }
+
+  /* ---------- add labels: "Category / Label" puts one in a category ---------- */
+  planCreate(entries, ctxCat) {
+    const data = this.state.data;
+    const rows = [], newCats = [], seen = new Set();
+    entries.forEach((line, i) => {
+      let catName = null, name = line, catId = ctxCat, catNew = false;
+      if (line.includes('/')) {
+        const at = line.indexOf('/');
+        catName = this.clean(line.slice(0, at));
+        name = this.clean(line.slice(at + 1));
+        if (!catName) catId = null;
+        else {
+          const c = this.categoryNamed(catName);
+          if (c) { catId = c.id; catName = c.name; }
+          else {
+            catNew = true; catId = null;
+            if (!newCats.some((n) => this.norm(n) === this.norm(catName))) newCats.push(catName);
+            catName = newCats.find((n) => this.norm(n) === this.norm(catName));
+          }
+        }
+      } else name = this.clean(line);
+      const prefix = catNew ? catName + ' /' : catId != null ? this.catName(catId) + ' /' : '';
+      const key = (catNew ? 'new:' + this.norm(catName) : String(catId)) + '::' + this.norm(name);
+      const row = { key: 'r' + i, name, prefix, catId, catName, catNew, create: false, status: '', statusMod: '' };
+      if (!name) { row.name = line; row.status = 'No label name — skipped'; row.statusMod = 'dlg-item__status--skip'; }
+      else if (!catNew && this.namesake(catId, name, [], data)) { row.status = 'Already exists — skipped'; row.statusMod = 'dlg-item__status--skip'; }
+      else if (seen.has(key)) { row.status = 'Repeated — skipped'; row.statusMod = 'dlg-item__status--skip'; }
+      else {
+        seen.add(key); row.create = true;
+        row.status = catNew ? 'New label, in a new category' : 'New label'; row.statusMod = catNew ? 'dlg-item__status--new' : 'dlg-item__status--ok';
+      }
+      rows.push(row);
+    });
+    const used = new Set(rows.filter((r) => r.create && r.catNew).map((r) => this.norm(r.catName)));
+    return { rows, newCats: newCats.filter((n) => used.has(this.norm(n))) };
+  }
+
+  dlgAddLabels(d) {
+    const ctx = d.catId;
+    const entries = this.stagedEntries(d, 'staged', 'input');
+    const plan = this.planCreate(entries.map((e) => e.text), ctx);
+    const n = plan.rows.filter((r) => r.create).length;
+    const where = ctx == null ? 'without a category' : 'in ' + this.catName(ctx);
+    const sections = [
+      this.stager(d, 'staged', 'input', {
+        label: 'Add labels', placeholder: ctx == null ? 'e.g. Giveaway, Brand / Heineken' : 'e.g. Heineken, Carlsberg',
+        helper: 'Separate labels with commas or new lines — pasting a list works too. They go ' + where + '; type Category / Label to put one in a category, even a new one.',
+      }),
+    ];
+    if (plan.rows.length) sections.push(this.sec('items', { heading: 'To add', listMod: 'dlg__list--follow', items: this.withRemove(plan.rows, entries, 'staged', 'input') }));
+    return {
+      title: ctx == null ? 'Add labels' : 'Add labels to ' + this.catName(ctx), width: 'sm', sections,
+      confirmText: n ? 'Add ' + this.plural(n, 'label') + (plan.newCats.length ? ' + ' + this.plural(plan.newCats.length, 'category', 'categories') : '') : 'Add labels',
+      confirmDisabled: n === 0, onConfirm: () => this.opCreate(plan),
+    };
+  }
+
+  /* ---------- add labels or a category, from the catalogue's home. The category is optional:
+     a label can start out loose and be sorted later, as it can when created on a post ---------- */
+  dlgAddCategory(d) {
+    const catName = this.clean(d.name);
+    const existing = catName ? this.categoryNamed(catName) : null;
+    const isNew = !!catName && !existing;
+    const entries = this.stagedEntries(d, 'staged', 'input');
+    // a new category's labels go through the same planner as "Category / Label", so namesakes and repeats read the same
+    const lines = entries.map((e) => (isNew && !e.text.includes('/') ? catName + ' / ' + e.text : e.text));
+    const plan = this.planCreate(lines, existing ? existing.id : null);
+    if (isNew && !plan.newCats.some((n) => this.norm(n) === this.norm(catName))) plan.newCats.unshift(catName);
+    const n = plan.rows.filter((r) => r.create).length;
+    const nCats = plan.newCats.length;
+    const catHelper = !catName ? 'Leave it empty to add loose labels, without a category, and sort them later.'
+      : existing ? 'Adds to the existing category ' + this.q(existing.name) + '.'
+      : 'Creates the category ' + this.q(catName) + '.';
+    const sections = [
+      this.field('Category (optional)', 'name', { helper: catHelper }),
+      this.stager(d, 'staged', 'input', {
+        label: catName ? 'Labels (optional)' : 'Labels', placeholder: 'e.g. Giveaway, Unboxing',
+        helper: 'Separate labels with commas or new lines — pasting a list works too.',
+      }),
+    ];
+    if (plan.rows.length) sections.push(this.sec('items', { heading: 'To add', listMod: 'dlg__list--follow', items: this.withRemove(plan.rows, entries, 'staged', 'input') }));
+    const confirmText = !n && !nCats ? 'Add'
+      : !nCats ? 'Add ' + this.plural(n, 'label')
+      : !n ? 'Add category'
+      : 'Add ' + (nCats === 1 ? 'category' : this.plural(nCats, 'category', 'categories')) + ' + ' + this.plural(n, 'label');
+    return {
+      title: 'Add labels or a category', width: 'sm', sections,
+      confirmText, confirmDisabled: n === 0 && nCats === 0,
+      onConfirm: () => (n ? this.opCreate(plan) : this.opCreateCategory(catName, [])),
+    };
+  }
+
+  /* ---------- rename several labels at once (never a merge: they must be in different categories) ---------- */
+  dlgBulkRename(d) {
+    const labels = d.ids.map((id) => this.label(id));
+    const name = this.clean(d.name);
+    let bad = 0, n = 0;
+    const items = labels.map((l) => {
+      const count = this.postsOf(l.id).length;
+      const row = { key: 'l' + l.id, prefix: l.categoryId == null ? 'No category /' : this.catName(l.categoryId) + ' /', name: l.name, meta: this.plural(count, 'post') };
+      if (!name) return { ...row, status: '', statusMod: '' };
+      const twin = this.namesake(l.categoryId, name, d.ids);
+      if (twin) { bad++; return { ...row, status: this.catName(l.categoryId) + ' already has ' + this.q(twin.name) + ' — merge it there instead', statusMod: 'dlg-item__status--error' }; }
+      if (l.name === name) return { ...row, status: 'Already called that', statusMod: 'dlg-item__status--skip' };
+      n++;
+      return { ...row, status: '→ ' + name, statusMod: 'dlg-item__status--ok' };
+    });
+    const total = this.postsOfMany(d.ids).length;
+    return {
+      title: 'Rename ' + this.plural(labels.length, 'label'), width: 'sm',
+      sections: [
+        this.text('Each label keeps its own category and its own posts — this only makes their spelling match. Labels in different categories stay separate labels.'),
+        this.field('New name', 'name', { placeholder: labels[0].name }),
+        this.sec('items', { heading: 'Labels', items }),
+        this.note(total ? 'The new name shows on ' + this.plural(total, 'post') + ' as soon as you rename.' : 'None of these are on a post yet.', 'info'),
+      ],
+      confirmText: n ? 'Rename ' + this.plural(n, 'label') : 'Rename', confirmDisabled: !name || bad > 0 || n === 0,
+      onConfirm: () => this.opBulkRename(d.ids.filter((id) => this.label(id).name !== name), name),
+    };
+  }
+
+  destOptions(includeNew, excludeIds) {
+    const cats = this.state.data.categories.filter((c) => !(excludeIds || []).includes(c.id)).slice().sort((a, b) => a.name.localeCompare(b.name));
+    const opts = cats.map((c) => ({ value: 'c:' + c.id, label: c.name }));
+    opts.push({ value: 'none', label: 'No category' });
+    if (includeNew) opts.push({ value: 'new', label: 'New category…' });
+    return opts;
+  }
+
+  /* ---------- move: a namesake in the destination is a merge inside that category, never across ---------- */
+  planMove(d) {
+    const out = { rows: [], destId: null, destName: '', newName: null, error: '' };
+    if (!d.dest) return out;
+    if (d.dest === 'new') {
+      out.newName = this.clean(d.newName);
+      out.destName = out.newName ? this.q(out.newName) : 'a new category';
+      if (!out.newName) out.error = 'empty';
+      else if (this.categoryNamed(out.newName)) out.error = 'taken';
+    } else if (d.dest === 'none') { out.destId = null; out.destName = 'No category'; }
+    else { out.destId = Number(d.dest.slice(2)); out.destName = this.catName(out.destId); }
+
+    const inDest = new Map(); // normalised name -> label id already (or about to be) in the destination
+    if (d.dest !== 'new') this.labelsIn(out.destId).forEach((l) => inDest.set(this.norm(l.name), l.id));
+    d.ids.map((id) => this.label(id)).forEach((l) => {
+      const count = this.postsOf(l.id).length;
+      const row = { key: 'm' + l.id, id: l.id, prefix: (l.categoryId == null ? 'No category' : this.catName(l.categoryId)) + ' /', name: l.name, meta: this.plural(count, 'post'), hasCheck: false };
+      if (d.dest !== 'new' && l.categoryId === out.destId) { out.rows.push({ ...row, action: 'skip', status: 'Already in ' + out.destName, statusMod: 'dlg-item__status--skip' }); return; }
+      const intoId = inDest.get(this.norm(l.name));
+      if (intoId != null) {
+        const into = this.label(intoId);
+        const on = !(d.noMerge || []).includes(l.id);
+        const both = this.postsOfMany([l.id, intoId]).length;
+        out.rows.push({ ...row, hasCheck: true, checked: on, checkAria: 'Merge ' + l.name + ' into ' + into.name,
+          onToggle: () => this.setDialog({ noMerge: on ? [...(d.noMerge || []), l.id] : (d.noMerge || []).filter((x) => x !== l.id) }),
+          action: on ? 'merge' : 'skip', intoId,
+          status: on ? 'Merges into ' + this.q(into.name) + ' — ' + this.plural(both, 'post') + ' after' : 'Skipped — ' + this.q(into.name) + ' is already there',
+          statusMod: on ? 'dlg-item__status--merge' : 'dlg-item__status--skip' });
+        return;
+      }
+      inDest.set(this.norm(l.name), l.id);
+      out.rows.push({ ...row, action: 'move', status: 'Moves', statusMod: 'dlg-item__status--ok' });
+    });
+    return out;
+  }
+
+  dlgMove(d) {
+    const plan = this.planMove(d);
+    const labels = d.ids.map((id) => this.label(id));
+    const same = labels.every((l) => l.categoryId === labels[0].categoryId);
+    const sections = [
+      this.sec('select', { label: 'Move to', value: d.dest || '', options: this.destOptions(true, same && labels[0].categoryId != null ? [labels[0].categoryId] : []),
+        onChange: (v) => this.setDialog({ dest: v }), mod: '' }),
+    ];
+    if (d.dest === 'new') sections.push(this.field('New category name', 'newName', { error: plan.error === 'taken', helper: plan.error === 'taken' ? 'That category exists — pick it from the list instead.' : '' }));
+    if (d.dest) {
+      sections.push(this.sec('items', { heading: 'Labels', items: plan.rows }));
+      const merges = plan.rows.filter((r) => r.action === 'merge');
+      sections.push(this.note(merges.length
+        ? this.plural(merges.length, 'label') + ' already exist' + (merges.length === 1 ? 's' : '') + (plan.destId == null && !plan.newName ? ' without a category' : ' in ' + plan.destName) + '. Merging moves their posts onto the existing label and deletes the duplicate — untick one to leave it where it is.'
+        : 'Moving doesn\'t change which posts carry these labels — only the category shown before their name.', merges.length ? 'warning' : 'info'));
+    }
+    const n = plan.rows.filter((r) => r.action !== 'skip').length;
+    return {
+      title: 'Move ' + (labels.length === 1 ? this.q(labels[0].name) : this.plural(labels.length, 'label')), width: 'sm', sections,
+      confirmText: n ? 'Move ' + this.plural(n, 'label') : 'Move', confirmDisabled: !d.dest || !!plan.error || n === 0,
+      onConfirm: () => this.opMove(plan),
+    };
+  }
+
+  /* ---------- duplicate: an independent copy; linking it to the same posts is opt-in ---------- */
+  planDuplicate(d) {
+    const out = { rows: [], destId: null, destName: '' };
+    if (!d.dest) return out;
+    out.destId = d.dest === 'none' ? null : Number(d.dest.slice(2));
+    out.destName = this.catName(out.destId);
+    const taken = new Set(this.labelsIn(out.destId).map((l) => this.norm(l.name)));
+    d.ids.map((id) => this.label(id)).forEach((l) => {
+      const row = { key: 'd' + l.id, id: l.id, prefix: (l.categoryId == null ? 'No category' : this.catName(l.categoryId)) + ' /', name: l.name, meta: this.plural(this.postsOf(l.id).length, 'post') };
+      if (taken.has(this.norm(l.name))) {
+        const inside = l.categoryId === out.destId;
+        out.rows.push({ ...row, action: 'skip', status: inside ? 'Already in ' + out.destName : out.destName + ' already has ' + this.q(l.name) + ' — skipped', statusMod: 'dlg-item__status--skip' });
+        return;
+      }
+      taken.add(this.norm(l.name));
+      out.rows.push({ ...row, action: 'copy', status: 'Copy in ' + out.destName, statusMod: 'dlg-item__status--ok' });
+    });
+    return out;
+  }
+
+  dlgDuplicate(d) {
+    const plan = this.planDuplicate(d);
+    const labels = d.ids.map((id) => this.label(id));
+    const copying = plan.rows.filter((r) => r.action === 'copy');
+    const nPosts = this.postsOfMany(copying.map((r) => r.id)).length;
+    const sections = [
+      this.text('A copy is a separate label with the same name. From then on the two are independent — renaming, moving or deleting one doesn\'t touch the other.'),
+      this.sec('select', { label: 'Duplicate into', value: d.dest || '', options: this.destOptions(false, []), onChange: (v) => this.setDialog({ dest: v }), mod: '' }),
+    ];
+    if (d.dest) {
+      sections.push(this.sec('items', { heading: 'Labels', items: plan.rows }));
+      sections.push(this.sec('check', { text: 'Also add the copies to the posts the originals are on',
+        sub: nPosts ? this.plural(nPosts, 'post') + '. Leave this off and the copies start with no posts.' : 'The originals aren\'t on any post, so there is nothing to copy.',
+        checked: !!d.withPosts && nPosts > 0, onToggle: () => this.setDialog({ withPosts: !d.withPosts }), mod: nPosts ? '' : 'choice--disabled' }));
+    }
+    return {
+      title: 'Duplicate ' + (labels.length === 1 ? this.q(labels[0].name) : this.plural(labels.length, 'label')), width: 'sm', sections,
+      confirmText: copying.length ? 'Duplicate ' + this.plural(copying.length, 'label') : 'Duplicate', confirmDisabled: !d.dest || copying.length === 0,
+      onConfirm: () => this.opDuplicate(plan, !!d.withPosts && nPosts > 0),
+    };
+  }
+
+  /* ---------- merge labels: same category only ---------- */
+  dlgMergeLabels(d) {
+    const labels = d.ids.map((id) => this.label(id));
+    const catId = labels[0].categoryId;
+    const catLabel = this.catName(catId);
+    const counts = new Map(labels.map((l) => [l.id, this.postsOf(l.id).length]));
+    const biggest = labels.slice().sort((a, b) => counts.get(b.id) - counts.get(a.id))[0];
+    const choice = d.choice || 'id:' + biggest.id;
+    let finalName = '', keepId = biggest.id, extra = null;
+    if (choice === 'other') {
+      finalName = this.clean(d.other);
+      const inSel = labels.find((l) => this.norm(l.name) === this.norm(finalName));
+      extra = finalName && !inSel ? this.namesake(catId, finalName, d.ids) : null;
+      if (inSel) keepId = inSel.id; else if (extra) keepId = extra.id;
+    } else {
+      keepId = Number(choice.slice(3));
+      finalName = this.label(keepId).name;
+    }
+    const allIds = extra ? [...d.ids, extra.id] : d.ids.slice();
+    const postIds = this.postsOfMany(allIds);
+    const overlap = postIds.filter((p) => (this.idx().byPost.get(p) || []).filter((x) => allIds.includes(x)).length > 1).length;
+    const pv = this.postItems(postIds, allIds, 6);
+
+    const options = labels.map((l) => ({ key: 'o' + l.id, text: l.name, sub: this.plural(counts.get(l.id), 'post'),
+      checked: choice === 'id:' + l.id, onPick: () => this.setDialog({ choice: 'id:' + l.id }), disabled: false, mod: '' }));
+    options.push({ key: 'other', text: 'Another name', sub: '', checked: choice === 'other', onPick: () => this.setDialog({ choice: 'other' }), disabled: false, mod: '' });
+
+    const sections = [
+      this.text('The merged label stays in ' + catLabel + '. Every post moves onto it and the others are deleted.'),
+      this.sec('radios', { label: 'Name to keep', name: 'merge-name', options }),
+    ];
+    if (choice === 'other') sections.push(this.field('Name', 'other', { mod: 'dlg__indent' }));
+    if (extra) sections.push(this.note(catLabel + ' already has ' + this.q(extra.name) + ' (' + this.plural(this.postsOf(extra.id).length, 'post') + ') — it will be merged in too.', 'warning'));
+    if (postIds.length) {
+      sections.push(this.sec('posts', { heading: this.plural(postIds.length, 'post') + ' affected — the labels each carries now', items: pv.items, more: pv.more }));
+      sections.push(this.note(
+        (finalName ? 'All ' + this.plural(postIds.length, 'post') + ' will carry ' + this.q(finalName) + '. ' : '') +
+        (overlap ? this.plural(overlap, 'post') + ' carr' + (overlap === 1 ? 'ies' : 'y') + ' more than one of these now — ' + (overlap === 1 ? 'it ends' : 'they end') + ' up with one. ' : '') +
+        'Everyone sees the change on these posts straight away.', overlap ? 'warning' : 'info'));
+    } else sections.push(this.note('None of these are on a post, so no post changes.', 'info'));
+    return {
+      title: 'Merge ' + this.plural(allIds.length, 'label') + ' in ' + catLabel, width: 'md', sections,
+      confirmText: 'Merge ' + this.plural(allIds.length, 'label'), confirmDisabled: !finalName,
+      onConfirm: () => this.opMergeLabels({ allIds, keepId, finalName }),
+    };
+  }
+
+  /* ---------- merge categories: namesakes inside them become one label ---------- */
+  dlgMergeCategories(d) {
+    const cats = d.ids.map((id) => this.category(id));
+    const counts = new Map(cats.map((c) => [c.id, this.labelsIn(c.id).length]));
+    const biggest = cats.slice().sort((a, b) => counts.get(b.id) - counts.get(a.id))[0];
+    const choice = d.choice || 'id:' + biggest.id;
+    let finalName = '', keepId = biggest.id, extra = null;
+    if (choice === 'other') {
+      finalName = this.clean(d.other);
+      const inSel = cats.find((c) => this.norm(c.name) === this.norm(finalName));
+      extra = finalName && !inSel ? this.categoryNamed(finalName, d.ids) : null;
+      if (inSel) keepId = inSel.id; else if (extra) keepId = extra.id;
+    } else { keepId = Number(choice.slice(3)); finalName = this.category(keepId).name; }
+    const allIds = extra ? [...d.ids, extra.id] : d.ids.slice();
+
+    const groups = new Map();
+    this.state.data.labels.filter((l) => allIds.includes(l.categoryId)).forEach((l) => {
+      const k = this.norm(l.name);
+      if (!groups.has(k)) groups.set(k, []);
+      groups.get(k).push(l);
+    });
+    const collisions = [...groups.values()].filter((g) => g.length > 1).map((g) => {
+      const sorted = g.slice().sort((a, b) => (a.categoryId === keepId ? -1 : b.categoryId === keepId ? 1 : this.postsOf(b.id).length - this.postsOf(a.id).length));
+      return { keepId: sorted[0].id, otherIds: sorted.slice(1).map((l) => l.id), labels: sorted };
+    });
+    const nLabels = this.state.data.labels.filter((l) => allIds.includes(l.categoryId)).length - collisions.reduce((n, c) => n + c.otherIds.length, 0);
+
+    const options = cats.map((c) => ({ key: 'o' + c.id, text: c.name, sub: this.plural(counts.get(c.id), 'label'),
+      checked: choice === 'id:' + c.id, onPick: () => this.setDialog({ choice: 'id:' + c.id }), disabled: false, mod: '' }));
+    options.push({ key: 'other', text: 'Another name', sub: '', checked: choice === 'other', onPick: () => this.setDialog({ choice: 'other' }), disabled: false, mod: '' });
+
+    const sections = [
+      this.text('Merging says these categories mean the same thing: their labels end up in one category and the others are deleted.'),
+      this.sec('radios', { label: 'Name to keep', name: 'merge-cat', options }),
+    ];
+    if (choice === 'other') sections.push(this.field('Name', 'other', { mod: 'dlg__indent' }));
+    if (extra) sections.push(this.note('There is already a category called ' + this.q(extra.name) + ' — it will be merged in too.', 'warning'));
+    if (collisions.length) {
+      sections.push(this.sec('items', { heading: 'Labels with the same name — each pair becomes one label', items: collisions.map((c) => ({
+        key: 'c' + c.keepId, prefix: '', name: c.labels.map((l) => l.name + ' (' + this.catName(l.categoryId) + ')').join(' + '),
+        meta: c.labels.map((l) => this.postsOf(l.id).length).join(' + ') + ' posts', status: 'Merged', statusMod: 'dlg-item__status--merge' })) }));
+    }
+    sections.push(this.note(finalName ? this.plural(nLabels, 'label') + ' will be in ' + this.q(finalName) + '.' : 'Choose a name.', 'info'));
+    return {
+      title: 'Merge ' + this.plural(allIds.length, 'category', 'categories'), width: 'md', sections,
+      confirmText: 'Merge ' + this.plural(allIds.length, 'category', 'categories'), confirmDisabled: !finalName,
+      onConfirm: () => this.opMergeCategories({ allIds, keepId, finalName, collisions }),
+    };
+  }
+
+  /* ---------- delete a category: ask what happens to its labels. One at a time, never in bulk ---------- */
+  dlgDeleteCategories(d) {
+    const ids = d.ids.slice(0, 1);
+    const cats = ids.map((id) => this.category(id));
+    const name = this.q(cats[0].name);
+    const labels = this.state.data.labels.filter((l) => ids.includes(l.categoryId));
+    const nPosts = this.postsOfMany(labels.map((l) => l.id)).length;
+    const others = this.state.data.categories.filter((c) => !ids.includes(c.id));
+    const mode = labels.length ? (d.mode || 'keep') : 'none';
+    const plan = { cats, mode, nLabels: labels.length, moves: [], destId: null, destName: '' };
+    const title = 'Delete ' + name;
+    const sections = [];
+
+    if (!labels.length) {
+      sections.push(this.text(name + ' has no labels. Nothing else changes.'));
+    } else {
+      sections.push(this.text(name + ' holds ' + this.plural(labels.length, 'label') + ', on ' + this.plural(nPosts, 'post') + '. What should happen to them?'));
+      sections.push(this.sec('radios', { label: 'What happens to the labels', name: 'del-cat', options: [
+        { key: 'keep', text: 'Keep them, without a category', sub: 'They stay on their posts; the category name disappears from them.', checked: mode === 'keep', onPick: () => this.setDialog({ mode: 'keep' }), disabled: false, mod: '' },
+        { key: 'move', text: 'Move them to another category', sub: others.length ? 'They stay on their posts under a different category.' : 'There is no other category to move them to.', checked: mode === 'move', onPick: () => this.setDialog({ mode: 'move' }), disabled: !others.length, mod: others.length ? '' : 'choice--disabled' },
+        { key: 'delete', text: 'Delete the labels too', sub: nPosts ? 'Removes them from ' + this.plural(nPosts, 'post') + '.' : 'None of them is on a post.', checked: mode === 'delete', onPick: () => this.setDialog({ mode: 'delete' }), disabled: false, mod: '' },
+      ] }));
+      if (mode === 'move') sections.push(this.sec('select', { label: 'Move to', value: d.dest || '', options: this.destOptions(false, ids).filter((o) => o.value !== 'none'), onChange: (v) => this.setDialog({ dest: v }), mod: 'dlg__indent' }));
+      if (mode === 'keep' || (mode === 'move' && d.dest)) {
+        plan.destId = mode === 'move' ? Number(d.dest.slice(2)) : null;
+        plan.destName = this.catName(plan.destId);
+        const inDest = new Map(this.labelsIn(plan.destId).map((l) => [this.norm(l.name), l.id]));
+        const merged = [];
+        labels.forEach((l) => {
+          const into = inDest.get(this.norm(l.name));
+          if (into != null) { plan.moves.push({ id: l.id, intoId: into }); merged.push(l.name); }
+          else { plan.moves.push({ id: l.id, intoId: null }); inDest.set(this.norm(l.name), l.id); }
+        });
+        const where = plan.destId == null ? 'without a category' : 'in ' + plan.destName;
+        if (merged.length) sections.push(this.note(merged.join(', ') + (merged.length === 1 ? ' already exists ' : ' already exist ') + where + '. ' + (merged.length === 1 ? 'It' : 'They') + ' will be merged, so each post keeps one.', 'warning'));
+      }
+      if (mode === 'delete' && nPosts) {
+        const pv = this.postItems(this.postsOfMany(labels.map((l) => l.id)), labels.map((l) => l.id), 5);
+        sections.push(this.sec('posts', { heading: 'These posts lose the labels', items: pv.items, more: pv.more }));
+      }
+    }
+    return {
+      title, width: 'sm', sections, confirmColor: 'error',
+      confirmText: 'Delete category',
+      confirmDisabled: mode === 'move' && !d.dest,
+      onConfirm: () => this.opDeleteCategories(plan),
+    };
+  }
+
+  /* ---------- delete labels: show the posts, ask what happens to them ---------- */
+  dlgDeleteLabels(d) {
+    const labels = d.ids.map((id) => this.label(id));
+    const postIds = this.postsOfMany(d.ids);
+    const oneCat = labels.every((l) => l.categoryId === labels[0].categoryId);
+    const candidates = oneCat ? this.labelsIn(labels[0].categoryId).filter((l) => !d.ids.includes(l.id)).sort((a, b) => a.name.localeCompare(b.name)) : [];
+    const canReplace = oneCat && candidates.length > 0;
+    const mode = postIds.length ? (d.mode || 'remove') : 'remove';
+    const replacement = mode === 'replace' && d.replacement ? this.label(Number(d.replacement)) : null;
+    const title = 'Delete ' + (labels.length === 1 ? this.q(labels[0].name) : this.plural(labels.length, 'label'));
+    const sections = [];
+    if (!postIds.length) {
+      sections.push(this.text((labels.length === 1 ? 'It isn\'t' : 'None of these is') + ' on any post. Nothing else changes.'));
+    } else {
+      const pv = this.postItems(postIds, d.ids, 5);
+      sections.push(this.sec('posts', { heading: 'On ' + this.plural(postIds.length, 'post'), items: pv.items, more: pv.more }));
+      sections.push(this.sec('radios', { label: 'What happens on these posts', name: 'del-label', options: [
+        { key: 'remove', text: 'Remove ' + (labels.length === 1 ? 'it' : 'them') + ' from these posts', sub: 'The posts simply lose the label.', checked: mode === 'remove', onPick: () => this.setDialog({ mode: 'remove' }), disabled: false, mod: '' },
+        { key: 'replace', text: 'Replace with another label on these posts',
+          sub: canReplace ? 'Pick a label from ' + this.catName(labels[0].categoryId) + '.' : !oneCat ? 'Only possible when the labels are in the same category.' : 'There is no other label in ' + this.catName(labels[0].categoryId) + '.',
+          checked: mode === 'replace', onPick: () => this.setDialog({ mode: 'replace' }), disabled: !canReplace, mod: canReplace ? '' : 'choice--disabled' },
+      ] }));
+      if (mode === 'replace') sections.push(this.sec('select', { label: 'Replace with', value: d.replacement || '', mod: 'dlg__indent',
+        options: candidates.map((l) => ({ value: String(l.id), label: l.name + ' (' + this.plural(this.postsOf(l.id).length, 'post') + ')' })), onChange: (v) => this.setDialog({ replacement: v }) }));
+    }
+    return {
+      title, width: 'sm', sections, confirmColor: 'error',
+      confirmText: 'Delete ' + this.plural(labels.length, 'label'), confirmDisabled: mode === 'replace' && !replacement,
+      onConfirm: () => this.opDeleteLabels({ labels, mode, replacement, nPosts: postIds.length }),
+    };
+  }
+
+  buildDialog() {
+    const d = this.state.dialog;
+    if (!d) return null;
+    const map = {
+      addLabels: this.dlgAddLabels, addCategory: this.dlgAddCategory, bulkRename: this.dlgBulkRename,
+      move: this.dlgMove, duplicate: this.dlgDuplicate, mergeLabels: this.dlgMergeLabels,
+      mergeCategories: this.dlgMergeCategories, deleteCategories: this.dlgDeleteCategories, deleteLabels: this.dlgDeleteLabels,
+    };
+    const b = map[d.type].call(this, d);
+    return { width: 'sm', confirmColor: 'primary', ...b, onCancel: () => this.closeDialog() };
+  }
+
+  // ================= export =================
+
+  exportRows() {
+    const data = this.state.data;
+    const rows = [];
+    data.categories.slice().sort((a, b) => a.name.localeCompare(b.name)).forEach((c) => {
+      const ls = this.labelsIn(c.id).sort((a, b) => a.name.localeCompare(b.name));
+      if (!ls.length) rows.push({ category: c.name, label: '', posts: 0, createdAt: c.createdAt, createdBy: c.createdBy, editedAt: c.editedAt });
+      ls.forEach((l) => rows.push({ category: c.name, label: l.name, posts: this.postsOf(l.id).length, createdAt: l.createdAt, createdBy: l.createdBy, editedAt: l.editedAt }));
+    });
+    this.labelsIn(null).sort((a, b) => a.name.localeCompare(b.name)).forEach((l) =>
+      rows.push({ category: '', label: l.name, posts: this.postsOf(l.id).length, createdAt: l.createdAt, createdBy: l.createdBy, editedAt: l.editedAt }));
+    return rows;
+  }
+
+  xml(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&apos;'); }
+
+  crc32(bytes) {
+    if (!this.__crc) {
+      this.__crc = new Uint32Array(256);
+      for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; this.__crc[n] = c >>> 0; }
+    }
+    let c = 0xFFFFFFFF;
+    for (let i = 0; i < bytes.length; i++) c = this.__crc[(c ^ bytes[i]) & 0xFF] ^ (c >>> 8);
+    return (c ^ 0xFFFFFFFF) >>> 0;
+  }
+
+  /** A minimal zip (stored, not compressed) — enough for .xlsx and .docx, with no library to load. */
+  zip(files, type) {
+    const enc = new TextEncoder(), parts = [], central = [];
+    const t = new Date();
+    const time = (t.getHours() << 11) | (t.getMinutes() << 5) | (t.getSeconds() >> 1);
+    const date = ((t.getFullYear() - 1980) << 9) | ((t.getMonth() + 1) << 5) | t.getDate();
+    let offset = 0;
+    files.forEach(([path, text]) => {
+      const name = enc.encode(path), data = enc.encode(text), crc = this.crc32(data);
+      const lh = new DataView(new ArrayBuffer(30));
+      [[0, 0x04034b50, 4], [4, 20, 2], [6, 0x0800, 2], [8, 0, 2], [10, time, 2], [12, date, 2], [14, crc, 4], [18, data.length, 4], [22, data.length, 4], [26, name.length, 2], [28, 0, 2]]
+        .forEach(([o, v, n]) => (n === 4 ? lh.setUint32(o, v, true) : lh.setUint16(o, v, true)));
+      parts.push(new Uint8Array(lh.buffer), name, data);
+      const ch = new DataView(new ArrayBuffer(46));
+      [[0, 0x02014b50, 4], [4, 20, 2], [6, 20, 2], [8, 0x0800, 2], [10, 0, 2], [12, time, 2], [14, date, 2], [16, crc, 4], [20, data.length, 4], [24, data.length, 4], [28, name.length, 2], [30, 0, 2], [32, 0, 2], [34, 0, 2], [36, 0, 2], [38, 0, 4], [42, offset, 4]]
+        .forEach(([o, v, n]) => (n === 4 ? ch.setUint32(o, v, true) : ch.setUint16(o, v, true)));
+      central.push(new Uint8Array(ch.buffer), name);
+      offset += 30 + name.length + data.length;
+    });
+    const size = central.reduce((n, p) => n + p.length, 0);
+    const end = new DataView(new ArrayBuffer(22));
+    end.setUint32(0, 0x06054b50, true); end.setUint16(8, files.length, true); end.setUint16(10, files.length, true);
+    end.setUint32(12, size, true); end.setUint32(16, offset, true);
+    return new Blob([...parts, ...central, new Uint8Array(end.buffer)], { type });
+  }
+
+  toXlsx(rows) {
+    const head = ['Category', 'Label', 'Posts', 'Created', 'Created by', 'Last edited'];
+    const col = (i) => String.fromCharCode(65 + i);
+    const str = (r, i, v, s) => '<c r="' + col(i) + r + '" t="inlineStr"' + (s ? ' s="1"' : '') + '><is><t xml:space="preserve">' + this.xml(v) + '</t></is></c>';
+    let sheet = '<row r="1">' + head.map((h, i) => str(1, i, h, true)).join('') + '</row>';
+    rows.forEach((x, j) => {
+      const r = j + 2;
+      sheet += '<row r="' + r + '">' + str(r, 0, x.category) + str(r, 1, x.label) + '<c r="C' + r + '"><v>' + x.posts + '</v></c>' +
+        str(r, 3, this.isoDate(x.createdAt)) + str(r, 4, x.createdBy) + str(r, 5, this.isoDate(x.editedAt)) + '</row>';
+    });
+    const X = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+    const NS = 'http://schemas.openxmlformats.org';
+    return this.zip([
+      ['[Content_Types].xml', X + '<Types xmlns="' + NS + '/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/><Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/><Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/></Types>'],
+      ['_rels/.rels', X + '<Relationships xmlns="' + NS + '/package/2006/relationships"><Relationship Id="rId1" Type="' + NS + '/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/></Relationships>'],
+      ['xl/workbook.xml', X + '<workbook xmlns="' + NS + '/spreadsheetml/2006/main" xmlns:r="' + NS + '/officeDocument/2006/relationships"><sheets><sheet name="Labels" sheetId="1" r:id="rId1"/></sheets></workbook>'],
+      ['xl/_rels/workbook.xml.rels', X + '<Relationships xmlns="' + NS + '/package/2006/relationships"><Relationship Id="rId1" Type="' + NS + '/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/><Relationship Id="rId2" Type="' + NS + '/officeDocument/2006/relationships/styles" Target="styles.xml"/></Relationships>'],
+      ['xl/styles.xml', X + '<styleSheet xmlns="' + NS + '/spreadsheetml/2006/main"><fonts count="2"><font><sz val="11"/><name val="Calibri"/></font><font><b/><sz val="11"/><name val="Calibri"/></font></fonts><fills count="2"><fill><patternFill patternType="none"/></fill><fill><patternFill patternType="gray125"/></fill></fills><borders count="1"><border><left/><right/><top/><bottom/><diagonal/></border></borders><cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs><cellXfs count="2"><xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/><xf numFmtId="0" fontId="1" fillId="0" borderId="0" xfId="0" applyFont="1"/></cellXfs><cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles></styleSheet>'],
+      ['xl/worksheets/sheet1.xml', X + '<worksheet xmlns="' + NS + '/spreadsheetml/2006/main"><sheetViews><sheetView workbookViewId="0"><pane ySplit="1" topLeftCell="A2" activePane="bottomLeft" state="frozen"/></sheetView></sheetViews><cols><col min="1" max="2" width="28" customWidth="1"/><col min="3" max="3" width="8" customWidth="1"/><col min="4" max="6" width="16" customWidth="1"/></cols><sheetData>' + sheet + '</sheetData></worksheet>'],
+    ], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+  }
+
+  toDocx() {
+    const data = this.state.data;
+    const run = (t, o) => '<w:r>' + (o ? '<w:rPr>' + (o.b ? '<w:b/>' : '') + (o.sz ? '<w:sz w:val="' + o.sz + '"/>' : '') + (o.grey ? '<w:color w:val="607D8B"/>' : '') + '</w:rPr>' : '') + '<w:t xml:space="preserve">' + this.xml(t) + '</w:t></w:r>';
+    const para = (t, o) => '<w:p>' + (o && o.after != null ? '<w:pPr><w:spacing w:after="' + o.after + '"/></w:pPr>' : '') + run(t, o) + '</w:p>';
+    const cell = (t, o) => '<w:tc><w:tcPr><w:tcW w:w="0" w:type="auto"/></w:tcPr>' + para(t, o) + '</w:tc>';
+    const border = '<w:tblBorders>' + ['top', 'left', 'bottom', 'right', 'insideH', 'insideV'].map((s) => '<w:' + s + ' w:val="single" w:sz="4" w:space="0" w:color="CFD8DC"/>').join('') + '</w:tblBorders>';
+    const table = (ls) => '<w:tbl><w:tblPr><w:tblW w:w="5000" w:type="pct"/>' + border + '</w:tblPr>' +
+      '<w:tr>' + ['Label', 'Posts', 'Created by', 'Created', 'Last edited'].map((h) => cell(h, { b: true })).join('') + '</w:tr>' +
+      ls.map((l) => '<w:tr>' + [l.name, String(this.postsOf(l.id).length), l.createdBy, this.fmtDate(l.createdAt), this.fmtDate(l.editedAt)].map((v) => cell(v)).join('') + '</w:tr>').join('') + '</w:tbl>';
+    let body = para('Labels and categories', { b: true, sz: 36, after: 80 }) +
+      para('Exported ' + this.fmtDate(new Date()) + ' · ' + this.plural(data.categories.length, 'category', 'categories') + ' · ' + this.plural(data.labels.length, 'label'), { grey: true, after: 240 });
+    const groups = data.categories.slice().sort((a, b) => a.name.localeCompare(b.name)).map((c) => ({ name: c.name, labels: this.labelsIn(c.id) }));
+    groups.push({ name: 'No category', labels: this.labelsIn(null) });
+    groups.forEach((g) => {
+      body += para(g.name + ' — ' + this.plural(g.labels.length, 'label'), { b: true, sz: 26, after: 80 });
+      body += g.labels.length ? table(g.labels.sort((a, b) => a.name.localeCompare(b.name))) + para('', { after: 160 }) : para('No labels.', { grey: true, after: 160 });
+    });
+    const X = '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>\n';
+    const NS = 'http://schemas.openxmlformats.org';
+    return this.zip([
+      ['[Content_Types].xml', X + '<Types xmlns="' + NS + '/package/2006/content-types"><Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/><Default Extension="xml" ContentType="application/xml"/><Override PartName="/word/document.xml" ContentType="application/vnd.openxmlformats-officedocument.wordprocessingml.document.main+xml"/></Types>'],
+      ['_rels/.rels', X + '<Relationships xmlns="' + NS + '/package/2006/relationships"><Relationship Id="rId1" Type="' + NS + '/officeDocument/2006/relationships/officeDocument" Target="word/document.xml"/></Relationships>'],
+      ['word/document.xml', X + '<w:document xmlns:w="' + NS + '/wordprocessingml/2006/main"><w:body>' + body + '<w:sectPr><w:pgSz w:w="11906" w:h="16838"/><w:pgMar w:top="1134" w:right="1134" w:bottom="1134" w:left="1134" w:header="708" w:footer="708" w:gutter="0"/></w:sectPr></w:body></w:document>'],
+    ], 'application/vnd.openxmlformats-officedocument.wordprocessingml.document');
+  }
+
+  toJson() {
+    const data = this.state.data;
+    const lab = (l) => ({ name: l.name, posts: this.postsOf(l.id).length, createdBy: l.createdBy, createdAt: l.createdAt.toISOString(), lastEdited: l.editedAt.toISOString() });
+    const out = {
+      exportedAt: new Date().toISOString(),
+      categories: data.categories.slice().sort((a, b) => a.name.localeCompare(b.name)).map((c) => ({
+        name: c.name, createdBy: c.createdBy, createdAt: c.createdAt.toISOString(), lastEdited: c.editedAt.toISOString(),
+        labels: this.labelsIn(c.id).sort((a, b) => a.name.localeCompare(b.name)).map(lab),
+      })),
+      uncategorised: this.labelsIn(null).sort((a, b) => a.name.localeCompare(b.name)).map(lab),
+    };
+    return new Blob([JSON.stringify(out, null, 2)], { type: 'application/json' });
+  }
+
+  exportAs(kind) {
+    const blob = kind === 'xlsx' ? this.toXlsx(this.exportRows()) : kind === 'docx' ? this.toDocx() : this.toJson();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'labels-and-categories-' + this.isoDate(new Date()) + '.' + kind;
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(a.href), 1000);
+    this.setState({ menu: null, toast: { id: (this.__toastSeq = (this.__toastSeq || 0) + 1), message: 'Exported ' + this.plural(this.state.data.labels.length, 'label') + ' as .' + kind, undo: false } });
+  }
+
+  // ================= views =================
+
+  toggleMenu(id) {
+    // the DS Menu closes itself on mousedown outside it — which includes the button that opened it —
+    // so a click that lands right after that close must not reopen it
+    if (this.__menuClosed && this.__menuClosed.id === id && Date.now() - this.__menuClosed.at < 250) return;
+    this.setState((s) => ({ menu: s.menu === id ? null : id }));
+  }
+  closeMenu(id) {
+    this.__menuClosed = { id, at: Date.now() };
+    this.setState((s) => (s.menu === id ? { menu: null } : {}));
+  }
+
+  sortBy(rows, sort, getters) {
+    const g = getters[sort.key];
+    const dir = sort.dir === 'asc' ? 1 : -1;
+    return rows.slice().sort((a, b) => {
+      const x = g(a), y = g(b);
+      const c = typeof x === 'string' ? x.localeCompare(y) : x - y;
+      return c * dir || a.name.localeCompare(b.name);
+    });
+  }
+
+  columns(defs, sort) {
+    return defs.map((c) => {
+      const sorted = sort.key === c.key;
+      return { key: c.key, text: c.text, sortable: c.sortable !== false, sorted, icon: sort.dir === 'asc' ? 'ArrowUpwardFilled' : 'ArrowDownwardFilled',
+        ariaSort: sorted ? (sort.dir === 'asc' ? 'ascending' : 'descending') : 'none',
+        onSort: () => this.setState((s) => {
+          const cur = s.sort || sort;
+          return { sort: { key: c.key, dir: cur.key === c.key ? (cur.dir === 'asc' ? 'desc' : 'asc') : c.firstDir || 'asc' }, page: 0 };
+        }) };
+    });
+  }
+
+  /** Categories: matches the category's name, or the name of a label inside it. */
+  categoryRows() {
+    const s = this.state, data = s.data;
+    const q = this.norm(s.q);
+    const all = data.categories.map((c) => ({ id: c.id, name: c.name, createdAt: c.createdAt, editedAt: c.editedAt, labels: this.labelsIn(c.id) }));
+    const none = this.labelsIn(null);
+    if (none.length) all.push({ id: null, name: 'No category', createdAt: null, editedAt: null, labels: none, pinned: true });
+    let catQ = q, labQ = q;
+    if (q.includes('/')) { catQ = this.norm(q.split('/')[0]); labQ = this.norm(q.split('/').slice(1).join('/')); }
+    const rows = [];
+    all.forEach((c) => {
+      if (!q) { rows.push({ ...c, hits: [] }); return; }
+      const catHit = !c.pinned && catQ && this.norm(c.name).includes(catQ);
+      const hits = labQ ? c.labels.filter((l) => this.norm(l.name).includes(labQ)) : [];
+      if (q.includes('/')) { if ((catQ ? catHit : true) && (labQ ? hits.length : true)) rows.push({ ...c, hits }); }
+      else if (catHit || hits.length) rows.push({ ...c, hits: catHit ? [] : hits });
+    });
+    return rows;
+  }
+
+  /** Labels: in one category, or all of them (then the category name matches too). */
+  labelRows(scope) {
+    const s = this.state, data = s.data;
+    const q = this.norm(s.q);
+    let rows = scope === 'all' ? data.labels.slice() : this.labelsIn(scope);
+    if (q) {
+      if (q.includes('/') && scope === 'all') {
+        const cq = this.norm(q.split('/')[0]), lq = this.norm(q.split('/').slice(1).join('/'));
+        rows = rows.filter((l) => this.norm(this.catName(l.categoryId)).includes(cq) && this.norm(l.name).includes(lq));
+      } else rows = rows.filter((l) => this.norm(l.name).includes(q) || (scope === 'all' && l.categoryId != null && this.norm(this.catName(l.categoryId)).includes(q)));
+    }
+    const counts = { any: rows.length, none: 0, few: 0, many: 0 };
+    rows.forEach((l) => { counts[this.postsBucket(l)]++; });
+    if (s.postsFilter !== 'any') rows = rows.filter((l) => this.postsBucket(l) === s.postsFilter);
+    return { rows, counts };
+  }
+
+  /** Which "Posts" filter a label falls under: no posts, 1 to 5, or more than 5. */
+  postsBucket(l) {
+    const n = this.postsOf(l.id).length;
+    return n === 0 ? 'none' : n <= 5 ? 'few' : 'many';
+  }
+
+  postRows(labelId) {
+    const s = this.state, data = s.data;
+    const q = this.norm(s.q);
+    const links = data.links.filter((l) => l.labelId === labelId);
+    let rows = links.map((l) => ({ ...data.posts.find((p) => p.id === l.postId), by: l.by, at: l.at, name: '' }));
+    rows.forEach((r) => { r.name = r.handle; });
+    // search what the table shows: the caption is no longer on screen, so it no longer matches
+    if (q) rows = rows.filter((p) => this.norm(p.handle).includes(q) || this.norm(this.postKind(p)).includes(q));
+    return rows;
+  }
+
+  page(rows) {
+    const s = this.state;
+    const pages = Math.max(1, Math.ceil(rows.length / s.rpp));
+    const page = Math.min(s.page, pages - 1);
+    const start = page * s.rpp;
+    return { visible: rows.slice(start, start + s.rpp), page, pages, start, total: rows.length };
+  }
+
+  labelMenu(l) {
+    return [
+      { key: 'open', text: 'Open', onClick: () => this.go({ view: 'label', id: l.id }) },
+      { key: 'rename', text: 'Rename', onClick: () => this.startRename('label', l.id, 'row') },
+      { key: 'move', text: 'Move to…', onClick: () => this.openDialog('move', { ids: [l.id], dest: '' }) },
+      { key: 'dup', text: 'Duplicate to…', onClick: () => this.openDialog('duplicate', { ids: [l.id], dest: '', withPosts: false }) },
+      { key: 'del', text: 'Delete', onClick: () => this.openDialog('deleteLabels', { ids: [l.id] }) },
+    ].map((m) => ({ ...m, disabled: false }));
+  }
+
+  rowBase(id, key, selectable, openFn) {
+    const s = this.state;
+    const checked = selectable && s.sel.includes(id);
+    const menuId = 'row:' + key;
+    return {
+      key, selectable, checked,
+      onCheck: () => this.setState((cur) => ({ sel: cur.sel.includes(id) ? cur.sel.filter((x) => x !== id) : [...cur.sel, id] })),
+      onRowClick: (e) => { if (e.target.closest('.grid__cell--control, .grid__cell--menu, .rename, button, a')) return; openFn(); },
+      onOpen: openFn, openable: true,
+      hasMenu: true, menuOpen: s.menu === menuId, menuMod: s.menu === menuId ? 'grid__menu-btn--open' : '',
+      onMenu: () => this.toggleMenu(menuId), onMenuClose: () => this.closeMenu(menuId),
+    };
+  }
+
+  buildLabelRow(l, showCat) {
+    const s = this.state;
+    const n = this.postsOf(l.id).length;
+    const renaming = !!(s.rename && s.rename.kind === 'label' && s.rename.id === l.id && s.rename.where === 'row');
+    const open = () => this.go({ view: 'label', id: l.id });
+    const base = this.rowBase(l.id, 'l' + l.id, true, open);
+    const cells = [];
+    if (showCat) cells.push({ key: 'cat', text: l.categoryId == null ? 'No category' : this.catName(l.categoryId), mod: l.categoryId == null ? 'grid__name--muted' : '' });
+    cells.push({ key: 'posts', text: String(n), mod: 'grid__cell--num' });
+    cells.push({ key: 'created', text: this.fmtDate(l.createdAt), mod: '' });
+    cells.push({ key: 'by', text: l.createdBy, mod: '' });
+    cells.push({ key: 'edited', text: this.fmtDate(l.editedAt), mod: '' });
+    return {
+      ...base, renaming, name: l.name, prefix: '', hint: '', nameMod: '', hasThumb: false,
+      mod: (base.checked ? 'grid__row--selected ' : '') + (renaming ? 'grid__row--renaming' : ''),
+      checkAria: 'Select ' + l.name, menuAria: 'Actions for ' + l.name, menuItems: this.labelMenu(l),
+      cells: cells.map((c) => ({ ...c, pill: false })),
+    };
+  }
+
+  buildView() {
+    const s = this.state, data = s.data, r = s.route;
+    const out = { head: {}, grid: {}, empty: { show: false }, tabs: { show: false }, searchPlaceholder: 'Search' };
+    const nCats = data.categories.length, nLabels = data.labels.length;
+    const tabs = { show: true, items: [
+      { key: 'categories', text: 'Categories (' + nCats + ')', active: r.view === 'categories', onClick: () => this.go({ view: 'categories' }) },
+      { key: 'labels', text: 'All labels (' + nLabels + ')', active: r.view === 'labels', onClick: () => this.go({ view: 'labels' }) },
+    ] };
+    const exportHead = { showExport: true };
+
+    if (r.view === 'categories') {
+      const sort = s.sort || { key: 'created', dir: 'desc' };
+      const getters = { name: (c) => c.name, labels: (c) => c.labels.length, posts: (c) => this.catPosts(c.id).length, created: (c) => (c.createdAt ? c.createdAt.getTime() : 0), edited: (c) => (c.editedAt ? c.editedAt.getTime() : 0) };
+      const found = this.categoryRows();
+      const pinned = found.filter((c) => c.pinned);
+      // "No category" is not a category: it sits outside the count and the paging, after the last page
+      const rows = this.sortBy(found.filter((c) => !c.pinned), sort, getters);
+      const pg = this.page(rows);
+      if (pg.page === pg.pages - 1) pg.visible = pg.visible.concat(pinned);
+      const sel = s.sel.map((id) => this.category(id)).filter(Boolean);
+      out.head = {
+        ...exportHead, title: 'Labels', total: rows.length, showTotal: rows.length > 0, meta: '',
+        buttons: [{ key: 'add', text: 'Add label or category', variant: 'contained', color: 'primary', onClick: () => this.openDialog('addCategory', { name: '', staged: [], input: '' }) }],
+        tools: this.toolsFor('category', sel),
+      };
+      out.tabs = tabs;
+      out.grid = {
+        aria: 'Categories', selectable: true, hasMenu: true,
+        cols: 'var(--grid-control-w) minmax(0,2.4fr) repeat(4,minmax(0,1fr)) var(--grid-control-w)',
+        columns: this.columns([{ key: 'name', text: 'Title' }, { key: 'labels', text: 'Labels', firstDir: 'desc' }, { key: 'posts', text: 'Posts', firstDir: 'desc' }, { key: 'created', text: 'Created', firstDir: 'desc' }, { key: 'edited', text: 'Last edited', firstDir: 'desc' }], sort),
+        rows: pg.visible.map((c) => {
+          const open = () => this.go({ view: 'category', id: c.id });
+          const base = this.rowBase(c.id, 'c' + (c.id == null ? 'none' : c.id), !c.pinned, open);
+          const renaming = !!(s.rename && s.rename.kind === 'category' && s.rename.id === c.id && s.rename.where === 'row');
+          const hint = c.hits.length ? 'Matching labels: ' + c.hits.slice(0, 3).map((l) => l.name).join(', ') + (c.hits.length > 3 ? ' +' + (c.hits.length - 3) + ' more' : '') : c.pinned ? 'Labels created without a category' : '';
+          return {
+            ...base, renaming, name: c.name, prefix: '', hint, hasThumb: false,
+            nameMod: c.pinned ? 'grid__name--muted' : '',
+            hasMenu: !c.pinned,
+            mod: (base.checked ? 'grid__row--selected ' : '') + (c.pinned ? 'grid__row--pinned ' : '') + (renaming ? 'grid__row--renaming' : ''),
+            checkAria: 'Select ' + c.name, menuAria: 'Actions for ' + c.name,
+            menuItems: c.pinned ? [] : [
+              { key: 'open', text: 'Open', onClick: open, disabled: false },
+              { key: 'rename', text: 'Rename', onClick: () => this.startRename('category', c.id, 'row'), disabled: false },
+              { key: 'add', text: 'Add labels…', onClick: () => this.openDialog('addLabels', { catId: c.id, staged: [], input: '' }), disabled: false },
+              { key: 'del', text: 'Delete', onClick: () => this.openDialog('deleteCategories', { ids: [c.id] }), disabled: false },
+            ],
+            cells: [
+              { key: 'labels', text: String(c.labels.length), mod: 'grid__cell--num' },
+              { key: 'posts', text: String(this.catPosts(c.id).length), mod: 'grid__cell--num' },
+              { key: 'created', text: this.fmtDate(c.createdAt), mod: '' },
+              { key: 'edited', text: this.fmtDate(c.editedAt), mod: '' },
+            ].map((x) => ({ ...x, pill: false })),
+          };
+        }),
+      };
+      out.pg = pg;
+      out.searchPlaceholder = 'Search categories and labels';
+      if (!rows.length && !pinned.length) out.empty = this.emptyFor(s.q ? 'search' : 'noCats');
+    } else if (r.view === 'labels' || r.view === 'category') {
+      const scope = r.view === 'labels' ? 'all' : r.id;
+      const showCat = r.view === 'labels';
+      const sort = s.sort || { key: 'name', dir: 'asc' };
+      const getters = { name: (l) => l.name, cat: (l) => (l.categoryId == null ? '￿' : this.catName(l.categoryId)), posts: (l) => this.postsOf(l.id).length,
+        created: (l) => l.createdAt.getTime(), by: (l) => l.createdBy, edited: (l) => l.editedAt.getTime() };
+      const { rows: found, counts } = this.labelRows(scope);
+      const rows = this.sortBy(found, sort, getters);
+      const pg = this.page(rows);
+      const sel = s.sel.map((id) => this.label(id)).filter(Boolean);
+      const defs = [{ key: 'name', text: 'Label' }];
+      if (showCat) defs.push({ key: 'cat', text: 'Category' });
+      defs.push({ key: 'posts', text: 'Posts', firstDir: 'desc' }, { key: 'created', text: 'Created', firstDir: 'desc' }, { key: 'by', text: 'Created by' }, { key: 'edited', text: 'Last edited', firstDir: 'desc' });
+      const postsOpts = [
+        { key: 'any', text: 'Any', menu: 'Any number of posts' },
+        { key: 'none', text: 'No posts', menu: 'No posts (' + counts.none + ')' },
+        { key: 'few', text: '1 to 5', menu: '1 to 5 posts (' + counts.few + ')' },
+        { key: 'many', text: 'More than 5', menu: 'More than 5 posts (' + counts.many + ')' },
+      ];
+      const posts = {
+        show: true, open: s.menu === 'posts', mod: s.postsFilter !== 'any' ? 'filter--on' : '',
+        text: postsOpts.find((o) => o.key === s.postsFilter).text,
+        onToggle: () => this.toggleMenu('posts'), onClose: () => this.closeMenu('posts'),
+        items: postsOpts.map((o) => ({ key: o.key, text: o.menu, selected: s.postsFilter === o.key,
+          onClick: () => this.setState({ postsFilter: o.key, page: 0, sel: [], menu: null }) })),
+      };
+      const addBtn = { key: 'add', text: 'Add labels', variant: 'contained', color: 'primary', onClick: () => this.openDialog('addLabels', { catId: scope === 'all' ? null : scope, staged: [], input: '' }) };
+
+      if (r.view === 'labels') {
+        out.head = { ...exportHead, title: 'Labels', total: rows.length, showTotal: rows.length > 0, meta: '', posts, buttons: [addBtn], tools: this.toolsFor('label', sel) };
+        out.tabs = tabs;
+        out.searchPlaceholder = 'Search labels';
+      } else {
+        const cat = r.id == null ? null : this.category(r.id);
+        const renaming = !!(cat && s.rename && s.rename.kind === 'category' && s.rename.id === cat.id && s.rename.where === 'head');
+        const catPostCount = this.catPosts(r.id).length;
+        out.head = {
+          showExport: false, title: cat ? cat.name : 'No category', total: rows.length, showTotal: rows.length > 0, posts,
+          hasCrumbs: true, crumbs: [{ key: 'root', text: 'Labels', href: '#/categories' }], here: cat ? cat.name : 'No category',
+          meta: cat ? 'Created by ' + cat.createdBy + ', ' + this.fmtDate(cat.createdAt) + ' · on ' + this.plural(catPostCount, 'post')
+            : 'Labels that don\'t belong to a category — usually created straight from a post. Move them into one to give them context.',
+          renaming, canRename: !!cat, renameTip: 'Rename category', onRename: () => cat && this.startRename('category', cat.id, 'head'),
+          canDelete: !!cat, deleteTip: 'Delete category', onDelete: () => cat && this.openDialog('deleteCategories', { ids: [cat.id] }),
+          buttons: [addBtn], tools: this.toolsFor('label', sel),
+        };
+        out.searchPlaceholder = 'Search in ' + (cat ? cat.name : 'No category');
+      }
+      out.grid = {
+        aria: 'Labels', selectable: true, hasMenu: true,
+        cols: 'var(--grid-control-w) minmax(0,2.4fr) ' + (showCat ? 'minmax(0,1.3fr) ' : '') + 'repeat(4,minmax(0,1fr)) var(--grid-control-w)',
+        columns: this.columns(defs, sort),
+        rows: pg.visible.map((l) => this.buildLabelRow(l, showCat)),
+      };
+      out.pg = pg;
+      if (!rows.length) {
+        if (s.q) out.empty = this.emptyFor('search');
+        else if (s.postsFilter !== 'any') out.empty = this.emptyFor('noUnused');
+        else out.empty = this.emptyFor(r.view === 'labels' ? 'noLabels' : 'emptyCat', r.id);
+      }
+    } else if (r.view === 'label') {
+      const l = this.label(r.id);
+      if (!l) return null;
+      const sort = s.sort || { key: 'at', dir: 'desc' };
+      const getters = { creator: (p) => p.handle, published: (p) => p.publishedAt.getTime(), platform: (p) => this.postKind(p), by: (p) => p.by, at: (p) => p.at.getTime() };
+      const rows = this.sortBy(this.postRows(l.id), sort, getters);
+      const pg = this.page(rows);
+      const n = this.postsOf(l.id).length;
+      const renaming = !!(s.rename && s.rename.kind === 'label' && s.rename.id === l.id && s.rename.where === 'head');
+      const catCrumb = { key: 'cat', text: l.categoryId == null ? 'No category' : this.catName(l.categoryId), href: this.hashFor({ view: 'category', id: l.categoryId }) };
+      out.head = {
+        showExport: false, title: l.name, prefix: '',
+        total: rows.length, showTotal: rows.length > 0,
+        hasCrumbs: true, crumbs: [{ key: 'root', text: 'Labels', href: '#/categories' }, catCrumb], here: l.name,
+        meta: 'Created by ' + l.createdBy + ', ' + this.fmtDate(l.createdAt) + ' · on ' + this.plural(n, 'post'),
+        renaming, canRename: true, renameTip: 'Rename label', onRename: () => this.startRename('label', l.id, 'head'),
+        canDelete: true, deleteTip: 'Delete label', onDelete: () => this.openDialog('deleteLabels', { ids: [l.id] }),
+        buttons: [
+          { key: 'move', text: 'Move', variant: 'outlined', color: 'primary', onClick: () => this.openDialog('move', { ids: [l.id], dest: '' }) },
+          { key: 'dup', text: 'Duplicate', variant: 'outlined', color: 'primary', onClick: () => this.openDialog('duplicate', { ids: [l.id], dest: '', withPosts: false }) },
+        ],
+        tools: [],
+      };
+      out.searchPlaceholder = 'Search posts';
+      out.grid = {
+        aria: 'Posts with this label', selectable: false, hasMenu: false,
+        // the first columns follow the product's Violations list: a post is known by its picture, then who posted it
+        cols: 'calc(var(--grid-preview-w) + var(--space-4)) minmax(0,1.6fr) minmax(0,1.3fr) minmax(0,1fr) minmax(0,1.2fr) minmax(0,1fr)',
+        columns: this.columns([{ key: 'preview', text: 'Preview', sortable: false }, { key: 'creator', text: 'Creator' }, { key: 'published', text: 'Posting time', firstDir: 'desc' }, { key: 'platform', text: 'Platform' }, { key: 'by', text: 'Label added by' }, { key: 'at', text: 'Added', firstDir: 'desc' }], sort),
+        rows: pg.visible.map((p) => {
+          const col = this.platformColors(p.platform);
+          const open = () => { if (p.inV4) location.href = 'post-v4-save-and-create-in-place.dc.html'; };
+          return {
+            key: 'p' + p.id, selectable: false, checked: false, renaming: false, hasMenu: false, menuOpen: false, menuItems: [],
+            onRowClick: (e) => { if (!e.target.closest('button, a')) open(); }, onOpen: open, openable: p.inV4,
+            mod: p.inV4 ? '' : 'grid__row--static',
+            name: p.handle, prefix: '', hint: '', nameMod: '',
+            isPreview: true, previewAria: (p.inV4 ? 'Open ' : '') + this.postKind(p) + ' by ' + p.handle + (p.inV4 ? ' in the v4 prototype' : ''),
+            hasThumb: true, thumbImg: p.img ? "url('" + p.img + "')" : 'none', thumbText: p.img ? '' : p.handle[0].toUpperCase(), thumbBg: col.bg, thumbFg: col.fg,
+            cells: [
+              { key: 'creator', text: p.handle, mod: '', pill: false, avatar: p.handle[0].toUpperCase() },
+              { key: 'published', text: this.fmtDateTime(p.publishedAt), mod: '', pill: false, avatar: '' },
+              { key: 'platform', text: this.postKind(p), mod: '', pill: true, pillBg: col.bg, pillFg: col.fg, avatar: '' },
+              { key: 'by', text: p.by, mod: '', pill: false, avatar: '' },
+              { key: 'at', text: this.fmtDate(p.at), mod: '', pill: false, avatar: '' },
+            ],
+          };
+        }),
+      };
+      out.pg = pg;
+      if (!rows.length) out.empty = this.emptyFor(s.q ? 'search' : 'noPosts');
+    }
+    return out;
+  }
+
+  emptyFor(kind, catId) {
+    const E = {
+      search: { icon: 'SearchFilled', title: 'No Results Found', text: 'Try adjusting your search to find what you\'re looking for.' },
+      noCats: { icon: 'FolderFilled', title: 'No categories yet', text: 'Categories group labels so everyone reads them in context.', actionText: 'Add label or category', onAction: () => this.openDialog('addCategory', { name: '', staged: [], input: '' }) },
+      noLabels: { icon: 'FolderFilled', title: 'No labels yet', text: 'Add labels here, or create them straight from a post.', actionText: 'Add labels', onAction: () => this.openDialog('addLabels', { catId: null, staged: [], input: '' }) },
+      emptyCat: { icon: 'FolderFilled', title: 'No labels in this category', text: 'Add labels to it, or move existing ones in from another category.', actionText: 'Add labels', onAction: () => this.openDialog('addLabels', { catId, staged: [], input: '' }) },
+      noUnused: { icon: 'CheckCircleOutlined', title: 'No labels match this filter', text: 'Set “Posts” back to “Any” to see them all.' },
+      noPosts: { icon: 'PhotoOutlined', title: 'Not on any post yet', text: 'Labels are added to posts from the post page. Open a post from Evaluations, Violations or an Influencer page.' },
+    };
+    return { show: true, actionText: '', onAction: null, ...E[kind] };
+  }
+
+  /** Selection toolbar. A disabled tool always says why, in its tooltip. */
+  toolsFor(kind, sel) {
+    const n = sel.length;
+    const tool = (key, icon, tip, disabled, onClick) => ({ key, icon, tip, aria: tip, disabled, onClick, isMerge: key === 'merge' });
+    if (kind === 'category') {
+      const ids = sel.map((c) => c.id);
+      return [
+        tool('merge', '', n < 2 ? 'Select two or more categories to merge' : 'Merge ' + n + ' categories', n < 2, () => this.openDialog('mergeCategories', { ids, choice: '', other: '' })),
+        tool('rename', 'EditFilled', n !== 1 ? 'Select one category to rename' : 'Rename', n !== 1, () => this.startRename('category', ids[0], 'row')),
+        // one at a time on purpose: deleting a category is heavy enough that a little friction helps
+        tool('delete', 'DeleteFilled', n === 0 ? 'Select a category to delete' : n === 1 ? 'Delete ' + this.q(sel[0].name) : 'Delete one category at a time', n !== 1, () => this.openDialog('deleteCategories', { ids })),
+      ];
+    }
+    const ids = sel.map((l) => l.id);
+    const cats = new Set(sel.map((l) => l.categoryId));
+    const sameCat = cats.size === 1;
+    const distinct = cats.size === n;
+    const mergeTip = n < 2 ? 'Select two or more labels to merge' : !sameCat ? 'Only labels in the same category can be merged' : 'Merge ' + n + ' labels';
+    const renameTip = n === 0 ? 'Select labels to rename' : n === 1 ? 'Rename' : distinct ? 'Rename ' + n + ' labels to one spelling' : 'Two of these share a category — merge them instead';
+    return [
+      tool('merge', '', mergeTip, n < 2 || !sameCat, () => this.openDialog('mergeLabels', { ids, choice: '', other: '' })),
+      tool('rename', 'EditFilled', renameTip, n === 0 || (n > 1 && !distinct), () => (n === 1 ? this.startRename('label', ids[0], 'row') : this.openDialog('bulkRename', { ids, name: '' }))),
+      tool('move', 'SwapHorizOutlined', n ? 'Move ' + this.plural(n, 'label') + ' to…' : 'Select labels to move', !n, () => this.openDialog('move', { ids, dest: '' })),
+      tool('duplicate', 'ContentCopyFilled', n ? 'Duplicate ' + this.plural(n, 'label') + ' to…' : 'Select labels to duplicate', !n, () => this.openDialog('duplicate', { ids, dest: '', withPosts: false })),
+      tool('delete', 'DeleteFilled', n ? 'Delete ' + this.plural(n, 'label') : 'Select labels to delete', !n, () => this.openDialog('deleteLabels', { ids })),
+    ];
+  }
+
+  renderVals() {
+    const s = this.state;
+    const v = this.buildView() || { head: { tools: [], buttons: [] }, grid: { rows: [], columns: [] }, empty: { show: false }, tabs: { show: false }, pg: { visible: [], page: 0, pages: 1, start: 0, total: 0 } };
+    const pg = v.pg;
+    const selectableIds = v.grid.rows.filter((r) => r.selectable).map((r) => {
+      const m = r.key.match(/^[cl](\d+)$/); return m ? Number(m[1]) : null; }).filter((x) => x != null);
+    const onPage = selectableIds.filter((id) => s.sel.includes(id)).length;
+
+    let renameVals = { value: '', help: '', helpMod: '', aria: '', onInput: null, onKeyDown: null, onBlur: null };
+    if (s.rename) {
+      const chk = this.renameCheck();
+      renameVals = {
+        value: s.rename.value, help: chk.help,
+        helpMod: chk.kind === 'error' ? 'rename__help--error' : chk.kind === 'collide' ? 'rename__help--merge' : '',
+        aria: 'New name',
+        onInput: (e) => { const value = e.target.value; this.setState((cur) => (cur.rename ? { rename: { ...cur.rename, value } } : {})); },
+        onKeyDown: (e) => {
+          if (e.key === 'Enter') { e.preventDefault(); this.submitRename(false); }
+          if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); this.setState({ rename: null }); }
+        },
+        // a blur that follows Enter/Escape finds rename already cleared, so it does nothing
+        onBlur: () => setTimeout(() => this.submitRename(true), 0),
+      };
+    }
+
+    const DS = window.MonitoringDesignSystem_1b6ea8;
+    const R = window.React;
+    const undoBtn = s.toast && s.toast.undo && DS && R
+      ? R.createElement(DS.Button, { variant: 'text', size: 'small', onClick: () => this.undo(), style: { color: 'var(--im-green-300)' } }, 'Undo')
+      : null;
+
+    return {
+      chrome: {
+        hidden: s.chromeHidden, appMod: s.chromeHidden ? 'app--bare' : '',
+        onHide: () => this.setState({ chromeHidden: true }), onShow: () => this.setState({ chromeHidden: false }),
+        onReset: () => { this.setState({ ...this.initialState(), route: { view: 'categories' } }); this.go({ view: 'categories' }); },
+      },
+      head: (() => {
+        const h = { hasCrumbs: false, crumbs: [], here: '', prefix: '', renaming: false, canRename: false, canDelete: false, posts: { show: false }, showExport: false, buttons: [], tools: [], ...v.head };
+        return { ...h, titleMod: h.hasCrumbs ? 'head__title--crumb' : '', renameMod: h.hasCrumbs ? '' : 'rename__input--head', ariaCurrent: h.hasCrumbs ? 'page' : null };
+      })(),
+      tabs: v.tabs,
+      exp: {
+        open: s.menu === 'export',
+        onToggle: () => this.toggleMenu('export'), onClose: () => this.closeMenu('export'),
+        items: [
+          { key: 'x', text: 'Excel (.xlsx)', onClick: () => this.exportAs('xlsx') },
+          { key: 'd', text: 'Word (.docx)', onClick: () => this.exportAs('docx') },
+          { key: 'j', text: 'JSON (.json)', onClick: () => this.exportAs('json') },
+        ],
+      },
+      search: {
+        value: s.q, placeholder: v.searchPlaceholder,
+        onInput: (e) => this.setState({ q: e.target.value, page: 0, sel: [] }),
+        onKeyDown: (e) => { if (e.key === 'Escape') { e.stopPropagation(); this.setState({ q: '', page: 0 }); e.target.blur(); } },
+        onClear: () => this.setState({ q: '', page: 0, sel: [] }),
+      },
+      rename: renameVals,
+      grid: {
+        ...v.grid,
+        allChecked: selectableIds.length > 0 && onPage === selectableIds.length,
+        someChecked: onPage > 0 && onPage < selectableIds.length,
+        noneSelectable: selectableIds.length === 0,
+        onCheckAll: () => this.setState((cur) => {
+          const all = selectableIds.every((id) => cur.sel.includes(id));
+          return { sel: all ? cur.sel.filter((id) => !selectableIds.includes(id)) : [...new Set([...cur.sel, ...selectableIds])] };
+        }),
+      },
+      empty: v.empty,
+      foot: {
+        selected: s.sel.length ? this.plural(s.sel.length, 'row') + ' selected' : '',
+        rpp: String(s.rpp), rppOpen: s.menu === 'rpp',
+        onRppToggle: () => this.toggleMenu('rpp'), onRppClose: () => this.closeMenu('rpp'),
+        rppItems: [10, 25, 50].map((n) => ({ key: 'r' + n, text: String(n), selected: s.rpp === n, onClick: () => this.setState({ rpp: n, page: 0, menu: null, sel: [] }) })),
+        range: pg.total ? (pg.start + 1) + '–' + Math.min(pg.start + s.rpp, pg.total) + ' of ' + pg.total : '0–0 of 0',
+        prevDisabled: pg.page === 0, nextDisabled: pg.page >= pg.pages - 1,
+        onPrev: () => this.setState({ page: Math.max(0, pg.page - 1), sel: [] }),
+        onNext: () => this.setState({ page: Math.min(pg.pages - 1, pg.page + 1), sel: [] }),
+      },
+      dlg: this.buildDialog(),
+      toast: {
+        open: !!s.toast, message: s.toast ? s.toast.message : '', action: undoBtn,
+        onClose: () => this.setState({ toast: null }),
+      },
+    };
+  }
+}
+</script>
+</body>
+</html>

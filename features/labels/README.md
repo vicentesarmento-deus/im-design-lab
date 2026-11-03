@@ -26,7 +26,8 @@ Open `index.html` for the cover, or go straight to one:
 
 | | | |
 | --- | --- | --- |
-| **admin v2** | [`prototypes/admin-v2-labels-and-categories.dc.html`](prototypes/admin-v2-labels-and-categories.dc.html) | **New.** The admin after the first round of feedback; see [Admin v2 — what changed](#admin-v2--what-changed). |
+| **admin v3** | [`prototypes/admin-v3-labels-and-categories.dc.html`](prototypes/admin-v3-labels-and-categories.dc.html) | **New — work in progress.** Admin v2 with a "Posts" filter beside the search for finding labels without posts; see [Admin v3 — what changed](#admin-v3--what-changed). |
+| **admin v2** | [`prototypes/admin-v2-labels-and-categories.dc.html`](prototypes/admin-v2-labels-and-categories.dc.html) | The admin after the first round of feedback; see [Admin v2 — what changed](#admin-v2--what-changed). |
 | **admin v1** | [`prototypes/admin-v1-labels-and-categories.dc.html`](prototypes/admin-v1-labels-and-categories.dc.html) | Managing the catalogue — categories and their labels — laid out like the product's Keyword Groups screen. Not part of the in-place vs modal question; see [The admin](#the-admin). |
 | **v4** | [`prototypes/post-v4-save-and-create-in-place.dc.html`](prototypes/post-v4-save-and-create-in-place.dc.html) | **Current — used in interviews.** v3's winning candidate — everything resolved in place on the page — on its own, with the ability to create new labels (and, via "Category / New label", new categories) restored to the same combobox that already adds existing ones. |
 | **v3** | [`prototypes/post-v3-save-flow-in-place-vs-modal.dc.html`](prototypes/post-v3-save-flow-in-place-vs-modal.dc.html) | The two candidates side by side. **A** resolves every action in place on the page, so the card itself is the editor; **B** resolves everything inside an "Edit labels" modal. Both share the same rules underneath — an explicit save step, visible authorship and timestamp on each label, and a switch to simulate someone else editing the same post — so a preference comes from the interaction model, not from a feature one has and the other lacks. |
@@ -162,6 +163,20 @@ round of feedback applied. The first admin is kept as it was, for comparison.
 - The same thumbnail and "IG: Story, date" line appear in the lists of posts
   inside the delete and merge dialogs.
 
+### Admin v3 — what changed
+
+`prototypes/admin-v3-labels-and-categories.dc.html` starts as a copy of admin v2.
+Admin v2 is kept as it was, for comparison.
+
+- **Labels without posts are found with a filter beside the search.** In the
+  first test round no participant noticed the "0 posts only" chip under the
+  title, and no one managed the task of finding the labels that are on no post
+  and deleting them. The chip is gone; a "Posts" filter now sits on the same
+  line as the search and the table's actions, on All labels and on a
+  category's page. Its menu offers Any number of posts, No posts, 1 to 5 posts
+  and More than 5 posts, each with its count, and while a filter is on the
+  button stays highlighted and reads, for example, "Posts: No posts".
+
 ### A clean copy for sessions
 
 `testing/2026-10-01-admin-v2/prototype.dc.html` is admin v2 with everything a
@@ -201,8 +216,8 @@ Szabo Viktor, Marissa Lewis (backstage); mr lee, Avtar Singh (kit).
 
 ```
 index.html      The cover for this feature
-prototypes/     The post section (post-v1 to post-v4) and the admin (admin-v1,
-                admin-v2)
+prototypes/     The post section (post-v1 to post-v4) and the admin (admin-v1
+                to admin-v3)
 testing/        One folder per test round, named by date and what was tested
   2026-10-01-admin-v2/
                 The clean copy of admin v2 and the facilitator script
