@@ -218,6 +218,8 @@ Admin v2 is kept as it was, for comparison.
   green "Becomes" column with the label that stays and its posts (a post
   that carries both counts once). Below it: "'Campaigns' will have 4 labels
   in total", where "4 labels" has a tooltip listing them.
+  When a post carries both labels of a pair, the result cell has an orange tag,
+  "1 post has both", which explains why 2 + 12 posts become 13.
 - **All labels is the first tab**, and the page opens on it. Label groups is
   second.
 - **The first-visit banner shows every time the page opens.** "Got it" hides

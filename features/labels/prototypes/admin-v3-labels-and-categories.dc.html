@@ -191,6 +191,8 @@ button{font:inherit}
 .cmp__posts{display:block;font-size:var(--fs-caption);color:var(--text-secondary)}
 .cmp__res{background:color-mix(in srgb, var(--color-success-main) 10%, transparent)}
 .cmp__res strong{font-weight:var(--fw-medium)}
+.cmp__tag{display:inline-block;margin-top:var(--space-0-5);padding:0 var(--space-1);border-radius:var(--radius-sm);font-size:var(--fs-caption);
+  background:var(--color-warning-light);color:var(--color-warning-dark)}
 .total{display:flex;align-items:center;gap:var(--space-1);padding:var(--space-1) var(--space-1-5);border-radius:var(--radius);
   background:var(--color-primary-selected);color:var(--color-primary-main);font-size:var(--fs-body2)}
 .total__more{text-decoration:underline dotted;cursor:help;font-weight:var(--fw-medium)}
@@ -749,7 +751,7 @@ button.grid__preview{cursor:pointer}
                   <sc-for list="{{sec.rows}}" as="row" hint-placeholder-count="2">
                     <tr>
                       <sc-for list="{{row.cells}}" as="c" hint-placeholder-count="3">
-                        <td class="{{c.mod}}"><sc-if value="{{c.res}}" hint-placeholder-val="{{false}}"><strong>{{c.name}}</strong></sc-if><sc-if value="{{!c.res}}" hint-placeholder-val="{{true}}">{{c.name}}</sc-if><span class="cmp__posts">{{c.posts}}</span></td>
+                        <td class="{{c.mod}}"><sc-if value="{{c.res}}" hint-placeholder-val="{{false}}"><strong>{{c.name}}</strong></sc-if><sc-if value="{{!c.res}}" hint-placeholder-val="{{true}}">{{c.name}}</sc-if><span class="cmp__posts">{{c.posts}}</span><sc-if value="{{c.tag}}" hint-placeholder-val="{{false}}"><span class="cmp__tag">{{c.tag}}</span></sc-if></td>
                       </sc-for>
                     </tr>
                   </sc-for>
@@ -1857,10 +1859,12 @@ class Component extends DCLogic {
         rows: collisions.map((c) => {
           const posts = new Set(); c.labels.forEach((l) => this.postsOf(l.id).forEach((p) => posts.add(p)));
           const keep = this.label(c.keepId);
+          const overlap = c.labels.reduce((n, l) => n + this.postsOf(l.id).length, 0) - posts.size;
+          const tag = overlap > 0 ? this.plural(overlap, 'post') + (overlap === 1 ? ' has both' : ' have both') : '';
           return { key: 'c' + c.keepId, cells: colIds.map((id) => {
             const l = c.labels.find((x) => x.categoryId === id);
-            return { key: 'k' + id, name: l ? l.name : '—', posts: l ? this.plural(this.postsOf(l.id).length, 'post') : '', mod: '', res: false };
-          }).concat([{ key: 'r', name: keep.name, posts: this.plural(posts.size, 'post'), mod: 'cmp__res', res: true }]) };
+            return { key: 'k' + id, name: l ? l.name : '—', posts: l ? this.plural(this.postsOf(l.id).length, 'post') : '', tag: '', mod: '', res: false };
+          }).concat([{ key: 'r', name: keep.name, posts: this.plural(posts.size, 'post'), tag, mod: 'cmp__res', res: true }]) };
         }),
       }));
     }
