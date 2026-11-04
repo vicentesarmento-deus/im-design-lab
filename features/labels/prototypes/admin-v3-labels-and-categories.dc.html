@@ -184,6 +184,16 @@ button{font:inherit}
 .dest__opt--new .dest__name{color:var(--color-primary-main);font-weight:var(--fw-medium);display:inline-flex;align-items:center;gap:var(--space-0-5)}
 .dest__labels{font-size:var(--fs-caption);color:var(--text-secondary)}
 .dest__more{color:var(--color-primary-main);text-decoration:underline dotted;cursor:help}
+.cmp{width:100%;border-collapse:collapse;font-size:var(--fs-body2);border:1px solid var(--grid-rule);border-radius:var(--radius)}
+.cmp th{text-align:left;font-weight:var(--fw-medium);font-size:var(--fs-caption);color:var(--text-secondary);padding:var(--space-1) var(--space-1-5);border-bottom:1px solid var(--grid-rule)}
+.cmp td{padding:var(--space-1) var(--space-1-5);border-bottom:1px solid var(--grid-rule);vertical-align:top}
+.cmp tr:last-child td{border-bottom:0}
+.cmp__posts{display:block;font-size:var(--fs-caption);color:var(--text-secondary)}
+.cmp__res{background:color-mix(in srgb, var(--color-success-main) 10%, transparent)}
+.cmp__res strong{font-weight:var(--fw-medium)}
+.total{display:flex;align-items:center;gap:var(--space-1);padding:var(--space-1) var(--space-1-5);border-radius:var(--radius);
+  background:var(--color-primary-selected);color:var(--color-primary-main);font-size:var(--fs-body2)}
+.total__more{text-decoration:underline dotted;cursor:help;font-weight:var(--fw-medium)}
 .dlg-item{flex-wrap:wrap}
 .dlg-item__acts{flex-basis:100%;display:flex;justify-content:flex-end;gap:var(--space-1)}
 .search__clear{all:unset;cursor:pointer;display:inline-flex;color:var(--action-active)}
@@ -730,6 +740,29 @@ button.grid__preview{cursor:pointer}
               </div>
             </div>
           </sc-if>
+          <sc-if value="{{sec.is.cmp}}" hint-placeholder-val="{{false}}">
+            <div>
+              <div class="dlg__heading">{{sec.heading}}</div>
+              <table class="cmp">
+                <thead><tr><sc-for list="{{sec.cols}}" as="c" hint-placeholder-count="3"><th scope="col">{{c.text}}</th></sc-for></tr></thead>
+                <tbody>
+                  <sc-for list="{{sec.rows}}" as="row" hint-placeholder-count="2">
+                    <tr>
+                      <sc-for list="{{row.cells}}" as="c" hint-placeholder-count="3">
+                        <td class="{{c.mod}}"><sc-if value="{{c.res}}" hint-placeholder-val="{{false}}"><strong>{{c.name}}</strong></sc-if><sc-if value="{{!c.res}}" hint-placeholder-val="{{true}}">{{c.name}}</sc-if><span class="cmp__posts">{{c.posts}}</span></td>
+                      </sc-for>
+                    </tr>
+                  </sc-for>
+                </tbody>
+              </table>
+            </div>
+          </sc-if>
+          <sc-if value="{{sec.is.total}}" hint-placeholder-val="{{false}}">
+            <div class="total" role="status">
+              <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Icon" name="InfoOutlined" size="18" hint-size="18px,18px"></x-import>
+              <span>{{sec.before}}<x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Tooltip" title="{{sec.list}}" hint-size="auto,auto"><span class="total__more" tabindex="0" aria-label="{{sec.aria}}">{{sec.count}}</span></x-import>{{sec.after}}</span>
+            </div>
+          </sc-if>
           <sc-if value="{{sec.is.note}}" hint-placeholder-val="{{false}}">
             <x-import component-from-global-scope="MonitoringDesignSystem_1b6ea8.Alert" severity="{{sec.severity}}" hint-size="auto,auto">{{sec.text}}</x-import>
           </sc-if>
@@ -767,8 +800,8 @@ class Component extends DCLogic {
   }
 
   /** The first-visit banner stays closed once dismissed, in this browser; Reset brings it back. */
-  introSeen() { try { return localStorage.getItem('im-labels-admin-v3-intro') === 'seen'; } catch (e) { return false; } }
-  dismissIntro() { try { localStorage.setItem('im-labels-admin-v3-intro', 'seen'); } catch (e) {} this.setState({ introDismissed: true }); }
+  introSeen() { return false; } // shown on every open; "Got it" hides it until the page is reloaded
+  dismissIntro() { this.setState({ introDismissed: true }); }
 
   // ================= seed =================
   /* Seeded so every path is demoable in the first minute:
@@ -1006,8 +1039,8 @@ class Component extends DCLogic {
     let m;
     if ((m = h.match(/^#\/category\/(none|\d+)$/))) return { view: 'category', id: m[1] === 'none' ? null : Number(m[1]) };
     if ((m = h.match(/^#\/label\/(\d+)$/))) return { view: 'label', id: Number(m[1]) };
-    if (h === '#/labels') return { view: 'labels' };
-    return { view: 'categories' };
+    if (h === '#/categories') return { view: 'categories' };
+    return { view: 'labels' };
   }
 
   hashFor(route) {
@@ -1816,11 +1849,27 @@ class Component extends DCLogic {
     if (choice === 'other') sections.push(this.field('Name', 'other', { mod: 'dlg__indent' }));
     if (extra) sections.push(this.note('There is already a label group called ' + this.q(extra.name) + ' — it will be merged in too.', 'warning'));
     if (collisions.length) {
-      sections.push(this.sec('items', { heading: 'Labels with the same name — each pair becomes one label', items: collisions.map((c) => ({
-        key: 'c' + c.keepId, prefix: '', name: c.labels.map((l) => l.name + ' (' + this.catName(l.categoryId) + ')').join(' + '),
-        meta: c.labels.map((l) => this.postsOf(l.id).length).join(' + ') + ' posts', status: 'Merged', statusMod: 'dlg-item__status--merge' })) }));
+      // one column per group, so the group name sits in the header instead of on every row; the last column is the result
+      const colIds = allIds.slice().sort((a, b) => (a === keepId ? -1 : b === keepId ? 1 : 0));
+      sections.push(this.sec('cmp', {
+        heading: this.plural(collisions.length, 'label') + ' exist in both — each pair becomes one',
+        cols: colIds.map((id) => ({ key: 'h' + id, text: 'In ' + this.catName(id) })).concat([{ key: 'hr', text: 'Becomes' }]),
+        rows: collisions.map((c) => {
+          const posts = new Set(); c.labels.forEach((l) => this.postsOf(l.id).forEach((p) => posts.add(p)));
+          const keep = this.label(c.keepId);
+          return { key: 'c' + c.keepId, cells: colIds.map((id) => {
+            const l = c.labels.find((x) => x.categoryId === id);
+            return { key: 'k' + id, name: l ? l.name : '—', posts: l ? this.plural(this.postsOf(l.id).length, 'post') : '', mod: '', res: false };
+          }).concat([{ key: 'r', name: keep.name, posts: this.plural(posts.size, 'post'), mod: 'cmp__res', res: true }]) };
+        }),
+      }));
     }
-    sections.push(this.note(finalName ? this.plural(nLabels, 'label') + ' will be in ' + this.q(finalName) + '.' : 'Choose a name.', 'info'));
+    if (finalName) {
+      const dropped = new Set(collisions.flatMap((c) => c.otherIds));
+      const names = this.state.data.labels.filter((l) => allIds.includes(l.categoryId) && !dropped.has(l.id)).map((l) => l.name).sort((a, b) => a.localeCompare(b));
+      sections.push(this.sec('total', { before: this.q(finalName) + ' will have ', count: this.plural(nLabels, 'label'), after: ' in total.',
+        list: names.join(', '), aria: this.plural(nLabels, 'label') + ': ' + names.join(', ') }));
+    } else sections.push(this.note('Choose a name.', 'info'));
     return {
       title: 'Merge ' + this.plural(allIds.length, 'label group', 'label groups'), width: 'md', sections,
       confirmText: 'Merge ' + this.plural(allIds.length, 'label group', 'label groups'), confirmDisabled: !finalName,
@@ -2192,8 +2241,8 @@ class Component extends DCLogic {
     const out = { head: {}, grid: {}, empty: { show: false }, tabs: { show: false }, searchPlaceholder: 'Search' };
     const nCats = data.categories.length, nLabels = data.labels.length;
     const tabs = { show: true, items: [
-      { key: 'categories', text: 'Label groups (' + nCats + ')', active: r.view === 'categories', onClick: () => this.go({ view: 'categories' }) },
       { key: 'labels', text: 'All labels (' + nLabels + ')', active: r.view === 'labels', onClick: () => this.go({ view: 'labels' }) },
+      { key: 'categories', text: 'Label groups (' + nCats + ')', active: r.view === 'categories', onClick: () => this.go({ view: 'categories' }) },
     ] };
     const exportHead = { showExport: true };
 
@@ -2436,7 +2485,7 @@ class Component extends DCLogic {
       chrome: {
         hidden: s.chromeHidden, appMod: s.chromeHidden ? 'app--bare' : '',
         onHide: () => this.setState({ chromeHidden: true }), onShow: () => this.setState({ chromeHidden: false }),
-        onReset: () => { try { localStorage.removeItem('im-labels-admin-v3-intro'); } catch (e) {} this.setState({ ...this.initialState(), route: { view: 'categories' } }); this.go({ view: 'categories' }); },
+        onReset: () => { try { localStorage.removeItem('im-labels-admin-v3-intro'); } catch (e) {} this.setState({ ...this.initialState(), route: { view: 'labels' } }); this.go({ view: 'labels' }); },
       },
       head: (() => {
         const h = { hasCrumbs: false, crumbs: [], here: '', prefix: '', renaming: false, canRename: false, canDelete: false, posts: { show: false }, showExport: false, buttons: [], tools: [], ...v.head };

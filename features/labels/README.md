@@ -182,8 +182,7 @@ Admin v2 is kept as it was, for comparison.
 - **A first-visit banner says what labels are for.** Above the tabs, on
   Categories and All labels: track brands across evaluations, assign posts to
   team members, group ads by product category. "Learn more" opens an example of
-  each; "Got it" hides it for good in that browser. The facilitator bar's Reset
-  brings it back.
+  each; "Got it" hides it until the page is reloaded.
 - **One dialog adds labels or a category, from everywhere.** "Add label or
   category" is the button on both tabs and on a category's page (where the
   category comes filled in); the category stays optional, and empty still means
@@ -213,6 +212,17 @@ Admin v2 is kept as it was, for comparison.
   Campaigns". Elsewhere it stays "Add label or label group".
 - **No total under the Labels title.** The tabs already show the counts. A
   label group's own page keeps its total.
+
+- **Merging label groups shows repeated labels as a table.** One column per
+  group, so the group name is in the header instead of on every row, and a
+  green "Becomes" column with the label that stays and its posts (a post
+  that carries both counts once). Below it: "'Campaigns' will have 4 labels
+  in total", where "4 labels" has a tooltip listing them.
+- **All labels is the first tab**, and the page opens on it. Label groups is
+  second.
+- **The first-visit banner shows every time the page opens.** "Got it" hides
+  it until the next reload, so it no longer stays hidden in a browser where it
+  was dismissed once.
 
 ### A clean copy for sessions
 
