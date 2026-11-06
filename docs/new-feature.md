@@ -103,3 +103,13 @@ Done when: the version runs without errors, and the cover and README list it.
 Add one row for the feature to the root `index.html` and to the Features table
 in the root `README.md`, then commit and push following "Who changes what" in
 `CLAUDE.md`.
+
+## Handoff (when a prototype is final)
+
+A prototype that is ready to be built can get a frontend developer handoff in
+`features/<feature>/handoff/<prototype-name>.md`, named after the prototype it
+describes. It is optional and per prototype: a feature can have several, and a
+new prototype version gets its own file rather than editing the old one. Link
+it from the feature's `README.md`.
+
+Done when: the file sits in `handoff/` and the feature README links to it.

@@ -35,12 +35,22 @@ the prototype tested (`YYYY-MM-DD-surface-vN/`). Start one by copying
 
 Tag the commit each round ran on.
 
+## Handoff
+
+A prototype that is final enough to be built can get a frontend developer
+handoff: `handoff/<prototype-name>.md`, named after the prototype it describes
+(`handoff/admin-v3-labels-and-categories.md`). It is optional and written per
+prototype, so one feature can have several. Write it for whoever builds the
+screen in the product: states, behaviour, copy, data and edge cases the page
+shows but does not say.
+
 ## What is in here
 
 ```
 index.html      The cover for this feature
 prototypes/     The working pages, surface-vN-short-name.dc.html
 testing/        One folder per test round
+handoff/        Frontend developer handoffs, one per prototype, when needed
 assets/         Images used by this feature only
 reference/      Screenshots and captures of the real product
 archive/        Earlier builds no longer linked from the cover
