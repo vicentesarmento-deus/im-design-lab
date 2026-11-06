@@ -31,11 +31,12 @@ jobs:
         with:
           enablement: true
 
-      # Publish the site only — not .git, not the workflow itself.
+      # Publish the site only — not .git, not the workflow itself, not the
+      # messages between Claudes.
       - name: Assemble the site
         run: |
           mkdir -p _site
-          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' ./ _site/
+          rsync -a --exclude='.git' --exclude='.github' --exclude='_site' --exclude='/messages/' ./ _site/
           test -f _site/.nojekyll || touch _site/.nojekyll
           test -f _site/index.html
           ls -la _site

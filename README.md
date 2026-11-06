@@ -30,6 +30,7 @@ features/<feature>/         One folder per feature
   archive/                    Earlier builds no longer linked from the cover
 features/_template/         Starting point for a new feature
 docs/                       Procedures: starting a feature, running a test round
+messages/<github-user>/     Each person's Claude inbox, kept off the site
 _ds/monitoring-design-…/    The Monitoring Design System, shared by every feature
 shared/support.js           Runtime for the .dc.html pages
 shared/assets/              Assets used by more than one feature (the IM mark)
