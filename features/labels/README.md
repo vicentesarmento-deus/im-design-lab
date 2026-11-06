@@ -165,7 +165,7 @@ round of feedback applied. The first admin is kept as it was, for comparison.
 
 ### Admin v3 — what changed
 
-For whoever builds it in the product: [`admin-v3-developer-handoff.md`](admin-v3-developer-handoff.md).
+For whoever builds it in the product: [`handoff/admin-v3-labels-and-categories.md`](handoff/admin-v3-labels-and-categories.md).
 
 `prototypes/admin-v3-labels-and-categories.dc.html` starts as a copy of admin v2.
 Admin v2 is kept as it was, for comparison.

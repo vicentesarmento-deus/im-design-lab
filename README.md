@@ -25,6 +25,8 @@ features/<feature>/         One folder per feature
   prototypes/                 The working pages, <surface>-vN-short-name.dc.html
   testing/<date>-<what>/      One folder per test round: the session copy,
                               the script and the round's findings
+  handoff/                    Frontend developer handoff for a prototype, when
+                              it has one: <prototype-name>.md
   assets/                     Images used by this feature only
   reference/                  Screenshots and captures of the real product
   archive/                    Earlier builds no longer linked from the cover
