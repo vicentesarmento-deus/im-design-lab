@@ -26,7 +26,8 @@ Open `index.html` for the cover, or go straight to one:
 
 | | | |
 | --- | --- | --- |
-| **admin v2** | [`prototypes/admin-v2-labels-and-categories.dc.html`](prototypes/admin-v2-labels-and-categories.dc.html) | **New.** The admin after the first round of feedback; see [Admin v2 — what changed](#admin-v2--what-changed). |
+| **admin v3** | [`prototypes/admin-v3-labels-and-categories.dc.html`](prototypes/admin-v3-labels-and-categories.dc.html) | **New — work in progress.** Admin v2 with "label groups" instead of categories, visible sort icons, a first-visit banner, one add dialog and an action bar; see [Admin v3 — what changed](#admin-v3--what-changed). |
+| **admin v2** | [`prototypes/admin-v2-labels-and-categories.dc.html`](prototypes/admin-v2-labels-and-categories.dc.html) | The admin after the first round of feedback; see [Admin v2 — what changed](#admin-v2--what-changed). |
 | **admin v1** | [`prototypes/admin-v1-labels-and-categories.dc.html`](prototypes/admin-v1-labels-and-categories.dc.html) | Managing the catalogue — categories and their labels — laid out like the product's Keyword Groups screen. Not part of the in-place vs modal question; see [The admin](#the-admin). |
 | **v4** | [`prototypes/post-v4-save-and-create-in-place.dc.html`](prototypes/post-v4-save-and-create-in-place.dc.html) | **Current — used in interviews.** v3's winning candidate — everything resolved in place on the page — on its own, with the ability to create new labels (and, via "Category / New label", new categories) restored to the same combobox that already adds existing ones. |
 | **v3** | [`prototypes/post-v3-save-flow-in-place-vs-modal.dc.html`](prototypes/post-v3-save-flow-in-place-vs-modal.dc.html) | The two candidates side by side. **A** resolves every action in place on the page, so the card itself is the editor; **B** resolves everything inside an "Edit labels" modal. Both share the same rules underneath — an explicit save step, visible authorship and timestamp on each label, and a switch to simulate someone else editing the same post — so a preference comes from the interaction model, not from a feature one has and the other lacks. |
@@ -162,6 +163,71 @@ round of feedback applied. The first admin is kept as it was, for comparison.
 - The same thumbnail and "IG: Story, date" line appear in the lists of posts
   inside the delete and merge dialogs.
 
+### Admin v3 — what changed
+
+For whoever builds it in the product: [`admin-v3-developer-handoff.md`](admin-v3-developer-handoff.md).
+
+`prototypes/admin-v3-labels-and-categories.dc.html` starts as a copy of admin v2.
+Admin v2 is kept as it was, for comparison.
+
+- **Labels without posts are found with a filter beside the search.** In the
+  first test round no participant noticed the "0 posts only" chip under the
+  title, and no one managed the task of finding the labels that are on no post
+  and deleting them. The chip is gone; a "Posts" filter now sits on the same
+  line as the search and the table's actions, on All labels and on a
+  category's page. Its menu offers Any number of posts, No posts, 1 to 5 posts
+  and More than 5 posts, each with its count, and while a filter is on the
+  button stays highlighted and reads, for example, "Posts: No posts".
+  *Later removed:* the filter went in the next round; the always-visible sort
+  icons below are how labels without posts are found now.
+
+- **A first-visit banner says what labels are for.** Above the tabs, on
+  Categories and All labels: track brands across evaluations, assign posts to
+  team members, group ads by product category. "Learn more" opens an example of
+  each; "Got it" hides it until the page is reloaded.
+- **One dialog adds labels or a category, from everywhere.** "Add label or
+  category" is the button on both tabs and on a category's page (where the
+  category comes filled in); the category stays optional, and empty still means
+  the labels go in without one. When a label being added already exists in
+  another category, or without one, its row says where ("Already exists in No
+  category") and offers **Move to Brand** — the existing label, with its posts,
+  moves here — or **Keep both**, which creates a second one as before
+  (different categories still mean different things). Nothing is added until
+  each of these rows is answered, and the answer can be changed.
+- **The table's actions are written out, in a bar above it.** The icon buttons
+  next to the search are gone. A bar over the table always shows the actions —
+  Move, Merge, Rename, Duplicate, Delete on labels; Merge, Rename, Delete on
+  categories — disabled until rows are selected, so they can be found before
+  anything is picked, and the table doesn't jump when the first row is
+  ticked. The ⋮ menu on each row is unchanged.
+- **Move shows what each category already holds.** "Move to" is a list instead
+  of a drop-down: each category shows its first five labels, and a "+N" whose
+  tooltip names the rest. **New category** is the first row, with a +.
+
+- **Categories are now called label groups.** The same idea as keywords and
+  keyword groups elsewhere in the product. Only the words on screen changed;
+  the code and the page addresses still say category.
+- **Every sortable column shows its sort icon.** Unsorted columns show a grey
+  up-and-down icon, so it is clear that Posts, Label and the rest can be
+  sorted; sorting by Posts replaces the Posts filter, which is gone.
+- **Inside a label group the button says where labels go:** "Add label to
+  Campaigns". Elsewhere it stays "Add label or label group".
+- **No total under the Labels title.** The tabs already show the counts. A
+  label group's own page keeps its total.
+
+- **Merging label groups shows repeated labels as a table.** One column per
+  group, so the group name is in the header instead of on every row, and a
+  green "Becomes" column with the label that stays and its posts (a post
+  that carries both counts once). Below it: "'Campaigns' will have 4 labels
+  in total", where "4 labels" has a tooltip listing them.
+  When a post carries both labels of a pair, the result cell has an orange tag,
+  "1 post has both", which explains why 2 + 12 posts become 13.
+- **All labels is the first tab**, and the page opens on it. Label groups is
+  second.
+- **The first-visit banner shows every time the page opens.** "Got it" hides
+  it until the next reload, so it no longer stays hidden in a browser where it
+  was dismissed once.
+
 ### A clean copy for sessions
 
 `testing/2026-10-01-admin-v2/prototype.dc.html` is admin v2 with everything a
@@ -201,8 +267,8 @@ Szabo Viktor, Marissa Lewis (backstage); mr lee, Avtar Singh (kit).
 
 ```
 index.html      The cover for this feature
-prototypes/     The post section (post-v1 to post-v4) and the admin (admin-v1,
-                admin-v2)
+prototypes/     The post section (post-v1 to post-v4) and the admin (admin-v1
+                to admin-v3)
 testing/        One folder per test round, named by date and what was tested
   2026-10-01-admin-v2/
                 The clean copy of admin v2 and the facilitator script
