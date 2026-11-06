@@ -30,6 +30,10 @@ Each feature's `README.md` names its owner. The repository owner is
   owner to review.
 - The repository owner commits shared changes directly to `main`, without a
   branch or pull request.
+- `ritacarqueija14052000` commits and pushes directly to `main` inside any
+  feature folder, another person's included, and when starting a new feature.
+  `features/_template/` and the other shared files listed above still go
+  through a pull request.
 
 Check the current git user (`gh api user -q .login`) against these rules before
 the first commit of a session.
